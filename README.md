@@ -50,4 +50,38 @@ Daniel Eldridge - mervhd@gmail.com
 1. The user can overlay satellite images on the drawing for accurate tracing and layout.
 
 ## Technologies
+SwiftSketch utilizes the following technologies:
+- **Flutter**: Primary framework for building a consistent and high-quality user interface across iOS and Android platforms.
+- **Dart**: The programming language is optimized for performance and easy cross-platform compilation.
+- **Firebase**: Supports cloud storage, synchronization, and user authentication across both platforms.
+- **Google Maps API**: Provides GPS metadata, satellite image overlays, and geographic context.
+- **Zapier API**: Enables automation and integration with other construction industry software.
+- **Algolia**: Offers powerful search capabilities within the app.
 
+## Installation
+To install SwiftSketch:
+1. Download the app from the iOS App Store or Google Play Store.
+2. Open the app and follow the on-screen instructions to sign in or explore in Guest Mode.
+3. Begin creating and managing your architectural drawings on your mobile device.
+
+### For new users
+The app is designed for intuitive use, with a simple interface that allows for immediate sketching and design after installation.
+
+## Development Setup
+For developers interested in setting up SwiftSketch for development:
+1. **Environment Setup**: Ensure you have Flutter and Dart installed.
+2. **Clone the Repository**: `git clone https://github.com/SwiftSketch/SwiftSketch.git`
+3. **Install Dependencies**: Run `flutter pub get` in the project directory.
+4. **Run the Application**: Use `flutter run` to start the app on an emulator or physical device.
+
+## License
+SwiftSketch is released under the MIT License, encouraging wide usage and collaborative improvement.
+
+## Contributors
+- Taylor Ogburn
+- Robert Sanders
+- Cameron Gwinn
+- Daniel Eldridge
+
+## Project Status
+SwiftSketch is currently in the **Alpha** phase, with ongoing development to add new features and enhance stability.
