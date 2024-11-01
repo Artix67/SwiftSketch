@@ -143,3 +143,24 @@ Coming soon!
 
 
 
+### For new users
+The app is designed for intuitive use, with a simple interface that allows for immediate sketching and design after installation.
+
+## Development Setup
+For developers interested in setting up SwiftSketch for development:
+1. **Environment Setup**: Ensure you have Flutter and Dart installed.
+2. **Clone the Repository**: `git clone https://github.com/SwiftSketch/SwiftSketch.git`
+3. **Install Dependencies**: Run `flutter pub get` in the project directory.
+4. **Run the Application**: Use `flutter run` to start the app on an emulator or physical device.
+
+## License
+SwiftSketch is released under the MIT License, encouraging wide usage and collaborative improvement.
+
+## Contributors
+- Taylor Ogburn
+- Robert Sanders
+- Cameron Gwinn
+- Daniel Eldridge
+
+## Project Status
+SwiftSketch is currently in the **Alpha** phase, with ongoing development to add new features and enhance stability.
