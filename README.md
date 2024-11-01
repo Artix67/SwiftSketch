@@ -195,3 +195,26 @@ SOFTWARE.
 
 ## Project Status
 SwiftSketch is currently in the **Alpha** phase, with ongoing development to add new features and enhance stability.
+
+## Support
+We will update these as we move forward with the project.
+
+- **FAQs and Documentation**: Coming soon!
+- **Community Support**: Join our community on Discord Coming soon!
+- **Issue Tracker**: If you have bugs or feature requests, please report them on our [GitHub issues page] Coming soon!
+
+We aim to provide timely and helpful support to all our users. If you have Urgent inquiries, please contact our support team at Coming soon!
+
+## Known Issues
+Currently, there are no known issues. As we discover them they will be posted here.
+
+## Roadmap
+- **Short Term**: Enhance UI responsiveness on all devices.
+- **Mid Term**: Add support for additional export formats such as SVG and PNG.
+- **Long Term**: Implement AI-based design suggestions to improve user productivity.
+
+## Export a Drawing
+Coming soon!
+
+
+
