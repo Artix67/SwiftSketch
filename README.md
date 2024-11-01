@@ -122,7 +122,7 @@ We will update these as we move forward with the project.
 
 - **FAQs and Documentation**: Coming soon!
 - **Community Support**: Join our community on Discord Coming soon!
-- **Issue Tracker**: If you have bugs or feature requests, please report them on our [GitHub issues page] Coming soon!
+- **Issue Tracker**: If you have bugs or feature requests, please report them on our [GitHub issues page](https://github.com/Artix67/SwiftSketch/issues).
 
 We aim to provide timely and helpful support to all our users. If you have Urgent inquiries, please contact our support team at Coming soon!
 
