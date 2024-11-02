@@ -169,52 +169,17 @@ MIT License
 
 Copyright (c) 2024 Taylor Ogburn, Robert Sanders, Cameron Gwinn, Daniel Eldridge
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+PnP Final
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+## Getting Started
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+This project is a starting point for a Flutter application.
 
-## Contributors
-- Taylor Ogburn
-- Robert Sanders
-- Cameron Gwinn
-- Daniel Eldridge
+A few resources to get you started if this is your first Flutter project:
 
-## Project Status
-SwiftSketch is currently in the **Alpha** phase, with ongoing development to add new features and enhance stability.
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-## Support
-We will update these as we move forward with the project.
-
-- **FAQs and Documentation**: Coming soon!
-- **Community Support**: Join our community on Discord Coming soon!
-- **Issue Tracker**: If you have bugs or feature requests, please report them on our [GitHub issues page](https://github.com/Artix67/SwiftSketch/issues).
-
-We aim to provide timely and helpful support to all our users. If you have Urgent inquiries, please contact our support team at Coming soon!
-
-## Known Issues
-Currently, there are no known issues. As we discover them they will be posted here.
-
-## Roadmap
-- **Short Term**: Enhance UI responsiveness on all devices.
-- **Mid Term**: Add support for additional export formats such as SVG and PNG.
-- **Long Term**: Implement AI-based design suggestions to improve user productivity.
-
-## Export a Drawing
-Coming soon!
-
-
-
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
