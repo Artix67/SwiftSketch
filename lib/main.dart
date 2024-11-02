@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,6 +34,19 @@ class MyApp extends StatelessWidget {
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
+  }
+}
+
+// Dart (Flutter) side
+class FlutterKotlinBridge {
+  static const platform = MethodChannel('com.example.app/channel');
+
+  Future<void> invokeKotlinMethod() async {
+    try {
+      await platform.invokeMethod('yourMethodName');
+    } on PlatformException catch (e) {
+      print("Failed to invoke: '${e.message}'.");
+    }
   }
 }
 
