@@ -6,7 +6,7 @@ allprojects {
 }
 
 buildscript {
-    ext.kotlin_version = '1.6.10' // or the latest stable version
+    ext.kotlin_version = '1.7.10' // or the latest stable version
     repositories {
         google()
         mavenCentral()
@@ -27,3 +27,7 @@ subprojects {
 tasks.register("clean", Delete::class) {
     delete(rootProject.buildDir)
 }
+
+//tasks.register("clean", Delete) {
+//    delete rootProject.buildDir
+//}
