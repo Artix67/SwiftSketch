@@ -19,27 +19,28 @@ Daniel Eldridge - mervhd@gmail.com
 ## Features
 
 ### Minimum Viable Product (A Features) - In Progress
-1. The user can draw using a simple, drag-and-drop interface with line tools.
-1. The user will have access to a toolbar containing essential drawing tools.
-1. The user can zoom in and out of their drawing for detailed adjustments.
-1. The user will be able to pan (scroll) around their drawing with ease.
-1. The user can customize stroke color and thickness for all drawing tools.
-1. The user can save preset colors and stroke thicknesses for frequent use.
-1. Users can access a basic shape library, including squares, circles, rectangles, triangles, and polygons.
-1. For precise placement, the user can snap lines and shapes to points or grids.
-1. The user can apply a grid overlay with 10px increments and snap objects within 20px.
-1. Users can add labels to their drawings with customizable font styles and sizes.
-1. The user can save, load, delete, and modify drawings stored locally on the device using SwiftData.
-1. The user will have access to essential measurement tools, allowing length and area annotations on shapes.
+1. The user can draw using a simple with line and freeform tools.
+1. The user can login.
 1. Users can export their drawings as PDF files for easy sharing and documentation.
 
 ### Alpha (B Features) - Coming Soon...
+1. The user will have access to a toolbar containing essential drawing tools.
+1. The user can zoom in and out of their drawing for detailed adjustments.
+1. The user will be able to pan (scroll) around their drawing with ease.
+1. Users can access a basic shape library, including squares, circles, rectangles, triangles, and polygons.
 1. The user can create layered drawings, distinguishing between materials like concrete and grass.
 1. The user will have access to pre-made templates for common project types, such as patios and driveways.
 1. Users can add detailed annotations or material lists as popovers within their drawings.
 1. The user will be able to save different variations of a project as “Options” for easy comparison.
 1. Users can add GPS location metadata to their drawings, marking addresses and coordinates.
 1. The user can store frequently used shapes for reuse in future projects.
+1. The user can customize stroke color and thickness for all drawing tools.
+2. The user can save preset colors and stroke thicknesses for frequent use.
+1. For precise placement, the user can snap lines and shapes to points or grids.
+1. The user can apply a grid overlay with 10px increments and snap objects within 20px.
+1. Users can add labels to their drawings with customizable font styles and sizes.
+1. The user can save, load, delete, and modify drawings stored locally on the device using SQLite.
+1. The user will have access to essential measurement tools, allowing length and area annotations on shapes.
 
 ### Beta  (C Feature) - Coming Soon...
 1. The user can overlay their drawing on top of an image taken from the camera for reference.
