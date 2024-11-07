@@ -19,7 +19,7 @@ Daniel Eldridge - mervhd@gmail.com
 ## Features
 
 ### Minimum Viable Product (A Features) - In Progress
-1. The user can draw using a simple with line and freeform tools.
+1. The user can draw using a simple freeform drawing tool.
 1. The user can login.
 1. Users can export their drawings as PDF files for easy sharing and documentation.
 
