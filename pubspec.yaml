@@ -14,7 +14,7 @@ dependencies:
   pdf: ^3.6.0
   printing: ^5.6.0
   path_provider: ^2.0.8
-
+  share_plus: ^10.1.2
 
 #  # SQLite and Path dependencies
 #  sqflite: ^2.0.0+4

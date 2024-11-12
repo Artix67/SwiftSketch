@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:share_plus/share_plus.dart';
 
 // StatefulWidget for exporting drawings.
 class ExportDrawing extends StatefulWidget {
@@ -19,48 +20,62 @@ class ExportDrawing extends StatefulWidget {
 class _ExportDrawingState extends State<ExportDrawing> {
   // Document object from the PDF package to build the PDF.
   final pdf = pw.Document();
+
   // GlobalKey to reference the widget tree for capturing the drawing as an image.
   final GlobalKey globalKey = GlobalKey();
 
   // Asynchronous function to export the drawing content to a PDF file.
   Future<void> exportToPdf() async {
-    // Get the render object from the global key and check if it's a RenderRepaintBoundary.
-    final boundary = globalKey.currentContext?.findRenderObject();
-    if (boundary is RenderRepaintBoundary) {
-      // Convert the boundary to an image.
-      var image = await boundary.toImage();
-      // Convert the image to byte data in PNG format.
-      ByteData? byteData = await image.toByteData(format: ImageByteFormat.png);
+    try {
+      // Get the render object from the global key and check if it's a RenderRepaintBoundary.
+      final boundary = globalKey.currentContext?.findRenderObject();
+      if (boundary is RenderRepaintBoundary) {
+        // Convert the boundary to an image.
+        var image = await boundary.toImage();
+        // Convert the image to byte data in PNG format.
+        ByteData? byteData =
+            await image.toByteData(format: ImageByteFormat.png);
 
-      if (byteData != null) {
-        // Convert the byte data to a Uint8List.
-        Uint8List pngBytes = byteData.buffer.asUint8List();
-        // Create a new PDF document.
-        final pdf = pw.Document();
-        // Add a new page to the PDF document with the captured image.
-        pdf.addPage(pw.Page(
-            build: (pw.Context context) {
-              return pw.Center(
-                child: pw.Image(pw.MemoryImage(pngBytes)),
-              );
-            }
-        ));
+        if (byteData != null) {
+          // Convert the byte data to a Uint8List.
+          Uint8List pngBytes = byteData.buffer.asUint8List();
+          // Create a new PDF document.
+          final pdf = pw.Document();
+          // Add a new page to the PDF document with the captured image.
+          pdf.addPage(pw.Page(build: (pw.Context context) {
+            return pw.Center(
+              child: pw.Image(pw.MemoryImage(pngBytes)),
+            );
+          }));
 
-        // Get the directory path for storing the file.
-        final String dir = (await getApplicationDocumentsDirectory()).path;
-        // Create the full path for the new PDF file.
-        final String path = '$dir/drawing.pdf';
-        // Create a File object for the path and write the PDF data to the file.
-        final File file = File(path);
-        await file.writeAsBytes(await pdf.save());
-        // I think this is where we should handle success and failure cases, let me know if you agree.
+          //Taylor - Set directory as temporary
+          final Directory tempDir = await getTemporaryDirectory();
+          final String path = '${tempDir.path}/drawing.pdf';
+          final File file = File(path);
+          await file.writeAsBytes(await pdf.save());
+
+          // Taylor - Added this to allow users to chose there own destination.
+          final XFile xfile = XFile(path);
+          await Share.shareXFiles([xfile], text: 'Here is my drawing');
+
+          // Taylor - Added success and failure messages.
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Drawing exported successfully to $path')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to retrieve image data.')),
+          );
+        }
       } else {
-        // Handle the case where byte data could not be retrieved.
-        // I am not sure if we need a user-friendly error message here or not.
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Unable to capture drawing.')),
+        );
       }
-    } else {
-      // Handle the case where the render boundary is not available.
-      // This is also might be a good place for an error message, let me know your thoughts.
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $e')),
+      );
     }
   }
 
