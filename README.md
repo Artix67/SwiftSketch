@@ -50,6 +50,9 @@ Daniel Eldridge - mervhd@gmail.com
 1. The user can export drawings in various file formats beyond PDF.
 1. The user can overlay satellite images on the drawing for accurate tracing and layout.
 
+### Future Features - Coming Soon...
+1. The user can overlay satellite images on the drawing for accurate tracing and layout.
+
 ## Technologies
 SwiftSketch utilizes the following technologies:
 - **Flutter**: Primary framework for building a consistent and high-quality user interface across iOS and Android platforms.
