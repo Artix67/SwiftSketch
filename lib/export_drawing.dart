@@ -64,12 +64,12 @@ class _ExportDrawingState extends State<ExportDrawing> {
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to retrieve image data.')),
+            const SnackBar(content: Text('Failed to retrieve image data.')),
           );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Unable to capture drawing.')),
+          const SnackBar(content: Text('Unable to capture drawing.')),
         );
       }
     } catch (e) {

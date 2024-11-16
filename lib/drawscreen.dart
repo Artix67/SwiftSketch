@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/drawing_canvas.dart';
@@ -27,16 +26,16 @@ class _Drawscreen extends State<Drawscreen>{
                   Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context){
-                        return HomeScreen();
+                        return const HomeScreen();
                       })
                   );
                 },
-                icon: Icon(Icons.delete),
+                icon: const Icon(Icons.delete),
               ),
             ],
           ),
 
-          body: DrawingCanvas(),
+          body: const DrawingCanvas(),
 
           ));
   }

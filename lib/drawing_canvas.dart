@@ -59,6 +59,8 @@ class DrawingPainter extends CustomPainter {
 }
 
 class DrawingCanvas extends StatefulWidget {
+  const DrawingCanvas({super.key});
+
   @override
   _DrawingCanvasState createState() => _DrawingCanvasState();
 }
@@ -139,19 +141,19 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
             children: [
               ElevatedButton(
                 onPressed: () => _switchTool(FreeformTool()),
-                child: Text("Freeform"),
+                child: const Text("Freeform"),
               ),
               ElevatedButton(
                 onPressed: () => _switchTool(LineTool()),
-                child: Text("Line"),
+                child: const Text("Line"),
               ),
               ElevatedButton(
                 onPressed: () => _switchTool(RectangleTool()),
-                child: Text("Rectangle"),
+                child: const Text("Rectangle"),
               ),
               ElevatedButton(
                 onPressed: () => _switchTool(CircleTool()),
-                child: Text("Circle"),
+                child: const Text("Circle"),
               ),
             ],
           ),
@@ -161,14 +163,14 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
           right: 16,
           child: Row(
             children: [
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               ElevatedButton(
                 onPressed: _toggleGrid,
                 child: Text(_showGrid ? "Hide Grid" : "Show Grid"),
               ),
               ElevatedButton(
                 onPressed: _clearCanvas,
-                child: Text("Clear"),
+                child: const Text("Clear"),
               ),
             ],
           ),

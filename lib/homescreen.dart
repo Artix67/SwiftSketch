@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:swift_sketch/drawscreen.dart';
 
 class HomeScreen extends StatelessWidget{
-  const HomeScreen({Key? key}) : super (key: key);
+  const HomeScreen({super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,11 +14,11 @@ class HomeScreen extends StatelessWidget{
                     Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context){
-                          return Drawscreen();
+                          return const Drawscreen();
                         })
                     );
                   },
-                  child: Text("New project"),
+                  child: const Text("New project"),
                 )
             )
         )

@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (user != null) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
         );
       }
     } catch (e) {
@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               obscureText: true,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _signIn,
               child: const Text('Sign In'),
