@@ -1,30 +1,70 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import 'FirebaseAuthService.dart';
 import 'homescreen.dart';
 
-class LoginScreen extends StatelessWidget{
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<LoginScreen> createState() => _LoginScreenState();
+}
 
-    return MaterialApp(
-        home: Scaffold(
-            body: Center(
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
-                  onPressed: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context){
-                          return HomeScreen();
-                        })
-                    );
-                  },
-                  child: Text("Login"),
-                )
-            )
-        )
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final FirebaseAuthService _authService = FirebaseAuthService();
+
+  void _signIn() async {
+    try {
+      User? user = await _authService.signInWithEmailAndPassword(
+        _emailController.text,
+        _passwordController.text,
+      );
+      if (user != null) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
+    } catch (e) {
+      // Handle login error
+      print('Login failed: $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login Screen'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+              ),
+            ),
+            TextField(
+              controller: _passwordController,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+              ),
+              obscureText: true,
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _signIn,
+              child: const Text('Sign In'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
