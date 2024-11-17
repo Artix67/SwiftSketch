@@ -17,14 +17,22 @@ class CircleTool implements DrawingTool {
     if (_startPoint != null) {
       _currentPosition = position;
 
-      final double radius = (_startPoint! - _currentPosition!).distance;
+      // Calculate the center point between start and current position
+      Offset center = Offset(
+        (_startPoint!.dx + _currentPosition!.dx) / 2,
+        (_startPoint!.dy + _currentPosition!.dy) / 2,
+      );
+
+      // Calculate the radius as half the distance between start and current position
+      double radius = (_startPoint! - _currentPosition!).distance / 2;
 
       points.clear();
+      // Generate points for the circle
       for (double angle = 0; angle < 2 * pi; angle += pi / 180) {
         double radians = angle;
         Offset circlePoint = Offset(
-          _startPoint!.dx + radius * cos(radians),
-          _startPoint!.dy + radius * sin(radians),
+          center.dx + radius * cos(radians),
+          center.dy + radius * sin(radians),
         );
         points.add(circlePoint);
       }
@@ -34,14 +42,20 @@ class CircleTool implements DrawingTool {
   @override
   void onPanEnd(Offset position, List<Offset?> points) {
     if (_startPoint != null && _currentPosition != null) {
-      final double radius = (_startPoint! - _currentPosition!).distance;
+      Offset center = Offset(
+        (_startPoint!.dx + _currentPosition!.dx) / 2,
+        (_startPoint!.dy + _currentPosition!.dy) / 2,
+      );
+
+      double radius = (_startPoint! - _currentPosition!).distance / 2;
 
       points.clear();
+
       for (double angle = 0; angle < 2 * pi; angle += pi / 180) {
         double radians = angle;
         Offset circlePoint = Offset(
-          _startPoint!.dx + radius * cos(radians),
-          _startPoint!.dy + radius * sin(radians),
+          center.dx + radius * cos(radians),
+          center.dy + radius * sin(radians),
         );
         points.add(circlePoint);
       }
