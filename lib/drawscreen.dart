@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/drawing_canvas.dart';
+import 'package:swift_sketch/drawing_tools/triangle_tool.dart';
 import 'package:swift_sketch/homescreen.dart';
 import '/drawing_tools/freeform_tool.dart';
 import '/drawing_tools/line_tool.dart';
@@ -41,6 +42,13 @@ class _Drawscreen extends State<Drawscreen>{
                 },
               ),
               IconButton(
+                icon: const Icon(Icons.signal_cellular_0_bar),
+                tooltip: 'Triangle',
+                onPressed: () {
+                  _drawingCanvasKey.currentState?.switchTool(TriangleTool());
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.square_outlined),
                 tooltip: 'Rectangle',
                 onPressed: () {
@@ -74,7 +82,7 @@ class _Drawscreen extends State<Drawscreen>{
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.vertical_align_center),
+                icon: const Icon(Icons.square_foot),
                 tooltip: 'Snap to Grid',
                 onPressed: () {
                   _drawingCanvasKey.currentState?.toggleSnapToGrid();

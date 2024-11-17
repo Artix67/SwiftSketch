@@ -66,8 +66,8 @@ class DrawingCanvas extends StatefulWidget {
 class DrawingCanvasState extends State<DrawingCanvas> {
   final ValueNotifier<List<Offset?>> _pointsNotifier = ValueNotifier<List<Offset?>>([]);
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
-  bool _showGrid = false;
-  bool _snapToGrid = false;
+  bool _showGrid = true;
+  bool _snapToGrid = true;
 
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
@@ -101,6 +101,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   void switchTool(DrawingTool tool) {
     setState(() {
       selectedTool = tool;
+      selectedTool.setSnapToGrid(_snapToGrid);
     });
   }
 
