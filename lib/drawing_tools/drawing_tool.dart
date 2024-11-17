@@ -15,4 +15,7 @@ abstract class DrawingTool {
 
   // Get the preview current position, if applicable
   Offset? get previewEnd;
+
+  // Method to set snap-to-grid behavior
+  void setSnapToGrid(bool value);
 }

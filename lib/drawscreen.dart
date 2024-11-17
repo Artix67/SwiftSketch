@@ -12,7 +12,6 @@ class Drawscreen extends StatefulWidget{
 
 class _Drawscreen extends State<Drawscreen>{
 
-  final _offsets = <Offset>[];
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
