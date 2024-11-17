@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:swift_sketch/drawing_tools/rectangle_tool.dart';
-import 'drawing_tools/drawing_tool.dart';
+import '/drawing_tools/drawing_tool.dart';
 import '/drawing_tools/freeform_tool.dart';
-import '/drawing_tools/line_tool.dart';
-import '/drawing_tools/circle_tool.dart';
-import '/drawing_tools/delete_tool.dart';
 import 'package:swift_sketch/drawing_shapes/drawing_shape.dart';
 
 class DrawingPainter extends CustomPainter {
@@ -64,47 +60,47 @@ class DrawingCanvas extends StatefulWidget {
   const DrawingCanvas({super.key});
 
   @override
-  _DrawingCanvasState createState() => _DrawingCanvasState();
+  DrawingCanvasState createState() => DrawingCanvasState();
 }
 
-class _DrawingCanvasState extends State<DrawingCanvas> {
+class DrawingCanvasState extends State<DrawingCanvas> {
   final ValueNotifier<List<Offset?>> _pointsNotifier = ValueNotifier<List<Offset?>>([]);
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
   bool _showGrid = false;
   bool _snapToGrid = false;
 
-  DrawingTool _selectedTool = FreeformTool();
-  List<DrawingShape> _shapes = [];
+  DrawingTool selectedTool = FreeformTool();
+  List<DrawingShape> shapes = [];
 
   void _addShape(DrawingShape shape) {
     setState(() {
-      _shapes.add(shape);
+      shapes.add(shape);
     });
   }
 
-  void _clearCanvas() {
+  void clearCanvas() {
     setState(() {
       _pointsNotifier.value = [];
-      _shapes.clear();
+      shapes.clear();
     });
   }
 
-  void _toggleGrid() {
+  void toggleGrid() {
     setState(() {
       _showGrid = !_showGrid;
     });
   }
 
-  void _toggleSnapToGrid() {
+  void toggleSnapToGrid() {
     setState(() {
       _snapToGrid = !_snapToGrid;
-      _selectedTool.setSnapToGrid(_snapToGrid);
+      selectedTool.setSnapToGrid(_snapToGrid);
     });
   }
 
-  void _switchTool(DrawingTool tool) {
+  void switchTool(DrawingTool tool) {
     setState(() {
-      _selectedTool = tool;
+      selectedTool = tool;
     });
   }
 
@@ -114,18 +110,18 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
       children: [
         GestureDetector(
           onPanStart: (details) {
-            _selectedTool.onPanStart(details.localPosition, _previewPointsNotifier.value);
+            selectedTool.onPanStart(details.localPosition, _previewPointsNotifier.value);
             _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
           },
           onPanUpdate: (details) {
-            _selectedTool.onPanUpdate(details.localPosition, _previewPointsNotifier.value);
+            selectedTool.onPanUpdate(details.localPosition, _previewPointsNotifier.value);
             _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
           },
           onPanEnd: (details) {
-            _selectedTool.onPanEnd(details.localPosition, _previewPointsNotifier.value);
+            selectedTool.onPanEnd(details.localPosition, _previewPointsNotifier.value);
             // Convert the completed points into a shape and add it to _shapes.
             if (_previewPointsNotifier.value.isNotEmpty) {
-              _addShape(DrawingShape(points: List.from(_previewPointsNotifier.value), tool: _selectedTool));
+              _addShape(DrawingShape(points: List.from(_previewPointsNotifier.value), tool: selectedTool));
             }
             _pointsNotifier.value = [
               ..._pointsNotifier.value,
@@ -145,7 +141,7 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
                     color: Colors.white,
                     child: CustomPaint(
                       painter: DrawingPainter(
-                        _shapes,
+                        shapes,
                         points,
                         previewPoints: previewPoints,
                         showGrid: _showGrid,
@@ -156,57 +152,6 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
                 },
               );
             },
-          ),
-        ),
-        Positioned(
-          top: 16,
-          left: 16,
-          child: Row(
-            children: [
-              ElevatedButton(
-                onPressed: () => _switchTool(FreeformTool()),
-                child: const Text("Freeform"),
-              ),
-              ElevatedButton(
-                onPressed: () => _switchTool(LineTool()),
-                child: const Text("Line"),
-              ),
-              ElevatedButton(
-                onPressed: () => _switchTool(RectangleTool()),
-                child: const Text("Rectangle"),
-              ),
-              ElevatedButton(
-                onPressed: () => _switchTool(CircleTool()),
-                child: const Text("Circle"),
-              ),
-              ElevatedButton(
-                onPressed: () => _switchTool(DeleteTool(_shapes, () {
-                  setState(() {});
-                })),
-                child: const Text("Delete"),
-              ),
-            ],
-          ),
-        ),
-        Positioned(
-          top: 16,
-          right: 16,
-          child: Row(
-            children: [
-              const SizedBox(width: 8),
-              ElevatedButton(
-                onPressed: _toggleGrid,
-                child: Text(_showGrid ? "Hide Grid" : "Show Grid"),
-              ),
-              ElevatedButton(
-                onPressed: _toggleSnapToGrid,
-                child: Text(_snapToGrid ? "Disable Snap" : "Enable Snap"),
-              ),
-              ElevatedButton(
-                onPressed: _clearCanvas,
-                child: const Text("Clear"),
-              ),
-            ],
           ),
         ),
       ],
