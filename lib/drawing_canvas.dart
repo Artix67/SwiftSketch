@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_sketch/export_drawing.dart';
 import '/drawing_tools/drawing_tool.dart';
 import '/drawing_tools/freeform_tool.dart';
 import 'package:swift_sketch/drawing_shapes/drawing_shape.dart';
@@ -64,6 +65,7 @@ class DrawingCanvas extends StatefulWidget {
 }
 
 class DrawingCanvasState extends State<DrawingCanvas> {
+  final GlobalKey exportGlobalKey = GlobalKey();
   final ValueNotifier<List<Offset?>> _pointsNotifier = ValueNotifier<List<Offset?>>([]);
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
   bool _showGrid = true;
@@ -105,57 +107,64 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
+  void export() {
+    exportToPdf(context, exportGlobalKey);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        GestureDetector(
-          onPanStart: (details) {
-            selectedTool.onPanStart(details.localPosition, _previewPointsNotifier.value);
-            _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
-          },
-          onPanUpdate: (details) {
-            selectedTool.onPanUpdate(details.localPosition, _previewPointsNotifier.value);
-            _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
-          },
-          onPanEnd: (details) {
-            selectedTool.onPanEnd(details.localPosition, _previewPointsNotifier.value);
-            // Convert the completed points into a shape and add it to _shapes.
-            if (_previewPointsNotifier.value.isNotEmpty) {
-              _addShape(DrawingShape(points: List.from(_previewPointsNotifier.value), tool: selectedTool));
-            }
-            _pointsNotifier.value = [
-              ..._pointsNotifier.value,
-              ..._previewPointsNotifier.value,
-            ];
-            _previewPointsNotifier.value = [];
-          },
-          child: ValueListenableBuilder<List<Offset?>>(
-            valueListenable: _pointsNotifier,
-            builder: (context, points, _) {
-              return ValueListenableBuilder<List<Offset?>>(
-                valueListenable: _previewPointsNotifier,
-                builder: (context, previewPoints, _) {
-                  return Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: Colors.white,
-                    child: CustomPaint(
-                      painter: DrawingPainter(
-                        shapes,
-                        points,
-                        previewPoints: previewPoints,
-                        showGrid: _showGrid,
-                      ),
-                      size: Size.infinite,
-                    ),
-                  );
-                },
-              );
+    return RepaintBoundary(
+      key: exportGlobalKey,
+      child: Stack(
+        children: [
+          GestureDetector(
+            onPanStart: (details) {
+              selectedTool.onPanStart(details.localPosition, _previewPointsNotifier.value);
+              _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
             },
+            onPanUpdate: (details) {
+              selectedTool.onPanUpdate(details.localPosition, _previewPointsNotifier.value);
+              _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
+            },
+            onPanEnd: (details) {
+              selectedTool.onPanEnd(details.localPosition, _previewPointsNotifier.value);
+              // Convert the completed points into a shape and add it to _shapes.
+              if (_previewPointsNotifier.value.isNotEmpty) {
+                _addShape(DrawingShape(points: List.from(_previewPointsNotifier.value), tool: selectedTool));
+              }
+              _pointsNotifier.value = [
+                ..._pointsNotifier.value,
+                ..._previewPointsNotifier.value,
+              ];
+              _previewPointsNotifier.value = [];
+            },
+            child: ValueListenableBuilder<List<Offset?>>(
+              valueListenable: _pointsNotifier,
+              builder: (context, points, _) {
+                return ValueListenableBuilder<List<Offset?>>(
+                  valueListenable: _previewPointsNotifier,
+                  builder: (context, previewPoints, _) {
+                    return Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.white,
+                      child: CustomPaint(
+                        painter: DrawingPainter(
+                          shapes,
+                          points,
+                          previewPoints: previewPoints,
+                          showGrid: _showGrid,
+                        ),
+                        size: Size.infinite,
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
