@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/drawing_tools/triangle_tool.dart';
-import 'package:swift_sketch/export_drawing.dart';
 import 'package:swift_sketch/homescreen.dart';
 import '/drawing_tools/freeform_tool.dart';
 import '/drawing_tools/line_tool.dart';
