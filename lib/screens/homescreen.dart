@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swift_sketch/drawscreen.dart';
+import 'package:swift_sketch/screens/drawscreen.dart';
 
 class HomeScreen extends StatelessWidget{
   const HomeScreen({super.key});

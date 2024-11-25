@@ -1,14 +1,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/drawing_tools/triangle_tool.dart';
-import 'package:swift_sketch/export_drawing.dart';
-import 'package:swift_sketch/homescreen.dart';
+import 'package:swift_sketch/screens/homescreen.dart';
 import '/drawing_tools/freeform_tool.dart';
 import '/drawing_tools/line_tool.dart';
 import '/drawing_tools/circle_tool.dart';
 import '/drawing_tools/delete_tool.dart';
 import '/drawing_tools/rectangle_tool.dart';
-import 'drawing_canvas.dart';
+import '../drawing_canvas.dart';
 
 class Drawscreen extends StatefulWidget{
   const Drawscreen({super.key});
@@ -18,7 +17,6 @@ class Drawscreen extends StatefulWidget{
 }
 
 class _Drawscreen extends State<Drawscreen>{
-  // final GlobalKey globalKey = GlobalKey();
   final GlobalKey<DrawingCanvasState> _drawingCanvasKey = GlobalKey<DrawingCanvasState>();
 
   @override

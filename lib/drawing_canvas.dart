@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:swift_sketch/export_drawing.dart';
 import '/drawing_tools/drawing_tool.dart';
 import '/drawing_tools/freeform_tool.dart';
-import 'package:swift_sketch/drawing_shapes/drawing_shape.dart';
+import '/drawing_tools/line_tool.dart';
+import '/drawing_tools/rectangle_tool.dart';
+import '/drawing_tools/circle_tool.dart';
+import '/drawing_tools/triangle_tool.dart';
+import '/drawing_tools/delete_tool.dart';
+import '/drawing_shapes/drawing_shape.dart';
 
 class DrawingPainter extends CustomPainter {
   final List<DrawingShape> shapes;
@@ -70,6 +75,15 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
   bool _showGrid = true;
   bool _snapToGrid = true;
+  String getToolTypeForTool(selectedTool) {
+    if (selectedTool is FreeformTool) return 'Freeform';
+    if (selectedTool is LineTool) return 'Line';
+    if (selectedTool is CircleTool) return 'Circle';
+    if (selectedTool is RectangleTool) return 'Rectangle';
+    if (selectedTool is TriangleTool) return 'Triangle';
+    if (selectedTool is DeleteTool) return 'Delete';
+    throw Exception('Unknown tool type');
+  }
 
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
@@ -130,7 +144,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
               selectedTool.onPanEnd(details.localPosition, _previewPointsNotifier.value);
               // Convert the completed points into a shape and add it to _shapes.
               if (_previewPointsNotifier.value.isNotEmpty) {
-                _addShape(DrawingShape(points: List.from(_previewPointsNotifier.value), tool: selectedTool));
+                _addShape(DrawingShape(points: List.from(_previewPointsNotifier.value), toolType: getToolTypeForTool(selectedTool)));
               }
               _pointsNotifier.value = [
                 ..._pointsNotifier.value,
