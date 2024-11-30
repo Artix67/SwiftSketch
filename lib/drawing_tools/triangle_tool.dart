@@ -1,7 +1,7 @@
 import 'drawing_tool.dart';
 import 'package:flutter/material.dart';
 
-class RectangleTool implements DrawingTool {
+class TriangleTool implements DrawingTool {
   Offset? _startPoint;
   Offset? _currentPosition;
   bool _snapToGrid = false;
@@ -21,7 +21,6 @@ class RectangleTool implements DrawingTool {
       points.add(_startPoint);
       points.add(Offset(_currentPosition!.dx, _startPoint!.dy));
       points.add(_currentPosition);
-      points.add(Offset(_startPoint!.dx, _currentPosition!.dy));
       points.add(_startPoint);
     }
   }
@@ -29,11 +28,9 @@ class RectangleTool implements DrawingTool {
   @override
   void onPanEnd(Offset position, List<Offset?> points) {
     if (_startPoint != null && _currentPosition != null) {
-
       points.add(_startPoint);
       points.add(Offset(_currentPosition!.dx, _startPoint!.dy));
       points.add(_currentPosition);
-      points.add(Offset(_startPoint!.dx, _currentPosition!.dy));
       points.add(_startPoint);
       points.add(null);
     }

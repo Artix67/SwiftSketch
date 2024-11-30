@@ -1,4 +1,4 @@
-import '/drawing_tool.dart';
+import 'drawing_tool.dart';
 import 'package:flutter/material.dart';
 
 class FreeformTool implements DrawingTool {
@@ -27,4 +27,7 @@ class FreeformTool implements DrawingTool {
 
   @override
   Offset? get previewEnd => _lastPoint;
+
+  @override
+  void setSnapToGrid(bool value) {} //freeform does not snap
 }

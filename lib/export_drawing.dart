@@ -7,25 +7,30 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
 
-// StatefulWidget for exporting drawings.
-class ExportDrawing extends StatefulWidget {
-  // Constructor with 'key' initialized using the 'super' keyword for better parameter forwarding.
-  const ExportDrawing({super.key});
+// Taylor - By commenting out a lot of this, I made the export function a public Utility.
+// This is to make it easier to call on the drawscreen, specifically about drawing_canvas.
 
-  @override
-  _ExportDrawingState createState() => _ExportDrawingState();
-}
+//Added this line just to be able to commit something
 
-// Private State class for ExportDrawing widget managing the export process.
-class _ExportDrawingState extends State<ExportDrawing> {
-  // Document object from the PDF package to build the PDF.
-  final pdf = pw.Document();
-
-  // GlobalKey to reference the widget tree for capturing the drawing as an image.
-  final GlobalKey globalKey = GlobalKey();
+// // StatefulWidget for exporting drawings.
+// class ExportDrawing extends StatefulWidget {
+//   // Constructor with 'key' initialized using the 'super' keyword for better parameter forwarding.
+//   const ExportDrawing({super.key});
+//
+//   @override
+//   _ExportDrawingState createState() => _ExportDrawingState();
+// }
+//
+// // Private State class for ExportDrawing widget managing the export process.
+// class _ExportDrawingState extends State<ExportDrawing> {
+//   // Document object from the PDF package to build the PDF.
+//   final pdf = pw.Document();
+//
+//   // GlobalKey to reference the widget tree for capturing the drawing as an image.
+//   final GlobalKey globalKey = GlobalKey();
 
   // Asynchronous function to export the drawing content to a PDF file.
-  Future<void> exportToPdf() async {
+  Future<void> exportToPdf(BuildContext context, GlobalKey globalKey) async {
     try {
       // Get the render object from the global key and check if it's a RenderRepaintBoundary.
       final boundary = globalKey.currentContext?.findRenderObject();
@@ -79,27 +84,27 @@ class _ExportDrawingState extends State<ExportDrawing> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Export Drawing'),
-        actions: <Widget>[
-          // IconButton to trigger the export to PDF function.
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: exportToPdf,
-          )
-        ],
-      ),
-      body: RepaintBoundary(
-        key: globalKey,
-        // The child of this RepaintBoundary should be the widget representing the drawing area.
-        // TODO: Replace this container with the actual drawing widget.
-        child: Container(),
-      ),
-    );
-  }
-}
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: const Text('Export Drawing'),
+  //       actions: <Widget>[
+  //         // IconButton to trigger the export to PDF function.
+  //         IconButton(
+  //           icon: const Icon(Icons.save),
+  //           onPressed: exportToPdf,
+  //         )
+  //       ],
+  //     ),
+  //     body: RepaintBoundary(
+  //       key: globalKey,
+  //       // The child of this RepaintBoundary should be the widget representing the drawing area.
+  //       // TODO: Replace this container with the actual drawing widget.
+  //       child: Container(),
+  //     ),
+  //   );
+  // }
+// }
 // I believe this is the base structure, I cannot test it yet. If someone is
 // is able to test and let me know that would be great!!
