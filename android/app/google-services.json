@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "742483661709",
+    "project_id": "swiftsketch-dde96",
+    "storage_bucket": "swiftsketch-dde96.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:742483661709:android:00027cb935e7b72662e3c4",
+        "android_client_info": {
+          "package_name": "com.swiftsketch.swift_sketch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "742483661709-lhjfpo192ti1j04hruaigar71n5301nd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBjH9tmLtpl5IkEIIozD9YS8uBz-2VPmyw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "742483661709-lhjfpo192ti1j04hruaigar71n5301nd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "742483661709-qj90re8koo4emjqcldrmf1t8heard28n.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.swiftsketch.swiftSketch"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

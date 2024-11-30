@@ -1,0 +1,39 @@
+name: swift_sketch
+description: "PnP Final"
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  pdf: ^3.6.0
+  printing: ^5.6.0
+  path_provider: ^2.0.8
+  share_plus: ^10.1.2
+
+#  # SQLite and Path dependencies
+#  sqflite: ^2.0.0+4
+#  path: ^1.8.0
+
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+
+  # Firebase dependencies (aligned versions)
+  firebase_core: ^3.7.0
+  firebase_auth: ^5.3.2
+  cloud_firestore: ^5.4.4
+  firebase_analytics: ^11.3.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true

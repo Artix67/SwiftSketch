@@ -1,0 +1,35 @@
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+buildscript {
+    ext.kotlin_version = '1.7.10' // or the latest stable version
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.gms:google-services:4.4.2' // This is for Firebase
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+    project.evaluationDependsOn(":app")
+}
+
+//This is the original code provided by either Firebase or Flutter.
+//tasks.register("clean", Delete::class) {
+//    delete(rootProject.buildDir)
+//}
+
+//This one fixes the register error
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
