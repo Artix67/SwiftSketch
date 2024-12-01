@@ -1,5 +1,5 @@
+import 'dart:ui';
 import 'drawing_tool.dart';
-import 'package:flutter/material.dart';
 import '/drawing_shapes/drawing_shape.dart';
 
 class DeleteTool implements DrawingTool {
@@ -16,10 +16,9 @@ class DeleteTool implements DrawingTool {
 
   @override
   void onPanEnd(Offset position, List<Offset?> points) {
-    // Check if the position intersects with any shape and delete the top-most shape
     DrawingShape? shapeToDelete;
     for (DrawingShape shape in _shapes.reversed) {
-      if (shape.containsPoint(position)) {
+      if (_intersectsPath(shape, position)) {
         shapeToDelete = shape;
         break;
       }
@@ -27,8 +26,54 @@ class DeleteTool implements DrawingTool {
 
     if (shapeToDelete != null) {
       _shapes.remove(shapeToDelete);
-      onShapeDeleted(); // Call the callback to trigger setState
+      onShapeDeleted();
     }
+  }
+
+  bool _intersectsPath(DrawingShape shape, Offset position) {
+    final Path path = shape.path;
+
+    // Create a stroked version of the path to represent the stroke area
+    final PathMetrics pathMetrics = path.computeMetrics();
+    for (PathMetric pathMetric in pathMetrics) {
+      final Path strokedPath = pathMetric.extractPath(0, pathMetric.length).shift(Offset.zero);
+      final Rect bounds = strokedPath.getBounds();
+
+      // Expand the bounds slightly to account for the stroke width
+      final Rect hitBox = bounds.inflate(shape.strokeWidth / 2);
+
+      // Check if the position is within the hit box
+      if (hitBox.contains(position)) {
+        return true;
+      }
+    }
+
+    const double proximityThreshold = 10.0;
+    for (PathMetric pathMetric in pathMetrics) {
+      Offset? nearestPoint = _getNearestPointOnPath(pathMetric, position);
+      if (nearestPoint != null && (nearestPoint - position).distance <= proximityThreshold) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Offset? _getNearestPointOnPath(PathMetric pathMetric, Offset position) {
+    double minDistance = double.infinity;
+    Offset? nearestPoint;
+
+    for (double t = 0.0; t <= pathMetric.length; t += 1.0) {
+      final Tangent? tangent = pathMetric.getTangentForOffset(t);
+      if (tangent != null) {
+        double distance = (tangent.position - position).distance;
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestPoint = tangent.position;
+        }
+      }
+    }
+
+    return nearestPoint;
   }
 
   @override
@@ -39,4 +84,7 @@ class DeleteTool implements DrawingTool {
 
   @override
   void setSnapToGrid(bool value) {}
+
+  @override
+  bool shouldSnapToGrid() => false;
 }

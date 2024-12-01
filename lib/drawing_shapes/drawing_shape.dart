@@ -4,15 +4,25 @@ class DrawingShape {
   final List<Offset?> points;
   final Path path;
   final String toolType;
+  final Color fillColor;
+  final Color strokeColor;
+  final double strokeWidth;
 
-  DrawingShape({required this.points, required this.toolType})
-      : path = _generatePath(points);
+  DrawingShape({
+    required this.points,
+    required this.toolType,
+    required this.fillColor,
+    required this.strokeColor,
+    required this.strokeWidth,
+  }) : path = _generatePath(points);
 
   // Method to convert points to a serializable JSON-friendly format
   Map<String, dynamic> toJson() {
     return {
       'points': points.map((point) => point != null ? {'x': point.dx, 'y': point.dy} : null).toList(),
       'toolType': toolType,
+      'fillColor': fillColor.value,
+      'strokeColor': strokeColor.value,
     };
   }
 
@@ -24,6 +34,9 @@ class DrawingShape {
     return DrawingShape(
       points: points,
       toolType: json['toolType'],
+      fillColor: Color(json['fillColor']),
+      strokeColor: Color(json['strokeColor']),
+      strokeWidth: json['strokeWidth'],
     );
   }
 

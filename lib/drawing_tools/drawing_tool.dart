@@ -18,4 +18,7 @@ abstract class DrawingTool {
 
   // Method to set snap-to-grid behavior
   void setSnapToGrid(bool value);
+
+  /// Determines whether the tool should snap to the grid.
+  bool shouldSnapToGrid() => true;
 }

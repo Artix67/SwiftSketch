@@ -14,41 +14,59 @@ class DrawingPainter extends CustomPainter {
   final List<Offset?> points;
   final List<Offset?>? previewPoints;
   final bool showGrid;
+  final Color strokeColor;
+  final double strokeWidth;
+  final double gridSize;
 
-  DrawingPainter(this.shapes, this.points, {required this.previewPoints, this.showGrid = false});
+  DrawingPainter(
+      this.shapes,
+      this.points, {
+        required this.previewPoints,
+        this.showGrid = false,
+        required this.strokeColor,
+        required this.strokeWidth,
+        required this.gridSize,
+      });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeWidth = 4.0;
-
     for (DrawingShape shape in shapes) {
-      canvas.drawPath(shape.path, paint);
+      final fillPaint = Paint()
+        ..color = shape.fillColor
+        ..style = PaintingStyle.fill;
+
+      final strokePaint = Paint()
+        ..color = shape.strokeColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = shape.strokeWidth;
+
+      canvas.drawPath(shape.path, fillPaint);
+      canvas.drawPath(shape.path, strokePaint);
     }
 
     if (previewPoints != null && previewPoints!.isNotEmpty) {
-      paint.color = Colors.black; // Preview color
+      final previewPaint = Paint()
+        ..color = strokeColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth;
 
       for (int i = 0; i < previewPoints!.length - 1; i++) {
         if (previewPoints![i] != null && previewPoints![i + 1] != null) {
-          canvas.drawLine(previewPoints![i]!, previewPoints![i + 1]!, paint);
+          canvas.drawLine(previewPoints![i]!, previewPoints![i + 1]!, previewPaint);
         }
       }
     }
 
     if (showGrid) {
-      paint
+      final gridPaint = Paint()
         ..color = Colors.grey.withOpacity(0.3)
         ..strokeWidth = 0.5;
 
-      for (double x = 0; x < size.width; x += 10) {
-        canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
+      for (double x = 0; x < size.width; x += gridSize) {
+        canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
       }
-      for (double y = 0; y < size.height; y += 10) {
-        canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
+      for (double y = 0; y < size.height; y += gridSize) {
+        canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
       }
     }
   }
@@ -58,7 +76,10 @@ class DrawingPainter extends CustomPainter {
     return oldDelegate.shapes != shapes ||
         oldDelegate.points != points ||
         oldDelegate.previewPoints != previewPoints ||
-        oldDelegate.showGrid != showGrid;
+        oldDelegate.showGrid != showGrid ||
+        oldDelegate.strokeColor != strokeColor ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.gridSize != gridSize;
   }
 }
 
@@ -75,6 +96,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
   bool _showGrid = true;
   bool _snapToGrid = true;
+  double _gridSize = 10.0;
+
   String getToolTypeForTool(selectedTool) {
     if (selectedTool is FreeformTool) return 'Freeform';
     if (selectedTool is LineTool) return 'Line';
@@ -87,9 +110,40 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
+  Color _fillColor = Colors.transparent;
+  Color _strokeColor = Colors.black;
+  double _strokeWidth = 4.0;
 
-  void _addShape(DrawingShape shape) {
+  void updateGridSize(double gridSize) {
     setState(() {
+      _gridSize = gridSize;
+    });
+  }
+
+  void updateColors(Color fillColor, Color strokeColor) {
+    setState(() {
+      _fillColor = fillColor;
+      _strokeColor = strokeColor;
+    });
+  }
+
+  void updateStrokeWidth(double strokeWidth) {
+    setState(() {
+      _strokeWidth = strokeWidth;
+    });
+  }
+
+  _addShape(DrawingShape shape) {
+    setState(() {
+      shape = DrawingShape(
+        points: shape.points,
+        toolType: shape.toolType,
+        fillColor: shape.toolType == 'Freeform' || shape.toolType == 'Line'
+            ? Colors.transparent
+            : _fillColor,
+        strokeColor: _strokeColor,
+        strokeWidth: _strokeWidth,
+      );
       shapes.add(shape);
     });
   }
@@ -114,6 +168,13 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
+  Offset _calculateSnapToGrid(Offset position) {
+    if (!_snapToGrid || !selectedTool.shouldSnapToGrid()) return position;
+    double snappedX = (position.dx / _gridSize).round() * _gridSize;
+    double snappedY = (position.dy / _gridSize).round() * _gridSize;
+    return Offset(snappedX, snappedY);
+  }
+
   void switchTool(DrawingTool tool) {
     setState(() {
       selectedTool = tool;
@@ -133,18 +194,33 @@ class DrawingCanvasState extends State<DrawingCanvas> {
         children: [
           GestureDetector(
             onPanStart: (details) {
-              selectedTool.onPanStart(details.localPosition, _previewPointsNotifier.value);
+              selectedTool.onPanStart(
+                _calculateSnapToGrid(details.localPosition),
+                _previewPointsNotifier.value,
+              );
               _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
             },
             onPanUpdate: (details) {
-              selectedTool.onPanUpdate(details.localPosition, _previewPointsNotifier.value);
+              selectedTool.onPanUpdate(
+                _calculateSnapToGrid(details.localPosition),
+                _previewPointsNotifier.value,
+              );
               _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
             },
             onPanEnd: (details) {
-              selectedTool.onPanEnd(details.localPosition, _previewPointsNotifier.value);
+              selectedTool.onPanEnd(
+                _calculateSnapToGrid(details.localPosition),
+                _previewPointsNotifier.value,
+              );
               // Convert the completed points into a shape and add it to _shapes.
               if (_previewPointsNotifier.value.isNotEmpty) {
-                _addShape(DrawingShape(points: List.from(_previewPointsNotifier.value), toolType: getToolTypeForTool(selectedTool)));
+                _addShape(DrawingShape(
+                  points: List.from(_previewPointsNotifier.value),
+                  toolType: getToolTypeForTool(selectedTool),
+                  fillColor: _fillColor,
+                  strokeColor: _strokeColor,
+                  strokeWidth: _strokeWidth,
+                ));
               }
               _pointsNotifier.value = [
                 ..._pointsNotifier.value,
@@ -168,6 +244,9 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                           points,
                           previewPoints: previewPoints,
                           showGrid: _showGrid,
+                          strokeColor: _strokeColor,
+                          strokeWidth: _strokeWidth,
+                          gridSize: _gridSize,
                         ),
                         size: Size.infinite,
                       ),
