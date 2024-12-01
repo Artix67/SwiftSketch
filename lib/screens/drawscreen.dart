@@ -17,6 +17,7 @@ class Drawscreen extends StatefulWidget{
 }
 
 class _Drawscreen extends State<Drawscreen>{
+  // final GlobalKey globalKey = GlobalKey();
   final GlobalKey<DrawingCanvasState> _drawingCanvasKey = GlobalKey<DrawingCanvasState>();
 
   @override
