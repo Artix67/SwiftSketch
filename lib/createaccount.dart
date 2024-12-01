@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:swift_sketch/loginscreen.dart';
+import '/screens/loginscreen.dart';
 import 'FirebaseAuthService.dart';
 
 class CreateAccountScreen extends StatefulWidget {

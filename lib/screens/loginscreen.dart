@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'FirebaseAuthService.dart';
-import 'createaccount.dart';
+import '/FirebaseAuthService.dart';
+import '/createaccount.dart';
 import 'homescreen.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -8,7 +8,7 @@ class DrawingShape {
   DrawingShape({required this.points, required this.toolType})
       : path = _generatePath(points);
 
-// Method to convert points to a serializable JSON-friendly format
+  // Method to convert points to a serializable JSON-friendly format
   Map<String, dynamic> toJson() {
     return {
       'points': points.map((point) => point != null ? {'x': point.dx, 'y': point.dy} : null).toList(),
