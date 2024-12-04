@@ -1,29 +1,39 @@
-
 import 'package:flutter/material.dart';
-import 'package:flex_color_picker/flex_color_picker.dart';
-import 'package:swift_sketch/drawing_tools/triangle_tool.dart';
-import 'package:swift_sketch/screens/homescreen.dart';
-import '/drawing_tools/freeform_tool.dart';
-import '/drawing_tools/line_tool.dart';
-import '/drawing_tools/circle_tool.dart';
-import '/drawing_tools/delete_tool.dart';
-import '/drawing_tools/rectangle_tool.dart';
+import 'package:swift_sketch/screens/toolbar.dart';
+import 'package:swift_sketch/screens/layers_tab.dart';
 import '../drawing_canvas.dart';
+import '../models/layer.dart';
 
-class Drawscreen extends StatefulWidget{
+class Drawscreen extends StatefulWidget {
   const Drawscreen({super.key});
 
   @override
   State<Drawscreen> createState() => _Drawscreen();
 }
 
-class _Drawscreen extends State<Drawscreen>{
+class _Drawscreen extends State<Drawscreen> {
   final GlobalKey<DrawingCanvasState> _drawingCanvasKey = GlobalKey<DrawingCanvasState>();
 
   Color _fillColor = Colors.transparent;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
   double _gridSize = 10.0;
+
+  final ValueNotifier<List<Layer>> _layersNotifier = ValueNotifier([
+    Layer(id: "1", name: "Layer 1", shapes: [])
+  ]);
+
+  final ValueNotifier<int> _selectedLayerIndex = ValueNotifier(0);
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_layersNotifier.value.isNotEmpty) {
+        _drawingCanvasKey.currentState?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
+      }
+    });
+  }
 
   void _updateStrokeWidth(double value) {
     setState(() {
@@ -39,216 +49,111 @@ class _Drawscreen extends State<Drawscreen>{
     _drawingCanvasKey.currentState?.updateGridSize(value);
   }
 
-  void _pickColor(BuildContext context, bool isFill) {
-    Color tempColor = isFill ? _fillColor : _strokeColor;
+  void _updateColors(Color fillColor, Color strokeColor) {
+    setState(() {
+      _fillColor = fillColor;
+      _strokeColor = strokeColor;
+    });
+    _drawingCanvasKey.currentState?.updateColors(fillColor, strokeColor);
+  }
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(isFill ? 'Pick Fill Color' : 'Pick Stroke Color'),
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              color: tempColor,
-              onColorChanged: (Color color) {
-                setState(() {
-                  if (isFill) {
-                    _fillColor = color;
-                  } else {
-                    _strokeColor = color;
-                  }
-                  _drawingCanvasKey.currentState?.updateColors(_fillColor, _strokeColor);
-                });
-              },
-              showColorName: true,
-              enableShadesSelection: true,
-              pickersEnabled: const <ColorPickerType, bool>{
-                ColorPickerType.both: true,
-                ColorPickerType.primary: true,
-                ColorPickerType.accent: false,
-              },
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
+  void _addLayer() {
+    final newLayer = Layer(
+      id: DateTime.now().toIso8601String(),
+      name: "Layer ${_layersNotifier.value.length + 1}",
+      shapes: [],
+      isVisible: true,
     );
+    _layersNotifier.value = List.from(_layersNotifier.value)..add(newLayer);
+    _selectedLayerIndex.value = _layersNotifier.value.length - 1;
+    _drawingCanvasKey.currentState?.setActiveLayer(newLayer);
+  }
+
+  void _removeLayer() {
+    if (_layersNotifier.value.length > 1) {
+      final List<Layer> updatedLayers = List<Layer>.from(_layersNotifier.value);
+      updatedLayers.removeAt(_selectedLayerIndex.value);
+      _selectedLayerIndex.value = (_selectedLayerIndex.value > 0) ? _selectedLayerIndex.value - 1 : 0;
+
+      _layersNotifier.value = updatedLayers;
+      _drawingCanvasKey.currentState?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
+    }
+  }
+
+  Future<void> _confirmRemoveLayer() async {
+    if (_layersNotifier.value.length <= 1) return; // Prevent removing the last layer
+    final shouldRemove = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Remove Layer'),
+        content: const Text('Are you sure you want to delete this layer?'),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () => Navigator.of(context).pop(false),
+          ),
+          TextButton(
+            child: const Text('Delete'),
+            onPressed: () => Navigator.of(context).pop(true),
+          ),
+        ],
+      ),
+    );
+    if (shouldRemove == true) {
+      _removeLayer();
+    }
+  }
+
+  void _selectLayer(int index) {
+    setState(() {
+      _selectedLayerIndex.value = index;
+
+    });
+    _drawingCanvasKey.currentState?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.orange[100],
-            actions: <Widget>[
-              Slider(
-                value: _gridSize,
-                min: 5.0,
-                max: 50.0,
-                divisions: 9,
-                label: '${_gridSize.toInt()} px',
-                onChanged: (value) {
-                  _updateGridSize(value);
-                },
-              ),
-              Slider(
-                value: _strokeWidth,
-                min: 1.0,
-                max: 10.0,
-                divisions: 9,
-                label: '${_strokeWidth.toStringAsFixed(1)} px',
-                onChanged: (value) {
-                  _updateStrokeWidth(value);
-                },
-              ),
-              IconButton(
-                icon: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Icon(
-                      Icons.square_rounded,
-                      color: _fillColor == Colors.transparent ? Colors.grey : _fillColor,
-                    ),
-                    if (_fillColor == Colors.transparent)
-                      Icon( //indicates no fill color, otherwise icon would be invisible
-                        Icons.blur_off_outlined,
-                        color: Colors.redAccent,
-                        size: 16,
-                      ),
-                  ],
-                ),
-                tooltip: 'Set Fill Color',
-                onPressed: () {
-                  _pickColor(context, true);
-                },
-              ),
-              IconButton(
-                icon: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Icon(
-                      Icons.crop_square_rounded,
-                      color: _strokeColor == Colors.transparent ? Colors.grey : _strokeColor,
-                    ),
-                    if (_strokeColor == Colors.transparent)
-                      Icon( //indicates no stroke color, otherwise icon would be invisible
-                        Icons.blur_off_outlined,
-                        color: Colors.redAccent,
-                        size: 16,
-                      ),
-                  ],
-                ),
-                tooltip: 'Set Stroke Color',
-                onPressed: () {
-                  _pickColor(context, false);
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.edit),
-                tooltip: 'Freeform',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(FreeformTool());
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.horizontal_rule),
-                tooltip: 'Line',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(LineTool());
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.signal_cellular_0_bar),
-                tooltip: 'Triangle',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(TriangleTool());
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.square_outlined),
-                tooltip: 'Rectangle',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(RectangleTool());
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.circle_outlined),
-                tooltip: 'Circle',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(CircleTool());
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.cancel_rounded),
-                tooltip: 'Delete',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(DeleteTool(
-                    _drawingCanvasKey.currentState?.shapes ?? [],
-                        () {
-                      setState(() {}); // Refresh UI
-                    },
-                  ));
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.grid_on),
-                tooltip: 'Toggle Grid',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.toggleGrid();
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.square_foot),
-                tooltip: 'Snap to Grid',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.toggleSnapToGrid();
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.clear),
-                tooltip: 'Clear Canvas',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.clearCanvas();
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.ios_share),
-                tooltip: 'Export',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.export();
-                },
-              ),
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context){
-                        return const HomeScreen();
-                      })
-                  );
-                },
-                icon: const Icon(Icons.delete),
-              ),
-            ],
+      home: Scaffold(
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Toolbar(
+            fillColor: _fillColor,
+            strokeColor: _strokeColor,
+            strokeWidth: _strokeWidth,
+            gridSize: _gridSize,
+            onUpdateStrokeWidth: _updateStrokeWidth,
+            onUpdateGridSize: _updateGridSize,
+            onUpdateColors: _updateColors,
+            drawingCanvasKey: _drawingCanvasKey,
+            onDeleteToolUpdate: () {
+              setState(() {});
+            },
+            activeLayerShapes: _layersNotifier.value[_selectedLayerIndex.value].shapes,
+            refreshUI: () {
+              setState(() {});
+            },
           ),
-          body: DrawingCanvas(key: _drawingCanvasKey),
-        )
+        ),
+        body: Row(
+          children: [
+            Expanded(
+              child: DrawingCanvas(
+                key: _drawingCanvasKey,
+                layersNotifier: _layersNotifier,
+              ),
+            ),
+            LayersTab(
+              layersNotifier: _layersNotifier,
+              selectedLayerIndexNotifier: _selectedLayerIndex,
+              onAddLayer: _addLayer,
+              onRemoveLayer: _confirmRemoveLayer,
+              onSelectLayer: _selectLayer,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
-
-

@@ -8,9 +8,10 @@ import '/drawing_tools/circle_tool.dart';
 import '/drawing_tools/triangle_tool.dart';
 import '/drawing_tools/delete_tool.dart';
 import '/drawing_shapes/drawing_shape.dart';
+import 'models/layer.dart';
 
 class DrawingPainter extends CustomPainter {
-  final List<DrawingShape> shapes;
+  final List<Layer> layers;
   final List<Offset?> points;
   final List<Offset?>? previewPoints;
   final bool showGrid;
@@ -19,44 +20,24 @@ class DrawingPainter extends CustomPainter {
   final double gridSize;
 
   DrawingPainter(
-      this.shapes,
-      this.points, {
-        required this.previewPoints,
-        this.showGrid = false,
-        required this.strokeColor,
-        required this.strokeWidth,
-        required this.gridSize,
-      });
+    this.layers,
+    this.points, {
+    required this.previewPoints,
+    this.showGrid = false,
+    required this.strokeColor,
+    required this.strokeWidth,
+    required this.gridSize,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
-    for (DrawingShape shape in shapes) {
-      final fillPaint = Paint()
-        ..color = shape.fillColor
-        ..style = PaintingStyle.fill;
+    // Draw background
+    final backgroundPaint = Paint()
+      ..color = Colors.white
+      ..style = PaintingStyle.fill;
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
 
-      final strokePaint = Paint()
-        ..color = shape.strokeColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = shape.strokeWidth;
-
-      canvas.drawPath(shape.path, fillPaint);
-      canvas.drawPath(shape.path, strokePaint);
-    }
-
-    if (previewPoints != null && previewPoints!.isNotEmpty) {
-      final previewPaint = Paint()
-        ..color = strokeColor
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = strokeWidth;
-
-      for (int i = 0; i < previewPoints!.length - 1; i++) {
-        if (previewPoints![i] != null && previewPoints![i + 1] != null) {
-          canvas.drawLine(previewPoints![i]!, previewPoints![i + 1]!, previewPaint);
-        }
-      }
-    }
-
+    // Draw grid first (beneath the shapes)
     if (showGrid) {
       final gridPaint = Paint()
         ..color = Colors.grey.withOpacity(0.3)
@@ -69,11 +50,44 @@ class DrawingPainter extends CustomPainter {
         canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
       }
     }
+
+    // Draw each layer's shapes
+    for (Layer layer in layers) {
+      if (!layer.isVisible) continue;
+
+      for (DrawingShape shape in layer.shapes) {
+        final fillPaint = Paint()
+          ..color = shape.fillColor
+          ..style = PaintingStyle.fill;
+
+        final strokePaint = Paint()
+          ..color = shape.strokeColor
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = shape.strokeWidth;
+
+        canvas.drawPath(shape.path, fillPaint);
+        canvas.drawPath(shape.path, strokePaint);
+      }
+    }
+
+    // Draw preview points (always on top)
+    if (previewPoints != null && previewPoints!.isNotEmpty) {
+      final previewPaint = Paint()
+        ..color = strokeColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth;
+
+      for (int i = 0; i < previewPoints!.length - 1; i++) {
+        if (previewPoints![i] != null && previewPoints![i + 1] != null) {
+          canvas.drawLine(previewPoints![i]!, previewPoints![i + 1]!, previewPaint);
+        }
+      }
+    }
   }
 
   @override
   bool shouldRepaint(DrawingPainter oldDelegate) {
-    return oldDelegate.shapes != shapes ||
+    return oldDelegate.layers != layers ||
         oldDelegate.points != points ||
         oldDelegate.previewPoints != previewPoints ||
         oldDelegate.showGrid != showGrid ||
@@ -84,7 +98,9 @@ class DrawingPainter extends CustomPainter {
 }
 
 class DrawingCanvas extends StatefulWidget {
-  const DrawingCanvas({super.key});
+  final ValueNotifier<List<Layer>> layersNotifier;
+
+  const DrawingCanvas({super.key, required this.layersNotifier});
 
   @override
   DrawingCanvasState createState() => DrawingCanvasState();
@@ -92,11 +108,19 @@ class DrawingCanvas extends StatefulWidget {
 
 class DrawingCanvasState extends State<DrawingCanvas> {
   final GlobalKey exportGlobalKey = GlobalKey();
-  final ValueNotifier<List<Offset?>> _pointsNotifier = ValueNotifier<List<Offset?>>([]);
-  final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
+  final ValueNotifier<List<Offset?>> _pointsNotifier = ValueNotifier([]);
+  final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier([]);
+
+  Layer? _activeLayer;
+
   bool _showGrid = true;
   bool _snapToGrid = true;
   double _gridSize = 10.0;
+
+  DrawingTool selectedTool = FreeformTool();
+  Color _fillColor = Colors.transparent;
+  Color _strokeColor = Colors.black;
+  double _strokeWidth = 4.0;
 
   String getToolTypeForTool(selectedTool) {
     if (selectedTool is FreeformTool) return 'Freeform';
@@ -108,11 +132,24 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     throw Exception('Unknown tool type');
   }
 
-  DrawingTool selectedTool = FreeformTool();
-  List<DrawingShape> shapes = [];
-  Color _fillColor = Colors.transparent;
-  Color _strokeColor = Colors.black;
-  double _strokeWidth = 4.0;
+  @override
+  void initState() {
+    super.initState();
+    widget.layersNotifier.addListener(_updateActiveLayer);
+  }
+
+  void _updateActiveLayer() {
+    if (_activeLayer == null || !widget.layersNotifier.value.contains(_activeLayer)) {
+      setActiveLayer(widget.layersNotifier.value.isNotEmpty ? widget.layersNotifier.value.first : null);
+    }
+    setState(() {}); // Trigger UI update
+  }
+
+  void setActiveLayer(Layer? layer) {
+    setState(() {
+      _activeLayer = layer;
+    });
+  }
 
   void updateGridSize(double gridSize) {
     setState(() {
@@ -133,25 +170,18 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
-  _addShape(DrawingShape shape) {
+  void switchTool(DrawingTool tool) {
     setState(() {
-      shape = DrawingShape(
-        points: shape.points,
-        toolType: shape.toolType,
-        fillColor: shape.toolType == 'Freeform' || shape.toolType == 'Line'
-            ? Colors.transparent
-            : _fillColor,
-        strokeColor: _strokeColor,
-        strokeWidth: _strokeWidth,
-      );
-      shapes.add(shape);
+      selectedTool = tool;
+      selectedTool.setSnapToGrid(_snapToGrid);
     });
   }
 
   void clearCanvas() {
     setState(() {
-      _pointsNotifier.value = [];
-      shapes.clear();
+      for (var layer in widget.layersNotifier.value) {
+        layer.shapes.clear();
+      }
     });
   }
 
@@ -175,10 +205,21 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     return Offset(snappedX, snappedY);
   }
 
-  void switchTool(DrawingTool tool) {
+  void _addShape(DrawingShape shape) {
+    if (_activeLayer == null) return;
+
     setState(() {
-      selectedTool = tool;
-      selectedTool.setSnapToGrid(_snapToGrid);
+      shape = DrawingShape(
+        points: shape.points,
+        toolType: shape.toolType,
+        fillColor: shape.toolType == 'Freeform' || shape.toolType == 'Line'
+            ? Colors.transparent
+            : _fillColor,
+        strokeColor: _strokeColor,
+        strokeWidth: _strokeWidth,
+      );
+      _activeLayer!.shapes.add(shape);
+      widget.layersNotifier.value = List.from(widget.layersNotifier.value);
     });
   }
 
@@ -190,73 +231,78 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   Widget build(BuildContext context) {
     return RepaintBoundary(
       key: exportGlobalKey,
-      child: Stack(
-        children: [
-          GestureDetector(
-            onPanStart: (details) {
-              selectedTool.onPanStart(
-                _calculateSnapToGrid(details.localPosition),
-                _previewPointsNotifier.value,
-              );
-              _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
-            },
-            onPanUpdate: (details) {
-              selectedTool.onPanUpdate(
-                _calculateSnapToGrid(details.localPosition),
-                _previewPointsNotifier.value,
-              );
-              _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
-            },
-            onPanEnd: (details) {
-              selectedTool.onPanEnd(
-                _calculateSnapToGrid(details.localPosition),
-                _previewPointsNotifier.value,
-              );
-              // Convert the completed points into a shape and add it to _shapes.
-              if (_previewPointsNotifier.value.isNotEmpty) {
-                _addShape(DrawingShape(
-                  points: List.from(_previewPointsNotifier.value),
-                  toolType: getToolTypeForTool(selectedTool),
-                  fillColor: _fillColor,
-                  strokeColor: _strokeColor,
-                  strokeWidth: _strokeWidth,
-                ));
-              }
-              _pointsNotifier.value = [
-                ..._pointsNotifier.value,
-                ..._previewPointsNotifier.value,
-              ];
-              _previewPointsNotifier.value = [];
-            },
-            child: ValueListenableBuilder<List<Offset?>>(
-              valueListenable: _pointsNotifier,
-              builder: (context, points, _) {
-                return ValueListenableBuilder<List<Offset?>>(
-                  valueListenable: _previewPointsNotifier,
-                  builder: (context, previewPoints, _) {
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.white,
-                      child: CustomPaint(
-                        painter: DrawingPainter(
-                          shapes,
-                          points,
-                          previewPoints: previewPoints,
-                          showGrid: _showGrid,
-                          strokeColor: _strokeColor,
-                          strokeWidth: _strokeWidth,
-                          gridSize: _gridSize,
-                        ),
-                        size: Size.infinite,
-                      ),
+      child: ValueListenableBuilder<List<Layer>>(
+        valueListenable: widget.layersNotifier,
+        builder: (context, layers, _) {
+          return Stack(
+            children: [
+              GestureDetector(
+                onPanStart: (details) {
+                  selectedTool.onPanStart(
+                    _calculateSnapToGrid(details.localPosition),
+                    _previewPointsNotifier.value,
+                  );
+                  _previewPointsNotifier.value =
+                      List.from(_previewPointsNotifier.value);
+                },
+                onPanUpdate: (details) {
+                  selectedTool.onPanUpdate(
+                    _calculateSnapToGrid(details.localPosition),
+                    _previewPointsNotifier.value,
+                  );
+                  _previewPointsNotifier.value =
+                      List.from(_previewPointsNotifier.value);
+                },
+                onPanEnd: (details) {
+                  selectedTool.onPanEnd(
+                    _calculateSnapToGrid(details.localPosition),
+                    _previewPointsNotifier.value,
+                  );
+                  if (_previewPointsNotifier.value.isNotEmpty) {
+                    _addShape(DrawingShape(
+                      points: List.from(_previewPointsNotifier.value),
+                      toolType: getToolTypeForTool(selectedTool),
+                      fillColor: _fillColor,
+                      strokeColor: _strokeColor,
+                      strokeWidth: _strokeWidth,
+                    ));
+                  }
+                  _pointsNotifier.value = [
+                    ..._pointsNotifier.value,
+                    ..._previewPointsNotifier.value,
+                  ];
+                  _previewPointsNotifier.value = [];
+                },
+                child: ValueListenableBuilder<List<Offset?>>(
+                  valueListenable: _pointsNotifier,
+                  builder: (context, points, _) {
+                    return ValueListenableBuilder<List<Offset?>>(
+                      valueListenable: _previewPointsNotifier,
+                      builder: (context, previewPoints, _) {
+                        return Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: CustomPaint(
+                            painter: DrawingPainter(
+                              layers,
+                              points,
+                              previewPoints: previewPoints,
+                              showGrid: _showGrid,
+                              strokeColor: _strokeColor,
+                              strokeWidth: _strokeWidth,
+                              gridSize: _gridSize,
+                            ),
+                            size: Size.infinite,
+                          ),
+                        );
+                      },
                     );
                   },
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

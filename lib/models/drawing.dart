@@ -1,37 +1,37 @@
 import 'dart:convert';
-import '../drawing_shapes/drawing_shape.dart';
+import 'layer.dart';
 
 class Drawing {
   final String id;
   final String title;
   final DateTime createdAt;
-  final List<DrawingShape> shapes;
+  final List<Layer> layers;
 
   Drawing({
     required this.id,
     required this.title,
     required this.createdAt,
-    required this.shapes,
+    required this.layers,
   });
 
-  // Method to convert a Drawing object to a JSON-friendly map.
+  // Convert a Drawing to a JSON-friendly map.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'title': title,
       'createdAt': createdAt.toIso8601String(),
-      'shapes': shapes.map((shape) => shape.toJson()).toList(),
+      'layers': layers.map((layer) => layer.toJson()).toList(),
     };
   }
 
-  // Factory to create a Drawing object from JSON.
+  // Create a Drawing from JSON.
   factory Drawing.fromJson(Map<String, dynamic> json) {
     return Drawing(
       id: json['id'],
       title: json['title'],
       createdAt: DateTime.parse(json['createdAt']),
-      shapes: (json['shapes'] as List)
-          .map((shapeJson) => DrawingShape.fromJson(shapeJson))
+      layers: (json['layers'] as List)
+          .map((layerJson) => Layer.fromJson(layerJson))
           .toList(),
     );
   }
