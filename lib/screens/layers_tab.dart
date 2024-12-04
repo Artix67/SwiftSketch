@@ -51,22 +51,52 @@ class LayersTab extends StatelessWidget {
                     return ListView.builder(
                       itemCount: layers.length,
                       itemBuilder: (context, index) {
+                        final layer = layers[index];
                         return GestureDetector(
                           onTap: () => onSelectLayer(index),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6.0, vertical: 6.0),
+                                horizontal: 6.0, vertical: 0.0),
                             margin: const EdgeInsets.symmetric(vertical: 2.0),
                             decoration: BoxDecoration(
                               color: selectedLayerIndex == index
                                   ? Colors.orange
                                   : Colors.white,
-                              border: Border.all(color: Colors.grey),
                               borderRadius: BorderRadius.circular(6.0),
                             ),
-                            child: Text(
-                              layers[index].name,
-                              style: const TextStyle(fontSize: 12.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    layer.name,
+                                    style: const TextStyle(fontSize: 14.0),
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    layer.isVisible
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    size: 18.0,
+                                    color: layer.isVisible
+                                        ? Colors.black
+                                        : Colors.black38,
+                                  ),
+                                  onPressed: () {
+                                    layersNotifier.value = List.from(layers)
+                                      ..[index] = Layer(
+                                        id: layer.id,
+                                        name: layer.name,
+                                        shapes: layer.shapes,
+                                        isVisible: !layer.isVisible,
+                                      );
+                                  },
+                                  tooltip: layer.isVisible
+                                      ? 'Hide Layer'
+                                      : 'Show Layer',
+                                ),
+                              ],
                             ),
                           ),
                         );
