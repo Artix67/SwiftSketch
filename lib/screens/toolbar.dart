@@ -233,8 +233,30 @@ class Toolbar extends StatelessWidget {
         IconButton(
           icon: const Icon(Icons.clear),
           tooltip: 'Clear Canvas',
-          onPressed: () {
-            drawingCanvasKey.currentState?.clearCanvas();
+          onPressed: () async {
+            final shouldClear = await showDialog<bool>(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Reset Drawing and Layers'),
+                content: const Text(
+                  'Are you sure you want to reset the drawing and all layers? This action cannot be undone.',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(true),
+                    child: const Text('Reset'),
+                  ),
+                ],
+              ),
+            );
+
+            if (shouldClear == true) {
+              drawingCanvasKey.currentState?.clearCanvas();
+            }
           },
         ),
         IconButton(

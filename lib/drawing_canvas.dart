@@ -271,9 +271,17 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
   void clearCanvas() {
     setState(() {
-      for (var layer in widget.layersNotifier.value) {
-        layer.shapes.clear();
+      if (widget.layersNotifier.value.isNotEmpty) {
+        widget.layersNotifier.value[0].shapes.clear();
+        widget.layersNotifier.value = [widget.layersNotifier.value[0]];
+      } else {
+        widget.layersNotifier.value = [
+          Layer(id: "1", name: "Layer 1", shapes: [], isVisible: true)
+        ];
       }
+
+      _pointsNotifier.value = [];
+      _previewPointsNotifier.value = [];
     });
   }
 
