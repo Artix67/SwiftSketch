@@ -149,8 +149,13 @@ class DrawingPainter extends CustomPainter {
 
 class DrawingCanvas extends StatefulWidget {
   final ValueNotifier<List<Layer>> layersNotifier;
+  final double initialSnapSensitivity;
 
-  const DrawingCanvas({super.key, required this.layersNotifier});
+  const DrawingCanvas({
+    super.key,
+    required this.layersNotifier,
+    required this.initialSnapSensitivity,
+  });
 
   @override
   DrawingCanvasState createState() => DrawingCanvasState();
@@ -166,6 +171,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   bool _showGrid = true;
   bool _snapToGrid = true;
   double _gridSize = 10.0;
+  late double _snapSensitivity;
 
   DrawingTool selectedTool = FreeformTool();
   Color _fillColor = Colors.transparent;
@@ -183,22 +189,57 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     throw Exception('Unknown tool type');
   }
 
+  Offset snapToGridOrExistingPoint(
+      Offset position, List<Offset> snapPoints, double gridSize, double snapSensitivity) {
+    double snapRadius = gridSize * snapSensitivity;
+
+    for (final snapPoint in snapPoints) {
+      if ((position - snapPoint).distance <= snapRadius) {
+        return snapPoint;
+      }
+    }
+
+    double snappedX = (position.dx / gridSize).round() * gridSize;
+    double snappedY = (position.dy / gridSize).round() * gridSize;
+    return Offset(snappedX, snappedY);
+  }
+
+  List<Offset> getSnapPoints(List<Layer> layers) {
+    final snapPoints = <Offset>[];
+    for (final layer in layers) {
+      for (final shape in layer.shapes) {
+        snapPoints.addAll(shape.points.whereType<Offset>());
+      }
+    }
+    return snapPoints;
+  }
+
   @override
   void initState() {
     super.initState();
+    _snapSensitivity = widget.initialSnapSensitivity;
     widget.layersNotifier.addListener(_updateActiveLayer);
   }
 
   void _updateActiveLayer() {
-    if (_activeLayer == null || !widget.layersNotifier.value.contains(_activeLayer)) {
-      setActiveLayer(widget.layersNotifier.value.isNotEmpty ? widget.layersNotifier.value.first : null);
+    if (_activeLayer == null ||
+        !widget.layersNotifier.value.contains(_activeLayer)) {
+      setActiveLayer(
+          widget.layersNotifier.value.isNotEmpty ? widget.layersNotifier.value
+              .first : null);
     }
-    setState(() {}); // Trigger UI update
+    setState(() {});
   }
 
   void setActiveLayer(Layer? layer) {
     setState(() {
       _activeLayer = layer;
+    });
+  }
+
+  void updateSnapSensitivity(double value) {
+    setState(() {
+      _snapSensitivity = value;
     });
   }
 
@@ -249,11 +290,52 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
-  Offset _calculateSnapToGrid(Offset position) {
-    if (!_snapToGrid || !selectedTool.shouldSnapToGrid()) return position;
-    double snappedX = (position.dx / _gridSize).round() * _gridSize;
-    double snappedY = (position.dy / _gridSize).round() * _gridSize;
-    return Offset(snappedX, snappedY);
+  void onPanStartHandler(Offset position) {
+    final snapPoints = getSnapPoints(widget.layersNotifier.value);
+    if (selectedTool is FreeformTool) {
+      selectedTool.onPanStart(position, _previewPointsNotifier.value);
+    } else {
+      selectedTool.onPanStart(
+        snapToGridOrExistingPoint(position, snapPoints, _gridSize, _snapSensitivity),
+        _previewPointsNotifier.value,
+      );
+    }
+  }
+
+  void onPanUpdateHandler(Offset position) {
+    final snapPoints = getSnapPoints(widget.layersNotifier.value);
+    if (selectedTool is FreeformTool) {
+      selectedTool.onPanUpdate(position, _previewPointsNotifier.value);
+    } else {
+      selectedTool.onPanUpdate(
+        snapToGridOrExistingPoint(position, snapPoints, _gridSize, _snapSensitivity),
+        _previewPointsNotifier.value,
+      );
+    }
+  }
+
+  void onPanEndHandler(Offset position) {
+    final snapPoints = getSnapPoints(widget.layersNotifier.value);
+    if (selectedTool is FreeformTool) {
+      selectedTool.onPanEnd(position, _previewPointsNotifier.value);
+    } else {
+      selectedTool.onPanEnd(
+        snapToGridOrExistingPoint(position, snapPoints, _gridSize, _snapSensitivity),
+        _previewPointsNotifier.value,
+      );
+    }
+
+    if (_previewPointsNotifier.value.isNotEmpty) {
+      _addShape(DrawingShape(
+        points: List.from(_previewPointsNotifier.value),
+        toolType: getToolTypeForTool(selectedTool),
+        fillColor: _fillColor,
+        strokeColor: _strokeColor,
+        strokeWidth: _strokeWidth,
+      ));
+    }
+
+    _previewPointsNotifier.value = [];
   }
 
   void _addShape(DrawingShape shape) {
@@ -261,7 +343,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
     setState(() {
       if (selectedTool is AnnotationTool) {
-        // Prompt for annotation input
         showDialog(
           context: context,
           builder: (context) {
@@ -286,7 +367,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                         annotation: annotationController.text,
                       );
                       _activeLayer!.shapes.add(shape);
-                      widget.layersNotifier.value = List.from(widget.layersNotifier.value);
+                      widget.layersNotifier.value =
+                          List.from(widget.layersNotifier.value);
                     }
                   },
                   child: const Text("Save"),
@@ -330,35 +412,17 @@ class DrawingCanvasState extends State<DrawingCanvas> {
             children: [
               GestureDetector(
                 onPanStart: (details) {
-                  selectedTool.onPanStart(
-                    _calculateSnapToGrid(details.localPosition),
-                    _previewPointsNotifier.value,
-                  );
+                  onPanStartHandler(details.localPosition);
                   _previewPointsNotifier.value =
                       List.from(_previewPointsNotifier.value);
                 },
                 onPanUpdate: (details) {
-                  selectedTool.onPanUpdate(
-                    _calculateSnapToGrid(details.localPosition),
-                    _previewPointsNotifier.value,
-                  );
+                  onPanUpdateHandler(details.localPosition);
                   _previewPointsNotifier.value =
                       List.from(_previewPointsNotifier.value);
                 },
                 onPanEnd: (details) {
-                  selectedTool.onPanEnd(
-                    _calculateSnapToGrid(details.localPosition),
-                    _previewPointsNotifier.value,
-                  );
-                  if (_previewPointsNotifier.value.isNotEmpty) {
-                    _addShape(DrawingShape(
-                      points: List.from(_previewPointsNotifier.value),
-                      toolType: getToolTypeForTool(selectedTool),
-                      fillColor: _fillColor,
-                      strokeColor: _strokeColor,
-                      strokeWidth: _strokeWidth,
-                    ));
-                  }
+                  onPanEndHandler(details.localPosition);
                   _pointsNotifier.value = [
                     ..._pointsNotifier.value,
                     ..._previewPointsNotifier.value,

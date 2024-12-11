@@ -18,6 +18,7 @@ class _Drawscreen extends State<Drawscreen> {
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
   double _gridSize = 10.0;
+  double _snapSensitivity = 2.0;
 
   final ValueNotifier<List<Layer>> _layersNotifier = ValueNotifier([
     Layer(id: "1", name: "Layer 1", shapes: [])
@@ -40,6 +41,13 @@ class _Drawscreen extends State<Drawscreen> {
       _strokeWidth = value;
     });
     _drawingCanvasKey.currentState?.updateStrokeWidth(value);
+  }
+
+  void _updateSnapSensitivity(double value) {
+    setState(() {
+      _snapSensitivity = value;
+    });
+    _drawingCanvasKey.currentState?.updateSnapSensitivity(value);
   }
 
   void _updateGridSize(double value) {
@@ -123,6 +131,7 @@ class _Drawscreen extends State<Drawscreen> {
             strokeColor: _strokeColor,
             strokeWidth: _strokeWidth,
             gridSize: _gridSize,
+            snapSensitivity: _snapSensitivity,
             onUpdateStrokeWidth: _updateStrokeWidth,
             onUpdateGridSize: _updateGridSize,
             onUpdateColors: _updateColors,
@@ -134,6 +143,7 @@ class _Drawscreen extends State<Drawscreen> {
             refreshUI: () {
               setState(() {});
             },
+            onUpdateSnapSensitivity: _updateSnapSensitivity,
           ),
         ),
         body: Row(
@@ -142,6 +152,7 @@ class _Drawscreen extends State<Drawscreen> {
               child: DrawingCanvas(
                 key: _drawingCanvasKey,
                 layersNotifier: _layersNotifier,
+                initialSnapSensitivity: _snapSensitivity,
               ),
             ),
             LayersTab(

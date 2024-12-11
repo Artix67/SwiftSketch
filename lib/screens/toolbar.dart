@@ -16,9 +16,11 @@ class Toolbar extends StatelessWidget {
   final Color strokeColor;
   final double strokeWidth;
   final double gridSize;
+  final double snapSensitivity;
   final Function(double) onUpdateStrokeWidth;
   final Function(double) onUpdateGridSize;
   final Function(Color, Color) onUpdateColors;
+  final Function(double) onUpdateSnapSensitivity;
   final GlobalKey<DrawingCanvasState> drawingCanvasKey;
   final VoidCallback onDeleteToolUpdate;
   final List<DrawingShape> activeLayerShapes;
@@ -30,9 +32,11 @@ class Toolbar extends StatelessWidget {
     required this.strokeColor,
     required this.strokeWidth,
     required this.gridSize,
+    required this.snapSensitivity,
     required this.onUpdateStrokeWidth,
     required this.onUpdateGridSize,
     required this.onUpdateColors,
+    required this.onUpdateSnapSensitivity,
     required this.drawingCanvasKey,
     required this.onDeleteToolUpdate,
     required this.activeLayerShapes,
@@ -85,6 +89,16 @@ class Toolbar extends StatelessWidget {
     return AppBar(
       backgroundColor: Colors.orange[100],
       actions: <Widget>[
+        Slider(
+          value: snapSensitivity,
+          min: 1.0,
+          max: 5.0,
+          divisions: 4,
+          label: '${snapSensitivity.toStringAsFixed(1)}x',
+          onChanged: (value) {
+            onUpdateSnapSensitivity(value);
+          },
+        ),
         Slider(
           value: gridSize,
           min: 5.0,
