@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'SQLiteDatabase.dart';
 
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final DatabaseHelper _dbHelper = DatabaseHelper();
 
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     UserCredential result = await _auth.signInWithEmailAndPassword(
@@ -20,7 +22,23 @@ class FirebaseAuthService {
       email: email,
       password: password,
     );
-    return userCredential.user;
+    User? user = userCredential.user;
+    if (user != null) {
+      await _dbHelper.insertUser({
+        'email': email,
+      });
+      await _dbHelper.insertSettings({
+        'userEmail': email,
+        'gridSize': 0.0,
+        'defaultColor': 'FFFFFF',
+        'defaultTool': '',
+        'gridSnapOnOff': 0,
+        'gridOnOff': 0,
+        'currentProject': '',
+        'snapSensitivity': 0.0,
+      });
+    }
+    return user;
   }
 
   Future<void> sendEmailVerification(User user) async {
