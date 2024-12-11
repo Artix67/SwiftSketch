@@ -8,6 +8,7 @@ import '../drawing_tools/delete_tool.dart';
 import '../drawing_tools/line_tool.dart';
 import '../drawing_tools/rectangle_tool.dart';
 import '../drawing_tools/triangle_tool.dart';
+import '../drawing_tools/annotation_tool.dart';
 import 'homescreen.dart';
 
 class Toolbar extends StatelessWidget {
@@ -180,6 +181,13 @@ class Toolbar extends StatelessWidget {
           tooltip: 'Circle',
           onPressed: () {
             drawingCanvasKey.currentState?.switchTool(CircleTool());
+          },
+        ),
+        IconButton(
+          icon: const Icon(Icons.note),
+          tooltip: 'Annotation Tool',
+          onPressed: () {
+            drawingCanvasKey.currentState?.switchTool(AnnotationTool());
           },
         ),
         IconButton(

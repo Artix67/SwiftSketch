@@ -7,6 +7,7 @@ import '/drawing_tools/rectangle_tool.dart';
 import '/drawing_tools/circle_tool.dart';
 import '/drawing_tools/triangle_tool.dart';
 import '/drawing_tools/delete_tool.dart';
+import '/drawing_tools/annotation_tool.dart';
 import '/drawing_shapes/drawing_shape.dart';
 import 'models/layer.dart';
 
@@ -31,13 +32,11 @@ class DrawingPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Draw background
     final backgroundPaint = Paint()
       ..color = Colors.white
       ..style = PaintingStyle.fill;
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
 
-    // Draw grid first (beneath the shapes)
     if (showGrid) {
       final gridPaint = Paint()
         ..color = Colors.grey.withOpacity(0.3)
@@ -51,7 +50,6 @@ class DrawingPainter extends CustomPainter {
       }
     }
 
-    // Draw each layer's shapes
     for (Layer layer in layers) {
       if (!layer.isVisible) continue;
 
@@ -65,12 +63,64 @@ class DrawingPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = shape.strokeWidth;
 
+        if (shape.toolType == 'Annotation' && shape.annotation != null) {
+          final bounds = shape.path.getBounds();
+          const double padding = 8.0;
+
+          final backgroundPaint = Paint()
+            ..color = Colors.white
+            ..style = PaintingStyle.fill;
+          canvas.drawRect(bounds.inflate(padding), backgroundPaint);
+
+          final borderPaint = Paint()
+            ..color = Colors.black
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 4.0;
+          canvas.drawRect(bounds.inflate(1), borderPaint);
+
+          final textSpan = TextSpan(
+            text: shape.annotation,
+            style: const TextStyle(color: Colors.black),
+          );
+
+          final textPainter = TextPainter(
+            text: textSpan,
+            textDirection: TextDirection.ltr,
+          );
+
+          double fontSize = 100.0;
+          const double minFontSize = 12.0;
+          const double paddingReduction = padding * 2;
+
+          while (fontSize > minFontSize) {
+            textPainter.text = TextSpan(
+              text: shape.annotation,
+              style: TextStyle(color: Colors.black, fontSize: fontSize),
+            );
+
+            textPainter.layout(maxWidth: bounds.width - paddingReduction);
+
+            if (textPainter.size.height <= bounds.height - paddingReduction) {
+              break;
+            }
+            fontSize -= 1.0;
+          }
+
+          textPainter.layout(maxWidth: bounds.width - paddingReduction);
+
+          final offset = Offset(
+            bounds.left + (bounds.width - textPainter.width) / 2,
+            bounds.top + (bounds.height - textPainter.height) / 2,
+          );
+
+          textPainter.paint(canvas, offset);
+        }
+
         canvas.drawPath(shape.path, fillPaint);
         canvas.drawPath(shape.path, strokePaint);
       }
     }
 
-    // Draw preview points (always on top)
     if (previewPoints != null && previewPoints!.isNotEmpty) {
       final previewPaint = Paint()
         ..color = strokeColor
@@ -128,6 +178,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     if (selectedTool is CircleTool) return 'Circle';
     if (selectedTool is RectangleTool) return 'Rectangle';
     if (selectedTool is TriangleTool) return 'Triangle';
+    if (selectedTool is AnnotationTool) return 'Note';
     if (selectedTool is DeleteTool) return 'Delete';
     throw Exception('Unknown tool type');
   }
@@ -209,17 +260,58 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     if (_activeLayer == null) return;
 
     setState(() {
-      shape = DrawingShape(
-        points: shape.points,
-        toolType: shape.toolType,
-        fillColor: shape.toolType == 'Freeform' || shape.toolType == 'Line'
-            ? Colors.transparent
-            : _fillColor,
-        strokeColor: _strokeColor,
-        strokeWidth: _strokeWidth,
-      );
-      _activeLayer!.shapes.add(shape);
-      widget.layersNotifier.value = List.from(widget.layersNotifier.value);
+      if (selectedTool is AnnotationTool) {
+        // Prompt for annotation input
+        showDialog(
+          context: context,
+          builder: (context) {
+            TextEditingController annotationController = TextEditingController();
+            return AlertDialog(
+              title: const Text("Add Annotation"),
+              content: TextField(
+                controller: annotationController,
+                decoration: const InputDecoration(hintText: "Enter your note"),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    if (annotationController.text.isNotEmpty) {
+                      shape = DrawingShape(
+                        points: shape.points,
+                        toolType: 'Annotation',
+                        fillColor: Colors.transparent,
+                        strokeColor: _strokeColor,
+                        strokeWidth: _strokeWidth,
+                        annotation: annotationController.text,
+                      );
+                      _activeLayer!.shapes.add(shape);
+                      widget.layersNotifier.value = List.from(widget.layersNotifier.value);
+                    }
+                  },
+                  child: const Text("Save"),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text("Cancel"),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        shape = DrawingShape(
+          points: shape.points,
+          toolType: shape.toolType,
+          fillColor: shape.toolType == 'Freeform' || shape.toolType == 'Line'
+              ? Colors.transparent
+              : _fillColor,
+          strokeColor: _strokeColor,
+          strokeWidth: _strokeWidth,
+        );
+        _activeLayer!.shapes.add(shape);
+        widget.layersNotifier.value = List.from(widget.layersNotifier.value);
+      }
     });
   }
 

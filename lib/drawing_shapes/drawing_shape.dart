@@ -7,6 +7,7 @@ class DrawingShape {
   final Color fillColor;
   final Color strokeColor;
   final double strokeWidth;
+  final String? annotation;
 
   DrawingShape({
     required this.points,
@@ -14,6 +15,7 @@ class DrawingShape {
     required this.fillColor,
     required this.strokeColor,
     required this.strokeWidth,
+    this.annotation,
   }) : path = _generatePath(points);
 
   // Method to convert points to a serializable JSON-friendly format
