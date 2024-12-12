@@ -39,7 +39,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.orange[100],
       appBar: AppBar(
-        title: const Text('Login Screen'),
+        centerTitle: true,
+        backgroundColor: Colors.orange[100],
+        automaticallyImplyLeading: false,
+        title: const Text('Login'),
       ),
       body: Center(
         child: ConstrainedBox(
