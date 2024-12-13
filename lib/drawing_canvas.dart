@@ -68,11 +68,15 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final GlobalKey exportGlobalKey = GlobalKey();
   final ValueNotifier<List<Offset?>> _pointsNotifier = ValueNotifier<List<Offset?>>([]);
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
+  final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
+
   bool _showGrid = true;
   bool _snapToGrid = true;
+  bool _isZoomEnabled = false; // Daniel - New variable to manage zoom state
 
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
+  // final ZoomTool _zoomTool = ZoomTool(); // Daniel - New ZoomTool instance
 
   void _addShape(DrawingShape shape) {
     setState(() {
@@ -107,6 +111,15 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
+  void toggleZoom() {
+    setState(() {
+      _isZoomEnabled = !_isZoomEnabled;
+      if (!_isZoomEnabled) {
+        _transformationController.value = Matrix4.identity();
+      }
+    });
+  }
+
   void export() {
     exportToPdf(context, exportGlobalKey);
   }
@@ -118,17 +131,21 @@ class DrawingCanvasState extends State<DrawingCanvas> {
       child: Stack(
         children: [
           GestureDetector(
-            onPanStart: (details) {
+            onPanStart: !_isZoomEnabled
+                ? (details) {
               selectedTool.onPanStart(details.localPosition, _previewPointsNotifier.value);
               _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
-            },
-            onPanUpdate: (details) {
+            }
+                : null,
+            onPanUpdate: !_isZoomEnabled
+                ? (details) {
               selectedTool.onPanUpdate(details.localPosition, _previewPointsNotifier.value);
               _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
-            },
-            onPanEnd: (details) {
+            }
+                : null,
+            onPanEnd: !_isZoomEnabled
+                ? (details) {
               selectedTool.onPanEnd(details.localPosition, _previewPointsNotifier.value);
-              // Convert the completed points into a shape and add it to _shapes.
               if (_previewPointsNotifier.value.isNotEmpty) {
                 _addShape(DrawingShape(points: List.from(_previewPointsNotifier.value), tool: selectedTool));
               }
@@ -137,30 +154,44 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                 ..._previewPointsNotifier.value,
               ];
               _previewPointsNotifier.value = [];
-            },
-            child: ValueListenableBuilder<List<Offset?>>(
-              valueListenable: _pointsNotifier,
-              builder: (context, points, _) {
-                return ValueListenableBuilder<List<Offset?>>(
-                  valueListenable: _previewPointsNotifier,
-                  builder: (context, previewPoints, _) {
-                    return Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.white,
-                      child: CustomPaint(
-                        painter: DrawingPainter(
-                          shapes,
-                          points,
-                          previewPoints: previewPoints,
-                          showGrid: _showGrid,
+            }
+                : null,
+            child: InteractiveViewer(
+              transformationController: _transformationController,
+              panEnabled: _isZoomEnabled,
+              scaleEnabled: _isZoomEnabled,
+              child: ValueListenableBuilder<List<Offset?>>(
+                valueListenable: _pointsNotifier,
+                builder: (context, points, _) {
+                  return ValueListenableBuilder<List<Offset?>>(
+                    valueListenable: _previewPointsNotifier,
+                    builder: (context, previewPoints, _) {
+                      return Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        color: Colors.white,
+                        child: CustomPaint(
+                          painter: DrawingPainter(
+                            shapes,
+                            points,
+                            previewPoints: previewPoints,
+                            showGrid: _showGrid,
+                          ),
+                          size: Size.infinite,
                         ),
-                        size: Size.infinite,
-                      ),
-                    );
-                  },
-                );
-              },
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: toggleZoom,
+              child: Icon(_isZoomEnabled ? Icons.zoom_out : Icons.zoom_in),
             ),
           ),
         ],

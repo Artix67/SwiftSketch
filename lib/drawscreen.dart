@@ -35,6 +35,13 @@ class _Drawscreen extends State<Drawscreen>{
                 },
               ),
               IconButton(
+                icon: const Icon(Icons.zoom_in),
+                tooltip: 'Toggle Zoom',
+                onPressed: () {
+                  _drawingCanvasKey.currentState?.toggleZoom();
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.horizontal_rule),
                 tooltip: 'Line',
                 onPressed: () {
