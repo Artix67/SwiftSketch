@@ -230,6 +230,26 @@ class Toolbar extends StatelessWidget {
             drawingCanvasKey.currentState?.toggleSnapToGrid();
           },
         ),
+        ValueListenableBuilder<bool>(
+          valueListenable: drawingCanvasKey.currentState?.isZoomEnabledNotifier ?? ValueNotifier(false),
+          builder: (context, isZoomEnabled, child) {
+            return Container(
+              decoration: isZoomEnabled
+                  ? BoxDecoration(
+                color: Colors.grey[50], // Background color when zoom is enabled
+                borderRadius: BorderRadius.circular(8),
+              )
+                  : null,
+              child: IconButton(
+                icon: Icon(isZoomEnabled ? Icons.zoom_out : Icons.zoom_in),
+                tooltip: 'Toggle Zoom',
+                onPressed: () {
+                  drawingCanvasKey.currentState?.toggleZoom();
+                },
+              ),
+            );
+          },
+        ),
         IconButton(
           icon: const Icon(Icons.clear),
           tooltip: 'Clear Canvas',

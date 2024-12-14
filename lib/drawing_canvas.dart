@@ -166,9 +166,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final ValueNotifier<List<Offset?>> _pointsNotifier = ValueNotifier<List<Offset?>>([]);
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
   final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
-
-  final ValueNotifier<List<Offset?>> _pointsNotifier = ValueNotifier([]);
-  final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier([]);
+  final ValueNotifier<bool> isZoomEnabledNotifier = ValueNotifier(false);
 
   Layer? _activeLayer;
 
@@ -180,10 +178,13 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
+
   // final ZoomTool _zoomTool = ZoomTool(); // Daniel - New ZoomTool instance
   Color _fillColor = Colors.transparent;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
+
+  bool get isZoomEnabled => _isZoomEnabled;
 
   String getToolTypeForTool(selectedTool) {
     if (selectedTool is FreeformTool) return 'Freeform';
@@ -196,8 +197,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     throw Exception('Unknown tool type');
   }
 
-  Offset snapToGridOrExistingPoint(
-      Offset position, List<Offset> snapPoints, double gridSize, double snapSensitivity) {
+  Offset snapToGridOrExistingPoint(Offset position, List<Offset> snapPoints,
+      double gridSize, double snapSensitivity) {
     double snapRadius = gridSize * snapSensitivity;
 
     for (final snapPoint in snapPoints) {
@@ -311,7 +312,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
       selectedTool.onPanStart(position, _previewPointsNotifier.value);
     } else {
       selectedTool.onPanStart(
-        snapToGridOrExistingPoint(position, snapPoints, _gridSize, _snapSensitivity),
+        snapToGridOrExistingPoint(
+            position, snapPoints, _gridSize, _snapSensitivity),
         _previewPointsNotifier.value,
       );
     }
@@ -323,7 +325,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
       selectedTool.onPanUpdate(position, _previewPointsNotifier.value);
     } else {
       selectedTool.onPanUpdate(
-        snapToGridOrExistingPoint(position, snapPoints, _gridSize, _snapSensitivity),
+        snapToGridOrExistingPoint(
+            position, snapPoints, _gridSize, _snapSensitivity),
         _previewPointsNotifier.value,
       );
     }
@@ -335,7 +338,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
       selectedTool.onPanEnd(position, _previewPointsNotifier.value);
     } else {
       selectedTool.onPanEnd(
-        snapToGridOrExistingPoint(position, snapPoints, _gridSize, _snapSensitivity),
+        snapToGridOrExistingPoint(
+            position, snapPoints, _gridSize, _snapSensitivity),
         _previewPointsNotifier.value,
       );
     }
@@ -415,10 +419,21 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   void toggleZoom() {
     setState(() {
       _isZoomEnabled = !_isZoomEnabled;
-      if (!_isZoomEnabled) {
-        _transformationController.value = Matrix4.identity();
-      }
+      isZoomEnabledNotifier.value = _isZoomEnabled;
+      // Taylor - I commented this out cause you couldn't zoom in, turn zoom off,
+      // then draw while zoomed. Not sure why this was put here.
+
+      /* if (!_isZoomEnabled) {
+         _transformationController.value = Matrix4.identity();
+       } */
+
     });
+  }
+
+  @override
+  void dispose() {
+    isZoomEnabledNotifier.dispose();
+    super.dispose();
   }
 
   void export() {
@@ -434,122 +449,83 @@ class DrawingCanvasState extends State<DrawingCanvas> {
         builder: (context, layers, _) {
           return Stack(
             children: [
-              GestureDetector(
-                onPanStart: (details) {
-                  onPanStartHandler(details.localPosition);
-                  _previewPointsNotifier.value =
-                      List.from(_previewPointsNotifier.value);
-                },
-                onPanUpdate: (details) {
-                  onPanUpdateHandler(details.localPosition);
-                  _previewPointsNotifier.value =
-                      List.from(_previewPointsNotifier.value);
-                },
-                onPanEnd: (details) {
-                  onPanEndHandler(details.localPosition);
-                  _pointsNotifier.value = [
-                    ..._pointsNotifier.value,
-                    ..._previewPointsNotifier.value,
-                  ];
-                  _previewPointsNotifier.value = [];
-                },
-                child: ValueListenableBuilder<List<Offset?>>(
-                  valueListenable: _pointsNotifier,
-                  builder: (context, points, _) {
-                    return ValueListenableBuilder<List<Offset?>>(
-                      valueListenable: _previewPointsNotifier,
-                      builder: (context, previewPoints, _) {
-                        return Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          child: CustomPaint(
-                            painter: DrawingPainter(
-                              layers,
-                              points,
-                              previewPoints: previewPoints,
-                              showGrid: _showGrid,
-                              strokeColor: _strokeColor,
-                              strokeWidth: _strokeWidth,
-                              gridSize: _gridSize,
+              InteractiveViewer(
+                transformationController: _transformationController,
+                panEnabled: _isZoomEnabled,
+                scaleEnabled: _isZoomEnabled,
+                child: GestureDetector(
+                  onPanStart: !_isZoomEnabled ? (details) {
+                    onPanStartHandler(details.localPosition);
+                    _previewPointsNotifier.value =
+                        List.from(_previewPointsNotifier.value);
+                  } : null,
+                  onPanUpdate: !_isZoomEnabled ? (details) {
+                    onPanUpdateHandler(details.localPosition);
+                    _previewPointsNotifier.value =
+                        List.from(_previewPointsNotifier.value);
+                  } : null,
+                  onPanEnd: !_isZoomEnabled ? (details) {
+                    onPanEndHandler(details.localPosition);
+                    if (_previewPointsNotifier.value.isNotEmpty) {
+                      _addShape(DrawingShape(
+                        points: List.from(_previewPointsNotifier.value),
+                        toolType: getToolTypeForTool(selectedTool),
+                        fillColor: _fillColor,
+                        strokeColor: _strokeColor,
+                        strokeWidth: _strokeWidth,
+                      ));
+                    }
+                    _pointsNotifier.value = [
+                      ..._pointsNotifier.value,
+                      ..._previewPointsNotifier.value,
+                    ];
+                    _previewPointsNotifier.value = [];
+                  } : null,
+                  child: ValueListenableBuilder<List<Offset?>>(
+                    valueListenable: _pointsNotifier,
+                    builder: (context, points, _) {
+                      return ValueListenableBuilder<List<Offset?>>(
+                        valueListenable: _previewPointsNotifier,
+                        builder: (context, previewPoints, _) {
+                          return Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            child: CustomPaint(
+                              painter: DrawingPainter(
+                                layers,
+                                points,
+                                previewPoints: previewPoints,
+                                showGrid: _showGrid,
+                                strokeColor: _strokeColor,
+                                strokeWidth: _strokeWidth,
+                                gridSize: _gridSize,
+                              ),
+                              size: Size.infinite,
                             ),
-                            size: Size.infinite,
-                          ),
-                        );
-                      },
-                    );
-                  },
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
+
+              //Taylor - Removed this bit, added coloring to the toolbar that would imply the zoom tool is on
+
+              /*
+               Positioned(
+                 bottom: 20,
+                 right: 20,
+                 child: FloatingActionButton(
+                   onPressed: toggleZoom,
+                   child: Icon(_isZoomEnabled ? Icons.zoom_out : Icons.zoom_in),
+                 ),
+               ),
+               */
+
             ],
           );
         },
-      child: Stack(
-        children: [
-          GestureDetector(
-            onPanStart: !_isZoomEnabled
-                ? (details) {
-              selectedTool.onPanStart(details.localPosition, _previewPointsNotifier.value);
-              _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
-            }
-                : null,
-            onPanUpdate: !_isZoomEnabled
-                ? (details) {
-              selectedTool.onPanUpdate(details.localPosition, _previewPointsNotifier.value);
-              _previewPointsNotifier.value = List.from(_previewPointsNotifier.value);
-            }
-                : null,
-            onPanEnd: !_isZoomEnabled
-                ? (details) {
-              selectedTool.onPanEnd(details.localPosition, _previewPointsNotifier.value);
-              if (_previewPointsNotifier.value.isNotEmpty) {
-                _addShape(DrawingShape(points: List.from(_previewPointsNotifier.value), tool: selectedTool));
-              }
-              _pointsNotifier.value = [
-                ..._pointsNotifier.value,
-                ..._previewPointsNotifier.value,
-              ];
-              _previewPointsNotifier.value = [];
-            }
-                : null,
-            child: InteractiveViewer(
-              transformationController: _transformationController,
-              panEnabled: _isZoomEnabled,
-              scaleEnabled: _isZoomEnabled,
-              child: ValueListenableBuilder<List<Offset?>>(
-                valueListenable: _pointsNotifier,
-                builder: (context, points, _) {
-                  return ValueListenableBuilder<List<Offset?>>(
-                    valueListenable: _previewPointsNotifier,
-                    builder: (context, previewPoints, _) {
-                      return Container(
-                        width: double.infinity,
-                        height: double.infinity,
-                        color: Colors.white,
-                        child: CustomPaint(
-                          painter: DrawingPainter(
-                            shapes,
-                            points,
-                            previewPoints: previewPoints,
-                            showGrid: _showGrid,
-                          ),
-                          size: Size.infinite,
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: toggleZoom,
-              child: Icon(_isZoomEnabled ? Icons.zoom_out : Icons.zoom_in),
-            ),
-          ),
-        ],
       ),
     );
   }
