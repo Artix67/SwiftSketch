@@ -34,6 +34,26 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _resetPassword() async {
+    if (_emailController.text.isNotEmpty) {
+      try {
+        await _authService.resetPassword(_emailController.text);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password reset email sent')),
+        );
+      } catch (e) {
+        print('Password reset failed: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to send password reset email')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter your email')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,61 +66,65 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       body: Center(
         child: ConstrainedBox(
-              constraints: const BoxConstraints.expand(height: 350, width: 350),
-            child:  Container(
-              color: Colors.white,
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                    ),
+          constraints: const BoxConstraints.expand(height: 350, width: 350),
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                TextField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
                   ),
-                  TextField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                    ),
-                    obscureText: true,
+                ),
+                TextField(
+                  controller: _passwordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Password',
                   ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _signIn,
-                    child: const Text('Sign In'),
-                  ),
-                  ElevatedButton(
-                      onPressed: (){
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context){
-                              return const HomeScreen();
-                            })
-                        );
-                      },
-                      child: const Text('Guest')),
-                  Center(
-                    child: Column(
-                      children: [
-                        TextButton(
-                            onPressed: (){}, child: const Text('Forgot Password?')),
-                        TextButton(onPressed: (){
+                  obscureText: true,
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _signIn,
+                  child: const Text('Sign In'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return const HomeScreen();
+                      }),
+                    );
+                  },
+                  child: const Text('Guest'),
+                ),
+                Center(
+                  child: Column(
+                    children: [
+                      TextButton(
+                        onPressed: _resetPassword,
+                        child: const Text('Forgot Password?'),
+                      ),
+                      TextButton(
+                        onPressed: () {
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context){
-                                return const CreateAccountScreen();
-                              })
+                            context,
+                            MaterialPageRoute(builder: (context) {
+                              return const CreateAccountScreen();
+                            }),
                           );
                         },
-                            child: const Text('Create Account'))
-                      ],
-                    ),
-                  )
-                ],
-              )
-
-            )
+                        child: const Text('Create Account'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
+          ),
+        ),
       ),
     );
   }
