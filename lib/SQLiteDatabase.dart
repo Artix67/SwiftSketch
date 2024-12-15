@@ -88,17 +88,17 @@ class DatabaseHelper {
     return await db.update(
       'users',
       user,
-      where: 'id = ?',
-      whereArgs: [user['id']],
+      where: 'email = ?',
+      whereArgs: [user['email']],
     );
   }
 
-  Future<int> deleteUser(int id) async {
+  Future<int> deleteUser(String email) async { // Updated to use String
     Database db = await database;
     return await db.delete(
       'users',
-      where: 'id = ?',
-      whereArgs: [id],
+      where: 'email = ?',
+      whereArgs: [email],
     );
   }
 

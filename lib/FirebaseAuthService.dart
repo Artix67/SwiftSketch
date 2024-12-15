@@ -5,6 +5,8 @@ class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final DatabaseHelper _dbHelper = DatabaseHelper();
 
+  FirebaseAuth get auth => _auth; // Public getter for _auth
+
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     UserCredential result = await _auth.signInWithEmailAndPassword(
       email: email,
