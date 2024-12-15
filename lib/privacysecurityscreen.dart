@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/settingsscreen.dart';
+import 'DatabaseHelper.dart';
+import 'FirebaseAuthService.dart';
 
 class PrivacySecurityScreen extends StatelessWidget{
   const PrivacySecurityScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,15 +25,15 @@ class PrivacySecurityScreen extends StatelessWidget{
             },
                 icon: const Icon(Icons.arrow_back)),
           ),
-          body: const Center(
-            child: Row( mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Biometric Authentication: "),
-                Enable(),
-              ],
-            )
+          body: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Biometric Authentication: "),
+                  const Enable(),
+                ],
+              )
           ),
-
         )
     );
   }
@@ -45,22 +48,52 @@ class Enable extends StatefulWidget {
 
 class _EnableState extends State<Enable> {
   bool light = true;
+  final FirebaseAuthService _authService = FirebaseAuthService();
+  final DatabaseHelper _dbHelper = DatabaseHelper();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricState();
+  }
+
+  void _loadBiometricState() async {
+    final user = _authService.auth.currentUser;
+    if (user != null) {
+      final settings = await _dbHelper.getSettings(user.email!);
+      if (settings != null) {
+        setState(() {
+          light = settings['biometricEnabled'] == 1;
+        });
+      }
+    }
+  }
+
+  void _updateBiometricState(bool value) async {
+    final user = _authService.auth.currentUser;
+    if (user != null) {
+      await _dbHelper.updateSettings({
+        'userEmail': user.email,
+        'biometricEnabled': value ? 1 : 0,
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Switch(
-      // This bool value toggles the switch.
       value: light,
       activeColor: Colors.red,
       onChanged: (bool value) {
-        // This is called when the user toggles the switch.
         setState(() {
           light = value;
+          _updateBiometricState(value);
         });
       },
     );
   }
 }
+
 
 
 

@@ -48,6 +48,7 @@ class DatabaseHelper {
         gridOnOff INTEGER,
         currentProject TEXT,
         snapSensitivity REAL,
+        biometricEnabled INTEGER,
         FOREIGN KEY(userEmail) REFERENCES users(email)
       )
     ''');
@@ -93,7 +94,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> deleteUser(String email) async { // Updated to use String
+  Future<int> deleteUser(String email) async {
     Database db = await database;
     return await db.delete(
       'users',

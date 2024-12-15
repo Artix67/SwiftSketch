@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/settingsscreen.dart';
 import 'FirebaseAuthService.dart';
-import 'SQLiteDatabase.dart';
+import 'DatabaseHelper.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
