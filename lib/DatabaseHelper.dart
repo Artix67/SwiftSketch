@@ -24,9 +24,8 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'user_database.db');
     return await openDatabase(
       path,
-      version: 2,
+      version: 1,
       onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
     );
   }
 
@@ -58,6 +57,10 @@ class DatabaseHelper {
         currentProject TEXT,
         snapSensitivity REAL,
         biometricEnabled INTEGER,
+        unitOfMeasurement TEXT,
+        snapToGridSensitivity TEXT,
+        zoomSensitivity TEXT,
+        autoSaveFrequency TEXT,
         FOREIGN KEY(userEmail) REFERENCES users(email)
       )
     ''');
@@ -70,32 +73,6 @@ class DatabaseHelper {
         FOREIGN KEY(userEmail) REFERENCES users(email)
       )
     ''');
-  }
-
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await db.execute('''
-        ALTER TABLE settings ADD COLUMN theme TEXT;
-      ''');
-      await db.execute('''
-        ALTER TABLE settings ADD COLUMN toolbarPosition TEXT;
-      ''');
-      await db.execute('''
-        ALTER TABLE settings ADD COLUMN fontSize TEXT;
-      ''');
-      await db.execute('''
-        ALTER TABLE settings ADD COLUMN layerPresets TEXT;
-      ''');
-      await db.execute('''
-        ALTER TABLE settings ADD COLUMN gridVisibility INTEGER;
-      ''');
-      await db.execute('''
-        ALTER TABLE settings ADD COLUMN tipsTutorials INTEGER;
-      ''');
-      await db.execute('''
-        ALTER TABLE settings ADD COLUMN appUpdates INTEGER;
-      ''');
-    }
   }
 
   // CRUD operations for users
@@ -203,4 +180,3 @@ class DatabaseHelper {
     );
   }
 }
-
