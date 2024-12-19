@@ -24,8 +24,9 @@ class DatabaseHelper {
     String path = join(await getDatabasesPath(), 'user_database.db');
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -41,6 +42,14 @@ class DatabaseHelper {
       CREATE TABLE settings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userEmail TEXT,
+        theme TEXT,
+        toolbarPosition TEXT,
+        fontSize TEXT,
+        gridSize TEXT,
+        layerPresets TEXT,
+        gridVisibility INTEGER,
+        tipsTutorials INTEGER,
+        appUpdates INTEGER,
         gridSize REAL,
         defaultColor TEXT,
         defaultTool TEXT,
@@ -61,6 +70,32 @@ class DatabaseHelper {
         FOREIGN KEY(userEmail) REFERENCES users(email)
       )
     ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute('''
+        ALTER TABLE settings ADD COLUMN theme TEXT;
+      ''');
+      await db.execute('''
+        ALTER TABLE settings ADD COLUMN toolbarPosition TEXT;
+      ''');
+      await db.execute('''
+        ALTER TABLE settings ADD COLUMN fontSize TEXT;
+      ''');
+      await db.execute('''
+        ALTER TABLE settings ADD COLUMN layerPresets TEXT;
+      ''');
+      await db.execute('''
+        ALTER TABLE settings ADD COLUMN gridVisibility INTEGER;
+      ''');
+      await db.execute('''
+        ALTER TABLE settings ADD COLUMN tipsTutorials INTEGER;
+      ''');
+      await db.execute('''
+        ALTER TABLE settings ADD COLUMN appUpdates INTEGER;
+      ''');
+    }
   }
 
   // CRUD operations for users
@@ -168,3 +203,4 @@ class DatabaseHelper {
     );
   }
 }
+
