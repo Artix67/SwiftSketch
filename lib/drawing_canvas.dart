@@ -3,6 +3,7 @@ import 'package:swift_sketch/export_drawing.dart';
 import '/drawing_tools/drawing_tool.dart';
 import '/drawing_tools/freeform_tool.dart';
 import 'package:swift_sketch/drawing_shapes/drawing_shape.dart';
+import '/drawing_tools/redo_undo_tool.dart';
 
 class DrawingPainter extends CustomPainter {
   final List<DrawingShape> shapes;
@@ -76,18 +77,38 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
-  // final ZoomTool _zoomTool = ZoomTool(); // Daniel - New ZoomTool instance
+  UndoRedoManager _undoRedoManager = UndoRedoManager(); // Undo/Redo manager initialization
 
   void _addShape(DrawingShape shape) {
     setState(() {
       shapes.add(shape);
+      _undoRedoManager.addAction(List.from(shapes));
     });
+  }
+
+  void undo() {
+    var previousShapes = _undoRedoManager.undo(shapes); // Pass the current shapes list
+    if (previousShapes != null) {
+      setState(() {
+        shapes = previousShapes;
+      });
+    }
+  }
+
+  void redo() {
+    var newShapes = _undoRedoManager.redo(); // Here, redo seems to not require arguments, ensure it is designed that way.
+    if (newShapes != null) {
+      setState(() {
+        shapes = newShapes;
+      });
+    }
   }
 
   void clearCanvas() {
     setState(() {
       _pointsNotifier.value = [];
       shapes.clear();
+      _undoRedoManager.addAction([]);
     });
   }
 
@@ -194,6 +215,25 @@ class DrawingCanvasState extends State<DrawingCanvas> {
               child: Icon(_isZoomEnabled ? Icons.zoom_out : Icons.zoom_in),
             ),
           ),
+          Positioned(
+            top: 20,
+            left: 20,
+            child: Row(
+              children: [
+                FloatingActionButton(
+                  onPressed: undo,
+                  child: Icon(Icons.undo),
+                  heroTag: null,
+                ),
+                SizedBox(width:10),
+                FloatingActionButton(
+                    onPressed: redo,
+                child: Icon(Icons.redo),
+                heroTag: null,
+                )
+              ]
+            )
+          )
         ],
       ),
     );

@@ -96,6 +96,20 @@ class _Drawscreen extends State<Drawscreen>{
                 },
               ),
               IconButton(
+                icon: const Icon(Icons.undo),
+                tooltip: 'Undo',
+                onPressed: () {
+                  _drawingCanvasKey.currentState?.undo();
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.redo),
+                tooltip: 'Redo',
+                onPressed: () {
+                  _drawingCanvasKey.currentState?.redo();
+                },
+              ),
+              IconButton(
                 icon: const Icon(Icons.clear),
                 tooltip: 'Clear Canvas',
                 onPressed: () {
