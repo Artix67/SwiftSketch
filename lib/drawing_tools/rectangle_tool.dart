@@ -57,4 +57,7 @@ class RectangleTool implements DrawingTool {
   void setSnapToGrid(bool value) {
     _snapToGrid = value;
   }
+
+  @override
+  bool shouldSnapToGrid() => true;
 }

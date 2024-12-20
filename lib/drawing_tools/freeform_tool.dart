@@ -30,4 +30,7 @@ class FreeformTool implements DrawingTool {
 
   @override
   void setSnapToGrid(bool value) {} //freeform does not snap
+
+  @override
+  bool shouldSnapToGrid() => false;
 }

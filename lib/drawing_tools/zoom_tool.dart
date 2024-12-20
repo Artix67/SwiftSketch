@@ -5,6 +5,7 @@ class ZoomTool implements DrawingTool {
   double _zoomFactor = 1.0; // Current zoom factor, initially no zoom
   final double _baseZoom = 1.0; // Base zoom factor to start from
   double? initialScale; // To store the scale when a pinch gesture starts
+  bool _snapToGrid = false; // Unused in zoom tool but implemented for protocol compliance
 
   @override
   void onPanStart(Offset position, List<Offset?> points) {
@@ -42,6 +43,13 @@ class ZoomTool implements DrawingTool {
       initialScale = scale; // Set initial scale if not already set
     }
   }
+
+  @override
+  bool shouldSnapToGrid() {
+    // Returns the current snap-to-grid setting (not applicable for zoom tool)
+    return _snapToGrid;
+  }
+
 
   @override
   void setSnapToGrid(bool value) {

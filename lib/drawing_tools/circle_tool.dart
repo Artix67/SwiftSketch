@@ -88,4 +88,6 @@ class CircleTool implements DrawingTool {
     _snapToGrid = value;
   }
 
+  @override
+  bool shouldSnapToGrid() => true;
 }

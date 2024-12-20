@@ -59,9 +59,40 @@ import 'package:share_plus/share_plus.dart';
           final File file = File(path);
           await file.writeAsBytes(await pdf.save());
 
+          //Taylor - Added this for iPads, so the share sheet would pop-up in the center of the screen
+          Rect _calculateCenteredRect(RenderBox box) {
+            Offset topLeft = box.localToGlobal(Offset.zero);
+            Size boxSize = box.size;
+
+            double centerX = topLeft.dx + boxSize.width / 2;
+            double centerY = topLeft.dy + boxSize.height / 2;
+
+            double popoverWidth = 1;
+            double popoverHeight = 1;
+
+            return Rect.fromLTWH(
+              centerX,
+              centerY,
+              popoverWidth,
+              popoverHeight,
+            );
+          }
+
           // Taylor - Added this to allow users to chose there own destination.
           final XFile xfile = XFile(path);
-          await Share.shareXFiles([xfile], text: 'Here is my drawing');
+          RenderBox? box = context.findRenderObject() as RenderBox?;
+          await Share.shareXFiles(
+            [xfile],
+            text: 'Here is my drawing', // Optional text accompanying the shared file
+            sharePositionOrigin: box != null
+                ? _calculateCenteredRect(box)
+                : Rect.fromLTWH(
+              MediaQuery.of(context).size.width / 2,
+              MediaQuery.of(context).size.height / 2,
+              1,
+              1,
+            ),
+          );
 
           // Taylor - Added success and failure messages.
           ScaffoldMessenger.of(context).showSnackBar(
