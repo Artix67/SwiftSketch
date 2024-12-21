@@ -15,26 +15,35 @@ class SettingsScreen extends StatelessWidget{
     return MaterialApp(
         home: Scaffold(
           backgroundColor: Colors.orange[100],
-            appBar: AppBar(
-              backgroundColor: Colors.orange[100],
-              centerTitle: true,
-              title: const Text('Settings'),
-              leading: IconButton(onPressed: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context){
-                      return const HomeScreen();
-                    })
-                );
-              },
-                  icon: const Icon(Icons.arrow_back)),
+            appBar: PreferredSize(
+                preferredSize: const Size.fromHeight(150),
+                child: AppBar(
+                  backgroundColor: Colors.orange[100],
+                  centerTitle: true,
+                  flexibleSpace: Container(
+                    height: 200,
+                    child: Image.asset('images/SSLogo.png',
+                      height: 200,
+                      width: 200,
+                    ),
+                  ),
+                  leading: IconButton(onPressed: (){
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context){
+                          return const HomeScreen();
+                        })
+                    );
+                  },
+                      icon: const Icon(Icons.arrow_back)),
+                )
             ),
             body: Center(
                 child: ConstrainedBox(
                     constraints: const BoxConstraints.expand(height: 500, width: 350),
                   child: SizedBox(
                     child: Column(
-                      children: [
+                      children: <Widget>[ 
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
                           onPressed: (){
