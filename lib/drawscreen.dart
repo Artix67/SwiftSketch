@@ -27,92 +27,199 @@ class _Drawscreen extends State<Drawscreen>{
           appBar: AppBar(
             backgroundColor: Colors.orange[100],
             actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.edit),
-                tooltip: 'Freeform',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(FreeformTool());
-                },
+              Transform.scale(
+                scale: 2,
+                child:  IconButton(onPressed: () {},
+                    icon: const ImageIcon(AssetImage("icons/save.png"))
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.horizontal_rule),
-                tooltip: 'Line',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(LineTool());
-                },
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(
+                  icon: const ImageIcon(AssetImage("icons/export2.png")),
+                  tooltip: 'Export',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.export();
+                  },
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.signal_cellular_0_bar),
-                tooltip: 'Triangle',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(TriangleTool());
-                },
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(onPressed: (){},
+                    icon: const ImageIcon(AssetImage("icons/undo.png"))
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.square_outlined),
-                tooltip: 'Rectangle',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(RectangleTool());
-                },
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(onPressed: (){},
+                    icon: const ImageIcon(AssetImage("icons/redo.png"))
+                )
               ),
-              IconButton(
-                icon: const Icon(Icons.circle_outlined),
-                tooltip: 'Circle',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(CircleTool());
-                },
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(onPressed: (){},
+                    icon: const ImageIcon(AssetImage("icons/slidermenu.png"))
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.cancel_rounded),
-                tooltip: 'Delete',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.switchTool(DeleteTool(
-                    _drawingCanvasKey.currentState?.shapes ?? [],
-                        () {
-                      setState(() {}); // Refresh UI
-                    },
-                  ));
-                },
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child:  IconButton(
+                  icon: const ImageIcon(AssetImage("icons/draw.png")),
+                  tooltip: 'Freeform',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.switchTool(FreeformTool());
+                  },
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.grid_on),
-                tooltip: 'Toggle Grid',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.toggleGrid();
-                },
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(
+                  icon:  const ImageIcon(AssetImage("icons/line.png")),
+                  tooltip: 'Line',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.switchTool(LineTool());
+                  },
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.square_foot),
-                tooltip: 'Snap to Grid',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.toggleSnapToGrid();
-                },
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(
+                  icon: const ImageIcon(AssetImage("icons/square.png")),
+                  tooltip: 'Rectangle',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.switchTool(RectangleTool());
+                  },
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.clear),
-                tooltip: 'Clear Canvas',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.clearCanvas();
-                },
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child:  IconButton(
+                  icon: const ImageIcon(AssetImage("icons/triangle.png")),
+                  tooltip: 'Triangle',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.switchTool(TriangleTool());
+                  },
+                ),
               ),
-              IconButton(
-                icon: const Icon(Icons.ios_share),
-                tooltip: 'Export',
-                onPressed: () {
-                  _drawingCanvasKey.currentState?.export();
-                },
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(
+                  icon: const ImageIcon(AssetImage("icons/circle.png")),
+                  tooltip: 'Circle',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.switchTool(CircleTool());
+                  },
+                ),
               ),
-              IconButton(
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context){
-                        return const HomeScreen();
-                      })
-                  );
-                },
-                icon: const Icon(Icons.delete),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child:  IconButton(onPressed: (){},
+                    icon:  const ImageIcon(AssetImage("icons/freeformshapes.png"))
+                ),
               ),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child:  IconButton(onPressed: (){},
+                    icon:  const ImageIcon(AssetImage("icons/label.png"))
+                ),
+              ),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(
+                  icon: const ImageIcon(AssetImage("icons/eraser.png")),
+                  tooltip: 'Delete',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.switchTool(DeleteTool(
+                      _drawingCanvasKey.currentState?.shapes ?? [],
+                          () {
+                        setState(() {}); // Refresh UI
+                      },
+                    ));
+                  },
+                ),
+              ),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(onPressed: (){},
+                    icon:  const ImageIcon(AssetImage("icons/zoomin.png"))
+                ),
+              ),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(onPressed: (){},
+                    icon:  const ImageIcon(AssetImage("icons/pan.png"))
+                ),
+              ),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(onPressed: (){},
+                    icon:  const ImageIcon(AssetImage("icons/cursor.png"))
+                ),
+              ),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(
+                  icon: const ImageIcon(AssetImage("icons/grid.png")),
+                  tooltip: 'Toggle Grid',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.toggleGrid();
+                  },
+                ),
+              ),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child:  IconButton(
+                  icon: const Icon(Icons.square_foot),
+                  tooltip: 'Snap to Grid',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.toggleSnapToGrid();
+                  },
+                ),
+              ),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(
+                  icon:const Icon(Icons.delete),
+                  tooltip: 'Clear Canvas',
+                  onPressed: () {
+                    _drawingCanvasKey.currentState?.clearCanvas();
+                  },
+                ),
+              ),
+              const SizedBox(width: 15,),
+              Transform.scale(
+                scale: 2,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context){
+                          return const HomeScreen();
+                        })
+                    );
+                  },
+                  icon:  const ImageIcon(AssetImage("icons/clear.png")),
+                ),
+              ),
+              const SizedBox(width: 15,),
             ],
           ),
           body: DrawingCanvas(key: _drawingCanvasKey),

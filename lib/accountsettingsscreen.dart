@@ -108,6 +108,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        extendBodyBehindAppBar: true,
         backgroundColor: Colors.orange[100],
         appBar: AppBar(
           centerTitle: true,
@@ -131,10 +132,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             child: SizedBox(
               child: Column(
                 children: [
-                  const Icon(
-                    Icons.verified_user,
+                  const ImageIcon(
+                    AssetImage("icons/userprofile.png"),
                     color: Colors.black,
-                    size: 24.0,
+                    size: 50.0,
                   ),
                   const SizedBox(height: 10),
                   const SelectionContainer.disabled(
