@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   pdf: ^3.6.0
+  sqflite: ^2.0.0+4
   printing: ^5.6.0
   path_provider: ^2.0.8
   share_plus: ^10.1.2
@@ -23,6 +24,8 @@ dependencies:
 
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+
+
 
   # Firebase dependencies (aligned versions)
   firebase_core: ^3.7.0
@@ -38,3 +41,37 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - images/SSLogo.png
+    - icons/add.png
+    - icons/circle.png
+    - icons/clear.png
+    - icons/colorfill.png
+    - icons/colorselect.png
+    - icons/cursor.png
+    - icons/draw.png
+    - icons/eraser.png
+    - icons/export.png
+    - icons/export2.png
+    - icons/freeformline.png
+    - icons/freeformshapes.png
+    - icons/grid.png
+    - icons/label.png
+    - icons/line.png
+    - icons/load.png
+    - icons/menu.png
+    - icons/navigation.png
+    - icons/pan.png
+    - icons/pan2.png
+    - icons/redo.png
+    - icons/ruler.png
+    - icons/save.png
+    - icons/settings.png
+    - icons/slidermenu.png
+    - icons/square.png
+    - icons/tools.png
+    - icons/triangle.png
+    - icons/undo.png
+    - icons/userprofile.png
+    - icons/zoomin.png
+    - icons/zoomout.png
