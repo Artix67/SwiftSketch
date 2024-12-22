@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/settingsscreen.dart';
-
+import 'DatabaseHelper.dart';
+import 'FirebaseAuthService.dart';
 
 const List<String> themelist = <String>['Light', 'Dark'];
 const List<String> toolbarposlist = <String>['Top', 'Bottom', 'Left', 'Right'];
@@ -11,8 +12,72 @@ const Color dgreencolor = Color(0xFF181C14);
 const Color lgreencolor = Color(0xFF2C2C2C);
 const Color biegecolor = Color(0xFF2C2C2C);
 const Color redcolor = Color(0xFF2C2C2C);
-class AppSettingsScreen extends StatelessWidget{
+
+class AppSettingsScreen extends StatefulWidget{
   const AppSettingsScreen({super.key});
+
+  @override
+  State<AppSettingsScreen> createState() => _AppSettingsScreenState();
+}
+
+class _AppSettingsScreenState extends State<AppSettingsScreen> {
+  final FirebaseAuthService _authService = FirebaseAuthService();
+  final DatabaseHelper _dbHelper = DatabaseHelper();
+
+  String _theme = 'Light';
+  String _toolbarPosition = 'Top';
+  String _fontSize = '12';
+  String _gridSize = '10';
+  String _layerPresets = 'Layer 1';
+  bool _gridVisibility = true;
+  bool _tipsTutorials = true;
+  bool _appUpdates = true;
+  double _lineThickness = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  void _loadSettings() async {
+    final user = _authService.auth.currentUser;
+    if (user != null) {
+      final settings = await _dbHelper.getSettings(user.email!);
+      if (settings != null) {
+        setState(() {
+          _theme = settings['theme'] ?? 'Light';
+          _toolbarPosition = settings['toolbarPosition'] ?? 'Top';
+          _fontSize = settings['fontSize'] ?? '12';
+          _gridSize = settings['gridSize'] ?? '10';
+          _layerPresets = settings['layerPresets'] ?? 'Layer 1';
+          _gridVisibility = settings['gridVisibility'] == 1;
+          _tipsTutorials = settings['tipsTutorials'] == 1;
+          _appUpdates = settings['appUpdates'] == 1;
+          _lineThickness = settings['lineThickness'] ?? 0.0;
+        });
+      }
+    }
+  }
+
+  void _updateSettings() async {
+    final user = _authService.auth.currentUser;
+    if (user != null) {
+      await _dbHelper.updateSettings({
+        'userEmail': user.email,
+        'theme': _theme,
+        'toolbarPosition': _toolbarPosition,
+        'fontSize': _fontSize,
+        'gridSize': _gridSize,
+        'layerPresets': _layerPresets,
+        'gridVisibility': _gridVisibility ? 1 : 0,
+        'tipsTutorials': _tipsTutorials ? 1 : 0,
+        'appUpdates': _appUpdates ? 1 : 0,
+        'lineThickness': _lineThickness,
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,7 +101,6 @@ class AppSettingsScreen extends StatelessWidget{
           body: Center(
             child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-
                 SizedBox(
                   width: MediaQuery.sizeOf(context).width * 0.3,
                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -118,7 +182,15 @@ class AppSettingsScreen extends StatelessWidget{
                         Container(alignment: Alignment.centerRight,
                               height: 58,
                               width: 150,
-                          child: LineThickness(),
+                          child: LineThickness(
+                            initialSliderValue: _lineThickness,
+                            onChanged: (value) {
+                              setState(() {
+                                _lineThickness = value;
+                                _updateSettings();
+                              });
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -236,10 +308,19 @@ class AppSettingsScreen extends StatelessWidget{
                         height: 58,
                         child: const Text("Grid Visibility:"),
                       ),
+                      const Text("Grid Visibility:"),
                       Container(alignment: Alignment.center,
                         width: 150,
                         height: 58,
-                        child: const Enable(),
+                        child: Enable(
+                          initialSwitchValue: _gridVisibility,
+                          onChanged: (value) {
+                            setState(() {
+                              _gridVisibility = value;
+                              _updateSettings();
+                            });
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -256,7 +337,15 @@ class AppSettingsScreen extends StatelessWidget{
                         Container(alignment: Alignment.center,
                             width: 150,
                           height: 58,
-                            child: const Enable(),
+                            child: Enable(
+                              initialSwitchValue: _tipsTutorials,
+                              onChanged: (value) {
+                                setState(() {
+                                  _tipsTutorials = value;
+                                  _updateSettings();
+                                });
+                              },
+                            ),
                         ),
                       ],
                     ),
@@ -270,10 +359,19 @@ class AppSettingsScreen extends StatelessWidget{
                           height: 58,
                             child: const Text("App Updates:"),
                         ),
+                        const Text("App Updates:"),
+
                         Container(alignment: Alignment.center,
                             width: 150,
                           height: 58,
-                            child: Enable(),
+                            child: Enable(
+                              initialSwitchValue: _appUpdates,
+                              onChanged: (value) {
+                                setState(() {
+                                  _appUpdates = value;
+                                  _updateSettings();
+                                });
+                              },),
                         ),
                       ],
                     ),
@@ -289,14 +387,24 @@ class AppSettingsScreen extends StatelessWidget{
 
 
 class Enable extends StatefulWidget {
-  const Enable({super.key});
+  final bool initialSwitchValue;
+  final ValueChanged<bool> onChanged;
+
+  const Enable({super.key, required this.initialSwitchValue, required this.onChanged});
 
   @override
   State<Enable> createState() => _EnableState();
 }
 
 class _EnableState extends State<Enable> {
-  bool light = true;
+  late bool light;
+
+  @override
+  void initState() {
+    super.initState();
+    light = widget.initialSwitchValue;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Switch(
@@ -307,6 +415,7 @@ class _EnableState extends State<Enable> {
         // This is called when the user toggles the switch.
         setState(() {
           light = value;
+          widget.onChanged(value);
         });
       },
     );
@@ -317,14 +426,23 @@ class _EnableState extends State<Enable> {
 
 
 class LineThickness extends StatefulWidget {
-  const LineThickness({super.key});
+  final double initialSliderValue;
+  final ValueChanged<double> onChanged;
+
+  const LineThickness({super.key, required this.initialSliderValue, required this.onChanged});
 
   @override
-  State<LineThickness> createState() => _LineThickness();
+  State<LineThickness> createState() => _LineThicknessState();
 }
 
-class _LineThickness extends State<LineThickness> {
-  double _currentSliderValue = 0;
+class _LineThicknessState extends State<LineThickness> {
+  late double _currentSliderValue;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentSliderValue = widget.initialSliderValue;
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,9 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'DatabaseHelper.dart';
+import 'FirestoreService.dart';
 
 class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final DatabaseHelper _dbHelper = DatabaseHelper();
+  final FirestoreService _firestoreService = FirestoreService();
 
   FirebaseAuth get auth => _auth; // Public getter for _auth
 
@@ -26,11 +26,19 @@ class FirebaseAuthService {
     );
     User? user = userCredential.user;
     if (user != null) {
-      await _dbHelper.insertUser({
+      await _firestoreService.addUser({
         'email': email,
       });
-      await _dbHelper.insertSettings({
+      await _firestoreService.addSettings({
         'userEmail': email,
+        'theme': 'Light',
+        'toolbarPosition': 'Top',
+        'fontSize': '12',
+        'gridSize': '10',
+        'layerPresets': 'Layer 1',
+        'gridVisibility': 1,
+        'tipsTutorials': 1,
+        'appUpdates': 1,
         'gridSize': 0.0,
         'defaultColor': 'FFFFFF',
         'defaultTool': '',
@@ -38,6 +46,11 @@ class FirebaseAuthService {
         'gridOnOff': 0,
         'currentProject': '',
         'snapSensitivity': 0.0,
+        'biometricEnabled': 0,
+        'unitOfMeasurement': 'Metric',
+        'snapToGridSensitivity': '10px',
+        'zoomSensitivity': '10',
+        'autoSaveFrequency': '5 min'
       });
     }
     return user;
@@ -51,3 +64,4 @@ class FirebaseAuthService {
     await _auth.signOut();
   }
 }
+

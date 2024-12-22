@@ -41,6 +41,14 @@ class DatabaseHelper {
       CREATE TABLE settings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         userEmail TEXT,
+        theme TEXT,
+        toolbarPosition TEXT,
+        fontSize TEXT,
+        gridSize TEXT,
+        layerPresets TEXT,
+        gridVisibility INTEGER,
+        tipsTutorials INTEGER,
+        appUpdates INTEGER,
         gridSize REAL,
         defaultColor TEXT,
         defaultTool TEXT,
@@ -49,6 +57,10 @@ class DatabaseHelper {
         currentProject TEXT,
         snapSensitivity REAL,
         biometricEnabled INTEGER,
+        unitOfMeasurement TEXT,
+        snapToGridSensitivity TEXT,
+        zoomSensitivity TEXT,
+        autoSaveFrequency TEXT,
         FOREIGN KEY(userEmail) REFERENCES users(email)
       )
     ''');
