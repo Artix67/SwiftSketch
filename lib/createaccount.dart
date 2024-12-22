@@ -44,6 +44,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints.expand(height: 350, width: 350),
