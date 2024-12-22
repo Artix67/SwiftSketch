@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:swift_sketch/settingsscreen.dart';
-import 'FirebaseAuthService.dart';
-import 'DatabaseHelper.dart';
+import '/screens/settingsscreen.dart';
+import '/FirebaseAuthService.dart';
+import '/FirestoreService.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -15,8 +15,8 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final FirebaseAuthService _authService = FirebaseAuthService();
-  final DatabaseHelper _dbHelper = DatabaseHelper();
-  String _currentEmail = '';
+  final FirestoreService _firestoreService = FirestoreService();
+  String _currentUID = '';
 
   @override
   void initState() {
@@ -27,13 +27,13 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   void _loadUserData() async {
     final user = _authService.auth.currentUser;
     if (user != null) {
-      final email = user.email!;
+      final uid = user.uid;
       setState(() {
-        _emailController.text = email;
-        _currentEmail = email;
+        _emailController.text = user.email!;
+        _currentUID = uid;
       });
 
-      final userData = await _dbHelper.getUserByEmail(email);
+      final userData = await _firestoreService.getUserByUID(uid);
       if (userData != null) {
         setState(() {
           _firstNameController.text = userData['firstName'] ?? '';
@@ -47,13 +47,14 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     final user = _authService.auth.currentUser;
     if (user != null) {
       try {
-        // Update email in Firebase
+        // Update email in Firebase Auth
         await user.updateEmail(_emailController.text);
         await user.reload();
         _authService.auth.currentUser!.sendEmailVerification();
 
-        // Update SQLite database
-        await _dbHelper.updateUser({
+        // Update Firestore
+        await _firestoreService.updateUser({
+          'uid': user.uid,
           'email': _emailController.text,
           'firstName': _firstNameController.text,
           'lastName': _lastNameController.text,
@@ -75,7 +76,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     final user = _authService.auth.currentUser;
     if (user != null) {
       try {
-        await _dbHelper.deleteUser(user.email!);
+        await _firestoreService.deleteUser(user.uid);
         await user.delete();
         Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
       } catch (e) {
@@ -108,6 +109,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
         backgroundColor: Colors.orange[100],
         appBar: AppBar(

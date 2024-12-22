@@ -25,8 +25,11 @@ class Toolbar extends StatelessWidget {
   final Function(double) onUpdateSnapSensitivity;
   final GlobalKey<DrawingCanvasState> drawingCanvasKey;
   final VoidCallback onDeleteToolUpdate;
+  final VoidCallback onSaved;
   final List<DrawingShape> activeLayerShapes;
   final VoidCallback refreshUI;
+  final double spacerSize;
+  final double iconSize;
 
 
   const Toolbar({
@@ -42,9 +45,11 @@ class Toolbar extends StatelessWidget {
     required this.onUpdateSnapSensitivity,
     required this.drawingCanvasKey,
     required this.onDeleteToolUpdate,
+    required this.onSaved,
     required this.activeLayerShapes,
     required this.refreshUI,
-
+    required this.spacerSize,
+    required this.iconSize,
   });
 
   void _pickColor(BuildContext context, bool isFill) {
@@ -93,24 +98,84 @@ class Toolbar extends StatelessWidget {
     return AppBar(
       backgroundColor: Colors.orange[100],
       actions: <Widget>[
-        Slider(
-          value: snapSensitivity,
-          min: 1.0,
-          max: 5.0,
-          divisions: 4,
-          label: '${snapSensitivity.toStringAsFixed(1)}x',
-          onChanged: (value) {
-            onUpdateSnapSensitivity(value);
-          },
+
+        //MARK: - SAVE BUTTON
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            onPressed: () {
+              onSaved();
+            },
+            icon: const ImageIcon(AssetImage("icons/save.png")),
+            tooltip: "Save",
+          ),
         ),
-        Slider(
-          value: gridSize,
-          min: 5.0,
-          max: 50.0,
-          divisions: 9,
-          label: '${gridSize.toInt()} px',
-          onChanged: onUpdateGridSize,
+        SizedBox(width: spacerSize,),
+
+        //MARK: - EXPORT BUTTON
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            icon: const ImageIcon(AssetImage("icons/export2.png")),
+            tooltip: 'Export',
+            onPressed: () {
+              drawingCanvasKey.currentState?.export();
+            },
+          ),
         ),
+        SizedBox(width: spacerSize,),
+
+        //MARK: - UNDO BUTTON
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            onPressed: () {
+              drawingCanvasKey.currentState?.undo();
+              refreshUI();
+            },
+            icon: const ImageIcon(AssetImage("icons/undo.png")),
+            tooltip: "Undo",
+          ),
+        ),
+        SizedBox(width: spacerSize,),
+
+        //MARK: - REDO BUTTON
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            onPressed: () {
+              drawingCanvasKey.currentState?.redo();
+              refreshUI();
+            },
+            icon: const ImageIcon(AssetImage("icons/redo.png")),
+            tooltip: "Redo",
+          ),
+        ),
+        SizedBox(width: spacerSize,),
+
+        //TODO: Move to Settings
+        // Slider(
+        //   value: snapSensitivity,
+        //   min: 1.0,
+        //   max: 5.0,
+        //   divisions: 4,
+        //   label: '${snapSensitivity.toStringAsFixed(1)}x',
+        //   onChanged: (value) {
+        //     onUpdateSnapSensitivity(value);
+        //   },
+        // ),
+
+        //TODO: Move to Settings
+        // Slider(
+        //   value: gridSize,
+        //   min: 5.0,
+        //   max: 50.0,
+        //   divisions: 9,
+        //   label: '${gridSize.toInt()} px',
+        //   onChanged: onUpdateGridSize,
+        // ),
+
+        //MARK: - STROKE WIDTH SLIDER
         Slider(
           value: strokeWidth,
           min: 1.0,
@@ -119,7 +184,11 @@ class Toolbar extends StatelessWidget {
           label: '${strokeWidth.toStringAsFixed(1)} px',
           onChanged: onUpdateStrokeWidth,
         ),
-        IconButton(
+
+        //TODO: Redesign to match desired style
+        Transform.scale(
+        scale: iconSize,
+          child: IconButton(
           icon: Stack(
             alignment: Alignment.center,
             children: [
@@ -142,7 +211,13 @@ class Toolbar extends StatelessWidget {
             _pickColor(context, true);
           },
         ),
-        IconButton(
+        ),
+        SizedBox(width: spacerSize,),
+
+        //TODO: Redesign to match desired style
+    Transform.scale(
+    scale: iconSize,
+    child: IconButton(
           icon: Stack(
             alignment: Alignment.center,
             children: [
@@ -166,74 +241,143 @@ class Toolbar extends StatelessWidget {
             _pickColor(context, false);
           },
         ),
-        IconButton(
-          icon: const Icon(Icons.edit),
-          tooltip: 'Freeform',
-          onPressed: () {
-            drawingCanvasKey.currentState?.switchTool(FreeformTool());
-          },
+    ),
+        SizedBox(width: spacerSize,),
+
+        // MARK: - FREEFORM TOOL SELECTOR
+        Transform.scale(
+          scale: iconSize,
+          child:  IconButton(
+            icon: const ImageIcon(AssetImage("icons/draw.png")),
+            tooltip: 'Freeform',
+            onPressed: () {
+              drawingCanvasKey.currentState?.switchTool(FreeformTool());
+            },
+          ),
         ),
-        IconButton(
-          icon: const Icon(Icons.horizontal_rule),
-          tooltip: 'Line',
-          onPressed: () {
-            drawingCanvasKey.currentState?.switchTool(LineTool());
-          },
+        SizedBox(width: spacerSize,),
+
+        //MARK: - LINE TOOL SELECTOR
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            icon:  const ImageIcon(AssetImage("icons/line.png")),
+            tooltip: 'Line',
+            onPressed: () {
+              drawingCanvasKey.currentState?.switchTool(LineTool());
+            },
+          ),
         ),
-        IconButton(
-          icon: const Icon(Icons.signal_cellular_0_bar),
-          tooltip: 'Triangle',
-          onPressed: () {
-            drawingCanvasKey.currentState?.switchTool(TriangleTool());
-          },
+        SizedBox(width: spacerSize,),
+
+        //MARK: - TRIANGLE TOOL SELECTOR
+        Transform.scale(
+          scale: iconSize,
+          child:  IconButton(
+            icon: const ImageIcon(AssetImage("icons/triangle.png")),
+            tooltip: 'Triangle',
+            onPressed: () {
+              drawingCanvasKey.currentState?.switchTool(TriangleTool());
+            },
+          ),
         ),
-        IconButton(
-          icon: const Icon(Icons.square_outlined),
-          tooltip: 'Rectangle',
-          onPressed: () {
-            drawingCanvasKey.currentState?.switchTool(RectangleTool());
-          },
+        SizedBox(width: spacerSize,),
+
+        //MARK: - SQUARE TOOL SELECTOR
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            icon: const ImageIcon(AssetImage("icons/square.png")),
+            tooltip: 'Rectangle',
+            onPressed: () {
+              drawingCanvasKey.currentState?.switchTool(RectangleTool());
+            },
+          ),
         ),
-        IconButton(
-          icon: const Icon(Icons.circle_outlined),
-          tooltip: 'Circle',
-          onPressed: () {
-            drawingCanvasKey.currentState?.switchTool(CircleTool());
-          },
+
+        //MARK: - CIRCLE TOOL SELECTOR
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            icon: const ImageIcon(AssetImage("icons/circle.png")),
+            tooltip: 'Circle',
+            onPressed: () {
+              drawingCanvasKey.currentState?.switchTool(CircleTool());
+            },
+          ),
         ),
-        IconButton(
-          icon: const Icon(Icons.note),
-          tooltip: 'Annotation Tool',
-          onPressed: () {
+        SizedBox(width: spacerSize,),
+
+        //TODO: CREATE POLYGON TOOL
+        // Transform.scale(
+        //                 scale: 2,
+        //                 child:  IconButton(onPressed: (){
+        //                    drawingCanvasKey.currentState?.switchTool(PolygonTool());
+        //                 },
+        //                     icon:  const ImageIcon(AssetImage("icons/freeformshapes.png"))
+        //                 ),
+        //               ),
+        //               const SizedBox(width: 15,),
+
+        //MARK: - ANNOTATION TOOL
+        Transform.scale(
+          scale: iconSize,
+          child:  IconButton(onPressed: (){
             drawingCanvasKey.currentState?.switchTool(AnnotationTool());
           },
+              icon:  const ImageIcon(AssetImage("icons/label.png")),
+              tooltip: 'Annotation Tool',
+          ),
         ),
-        IconButton(
-          icon: const Icon(Icons.cancel_rounded),
-          tooltip: 'Delete',
-          onPressed: () {
-            drawingCanvasKey.currentState?.switchTool(DeleteTool(
-              activeLayerShapes,
-                  () {
-                refreshUI();
-              },
-            ));
-          },
+        SizedBox(width: spacerSize,),
+
+        //MARK: - ERASER TOOL SELECTOR
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            icon: const ImageIcon(AssetImage("icons/eraser.png")),
+            tooltip: 'Eraser',
+            onPressed: () {
+              drawingCanvasKey.currentState?.switchTool(DeleteTool(
+                activeLayerShapes,
+                    () {
+                  refreshUI();
+                },
+              ));
+            },
+          ),
         ),
-        IconButton(
-          icon: const Icon(Icons.grid_on),
-          tooltip: 'Toggle Grid',
-          onPressed: () {
-            drawingCanvasKey.currentState?.toggleGrid();
-          },
+
+        //MARK: - TOGGLE GRID VISIBILITY
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            icon: const ImageIcon(AssetImage("icons/grid.png")),
+            tooltip: 'Toggle Grid',
+            onPressed: () {
+              drawingCanvasKey.currentState?.toggleGrid();
+            },
+          ),
         ),
-        IconButton(
-          icon: const Icon(Icons.square_foot),
-          tooltip: 'Snap to Grid',
-          onPressed: () {
-            drawingCanvasKey.currentState?.toggleSnapToGrid();
-          },
+        SizedBox(width: spacerSize,),
+
+        //MARK: - TOGGLE SNAP TO GRID
+        Transform.scale(
+          scale: iconSize,
+          child:  IconButton(
+            icon: const Icon(Icons.square_foot),
+            tooltip: 'Snap to Grid',
+            onPressed: () {
+              drawingCanvasKey.currentState?.toggleSnapToGrid();
+            },
+          ),
         ),
+        SizedBox(width: spacerSize,),
+
+        //TODO: CONFORM THIS TO TOOL STYLING
+        // You may want to add this styling to other buttons as well. Via a bool the button
+        // changes looks to indicate that it is selected.
+        //MARK: - ZOOM IN/OUT TOGGLE
         ValueListenableBuilder<bool>(
           valueListenable: drawingCanvasKey.currentState?.isZoomEnabledNotifier ?? ValueNotifier(false),
           builder: (context, isZoomEnabled, child) {
@@ -244,68 +388,84 @@ class Toolbar extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               )
                   : null,
-              child: IconButton(
-                icon: Icon(isZoomEnabled ? Icons.zoom_out : Icons.zoom_in),
-                tooltip: 'Toggle Zoom',
-                onPressed: () {
-                  drawingCanvasKey.currentState?.toggleZoom();
-                },
-              ),
-            );
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.redo),
-          tooltip: 'Redo',
-          onPressed: () {
-            drawingCanvasKey.currentState?.redo();
-            refreshUI();
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.undo),
-          tooltip: 'Undo',
-          onPressed: () {
-            drawingCanvasKey.currentState?.undo();
-            refreshUI();
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.clear),
-          tooltip: 'Clear Canvas',
-          onPressed: () async {
-            final shouldClear = await showDialog<bool>(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Reset Drawing and Layers'),
-                content: const Text(
-                  'Are you sure you want to reset the drawing and all layers? This action cannot be undone.',
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('Cancel'),
+              child: Row(
+                children: [
+                  Transform.scale(
+                  scale: iconSize,
+                  child: IconButton(
+                    icon: ImageIcon(isZoomEnabled ? AssetImage("icons/zoomout.png") : AssetImage("icons/zoomin.png")),
+                    tooltip: 'Toggle Zoom',
+                    onPressed: () {
+                      drawingCanvasKey.currentState?.toggleZoom();
+                    },
                   ),
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(true),
-                    child: const Text('Reset'),
                   ),
+                  SizedBox(width: spacerSize),
                 ],
               ),
-            );
 
-            if (shouldClear == true) {
-              drawingCanvasKey.currentState?.clearCanvas();
-            }
+            );
           },
         ),
-        IconButton(
-          icon: const Icon(Icons.ios_share),
-          tooltip: 'Export',
-          onPressed: () {
-            drawingCanvasKey.currentState?.export();
-          },
+
+        //TODO: DEVELOP A TOOL FOR PANNING THAT IS SEPARATE FROM ZOOM
+        //MARK: - PAN TOOL SELECTOR
+        // Transform.scale(
+        //   scale: iconSize,
+        //   child: IconButton(onPressed: (){},
+        //       icon:  const ImageIcon(AssetImage("icons/pan.png"))
+        //   ),
+        // ),
+        // SizedBox(width: iconSize,),
+
+        //MARK: - CURSOR TOOL SELECTOR
+        //This may be unnecessary, currently we don't have a tool that would use this.
+        //Keeping just in case.
+        // Transform.scale(
+        //   scale: iconSize,
+        //   child: IconButton(onPressed: (){},
+        //       icon:  const ImageIcon(AssetImage("icons/cursor.png"))
+        //   ),
+        // ),
+        // SizedBox(width: iconSize,),
+
+
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton (
+            icon: const Icon(Icons.delete),
+            tooltip: 'Clear Canvas',
+            onPressed: () async {
+              final shouldClear = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Reset Drawing and Layers'),
+                  content: const Text(
+                   'Are you sure you want to reset the drawing and all layers? This action cannot be undone.',
+                  ),
+                actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Reset'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (shouldClear == true) {
+                drawingCanvasKey.currentState?.clearCanvas();
+              }
+           },
+          ),
         ),
+        SizedBox(width: spacerSize,),
+
+        //TODO: Resdeign to match desired style
+        //MARK: - RETURN TO HOME SCREEN
         IconButton(
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -313,6 +473,7 @@ class Toolbar extends StatelessWidget {
             }));
           },
           icon: const Icon(Icons.keyboard_return),
+          tooltip: 'Home',
         ),
       ],
     );

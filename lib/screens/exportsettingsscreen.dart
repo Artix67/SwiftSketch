@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swift_sketch/settingsscreen.dart';
+import 'package:swift_sketch/screens/settingsscreen.dart';
 
 
 const List<String> exportlist = <String>['PDF', 'JPEG', 'PNG'];

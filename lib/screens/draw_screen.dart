@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:swift_sketch/screens/toolbar.dart';
 import 'package:swift_sketch/screens/layers_tab.dart';
 import '../drawing_canvas.dart';
+import '../drawing_shapes/drawing_shape.dart';
 import '../models/layer.dart';
+import 'package:swift_sketch/ProjectManager.dart';
 
 class Drawscreen extends StatefulWidget {
+  final String projectName;
 
-  const Drawscreen({super.key});
+  const Drawscreen({super.key, required this.projectName});
 
   @override
   State<Drawscreen> createState() => _Drawscreen();
@@ -14,12 +17,15 @@ class Drawscreen extends StatefulWidget {
 
 class _Drawscreen extends State<Drawscreen> {
   final GlobalKey<DrawingCanvasState> _drawingCanvasKey = GlobalKey<DrawingCanvasState>();
+  final ProjectManager _projectManager = ProjectManager();
 
   Color _fillColor = Colors.transparent;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
   double _gridSize = 10.0;
   double _snapSensitivity = 2.0;
+  double _iconSize = 1.5;
+  double _spacerSize = 15;
 
   final ValueNotifier<List<Layer>> _layersNotifier = ValueNotifier([
     Layer(id: "1", name: "Layer 1", shapes: [])
@@ -30,11 +36,27 @@ class _Drawscreen extends State<Drawscreen> {
   @override
   void initState() {
     super.initState();
+    _loadProject();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_layersNotifier.value.isNotEmpty) {
         _drawingCanvasKey.currentState?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
       }
     });
+  }
+
+  Future<void> _loadProject() async {
+    List<DrawingShape> shapes = await _projectManager.loadProject(widget.projectName);
+    setState(() {
+      _drawingCanvasKey.currentState?.shapes = shapes;
+    });
+  }
+
+  void _saveProject() async {
+    List<DrawingShape> shapes = _drawingCanvasKey.currentState?.shapes ?? [];
+    await _projectManager.saveProject(widget.projectName, shapes);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Project saved successfully')),
+    );
   }
 
   void _updateStrokeWidth(double value) {
@@ -140,11 +162,14 @@ class _Drawscreen extends State<Drawscreen> {
             onDeleteToolUpdate: () {
               setState(() {});
             },
+            onSaved: _saveProject,
             activeLayerShapes: _layersNotifier.value[_selectedLayerIndex.value].shapes,
             refreshUI: () {
               setState(() {});
             },
             onUpdateSnapSensitivity: _updateSnapSensitivity,
+            iconSize: _iconSize,
+            spacerSize: _spacerSize,
           ),
         ),
         body: Row(

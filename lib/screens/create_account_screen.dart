@@ -1,7 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '/screens/loginscreen.dart';
-import 'FirebaseAuthService.dart';
+import 'loginscreen.dart';
+import '/FirebaseAuthService.dart';
+import 'homescreen.dart';
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -22,17 +23,27 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         _passwordController.text,
       );
       if (user != null) {
-        await _authService.sendEmailVerification(user);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Verification email sent')),
+          const SnackBar(content: Text('Account created and signed in successfully')),
         );
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
+          MaterialPageRoute(builder: (context) => const HomeScreen()), // Navigate to home screen
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'too-many-requests') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Too many requests. Please try again later.')),
+        );
+      } else {
+        print('Account creation failed: ${e.message}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create account: ${e.message}')),
         );
       }
     } catch (e) {
-      // Handle account creation error
+      // Handle any other errors
       print('Account creation failed: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to create account')),
@@ -44,6 +55,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints.expand(height: 350, width: 350),

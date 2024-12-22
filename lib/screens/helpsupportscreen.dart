@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swift_sketch/settingsscreen.dart';
+import 'package:swift_sketch/screens/settingsscreen.dart';
 
 class HelpSupportScreen extends StatelessWidget{
   const HelpSupportScreen({super.key});

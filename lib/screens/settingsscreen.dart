@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:swift_sketch/accountsettingsscreen.dart';
-import 'package:swift_sketch/appsettingsscreen.dart';
-import 'package:swift_sketch/drawingsettingsscreen.dart';
-import 'package:swift_sketch/exportsettingsscreen.dart';
-import 'package:swift_sketch/helpsupportscreen.dart';
-import 'package:swift_sketch/homescreen.dart';
-import 'package:swift_sketch/loginscreen.dart';
-import 'package:swift_sketch/privacysecurityscreen.dart';
+import 'package:swift_sketch/screens/account_settings_screen.dart';
+import 'package:swift_sketch/screens/app_settings_screen.dart';
+import 'package:swift_sketch/screens/drawing_settings_screen.dart';
+import 'package:swift_sketch/screens/exportsettingsscreen.dart';
+import 'package:swift_sketch/screens/helpsupportscreen.dart';
+import 'package:swift_sketch/screens/homescreen.dart';
+import 'package:swift_sketch/screens/loginscreen.dart';
 
 class SettingsScreen extends StatelessWidget{
   const SettingsScreen({super.key});
@@ -96,19 +95,22 @@ class SettingsScreen extends StatelessWidget{
                           child: const Text("Export Settings"),
                         ),
                         const SizedBox(height: 10),
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
-                          onPressed: (){
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context){
-                                  return const PrivacySecurityScreen();
-                                })
-                            );
-                          },
-                          child: const Text("Privacy & Security"),
-                        ),
-                        const SizedBox(height: 10),
+
+                        //TODO: ADD BIOMETRIC DEPENDENCIES
+                        // OutlinedButton(
+                        //   style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
+                        //   onPressed: (){
+                        //     Navigator.push(
+                        //         context,
+                        //         MaterialPageRoute(builder: (context){
+                        //           return const PrivacySecurityScreen();
+                        //         })
+                        //     );
+                        //   },
+                        //   child: const Text("Privacy & Security"),
+                        // ),
+                        // const SizedBox(height: 10),
+
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
                           onPressed: (){
