@@ -35,10 +35,10 @@ class Layer {
 
   Layer copy() {
     return Layer(
-      id: id,
-      name: name,
-      isVisible: isVisible,
-      shapes: shapes.map((shape) => shape.copy()).toList()
+      id: this.id,
+      name: this.name,
+      isVisible: this.isVisible,
+      shapes: this.shapes.map((shape) => shape.copy()).toList()
     );
   }
 }

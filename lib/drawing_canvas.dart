@@ -20,6 +20,7 @@ class DrawingPainter extends CustomPainter {
   final Color strokeColor;
   final double strokeWidth;
   final double gridSize;
+  final int undoCalled;
 
   DrawingPainter(
       this.layers,
@@ -29,6 +30,7 @@ class DrawingPainter extends CustomPainter {
         required this.strokeColor,
         required this.strokeWidth,
         required this.gridSize,
+        required this.undoCalled,
       });
 
   @override
@@ -134,6 +136,21 @@ class DrawingPainter extends CustomPainter {
         }
       }
     }
+
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: 'Undo Count: $undoCalled',
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    );
+    textPainter.layout();
+    textPainter.paint(canvas, const Offset(10, 10));
+
   }
 
   @override
@@ -144,7 +161,8 @@ class DrawingPainter extends CustomPainter {
         oldDelegate.showGrid != showGrid ||
         oldDelegate.strokeColor != strokeColor ||
         oldDelegate.strokeWidth != strokeWidth ||
-        oldDelegate.gridSize != gridSize;
+        oldDelegate.gridSize != gridSize ||
+        oldDelegate.undoCalled != undoCalled;
   }
 }
 
@@ -169,6 +187,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   // final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
   final ValueNotifier<bool> isZoomEnabledNotifier = ValueNotifier(false);
 
+  int undoCalled = 0;
+
   Layer? _activeLayer;
 
   bool _showGrid = true;
@@ -180,8 +200,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
   final UndoRedoManager _undoRedoManager = UndoRedoManager(); // Undo/Redo manager initialization
-
-  // final ZoomTool _zoomTool = ZoomTool(); // Daniel - New ZoomTool instance
   Color _fillColor = Colors.transparent;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
@@ -232,6 +250,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   void initState() {
     super.initState();
     _snapSensitivity = widget.initialSnapSensitivity;
+    _undoRedoManager.addAction(widget.layersNotifier.value);
+    _undoRedoManager.addAction(widget.layersNotifier.value);
     widget.layersNotifier.addListener(_updateActiveLayer);
   }
 
@@ -284,21 +304,13 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   }
 
   void undo() {
-    List<Layer>? previousLayers = _undoRedoManager.undo(widget.layersNotifier.value);
-    if (previousLayers != null) {
-      setState(() {
-        widget.layersNotifier.value = previousLayers;
-      });
-    }
+    widget.layersNotifier.value = _undoRedoManager.undo(widget.layersNotifier.value);
+    undoCalled += 1;
   }
 
   void redo() {
-    List<Layer>? newLayers = _undoRedoManager.redo();
-    if (newLayers != null) {
-      setState(() {
-        widget.layersNotifier.value = newLayers;
-      });
-    }
+    widget.layersNotifier.value = _undoRedoManager.redo();
+    undoCalled += 1;
   }
 
   void clearCanvas() {
@@ -375,6 +387,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
         fillColor: _fillColor,
         strokeColor: _strokeColor,
         strokeWidth: _strokeWidth,
+        tool: selectedTool,
       ));
     }
 
@@ -408,11 +421,13 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                         strokeColor: _strokeColor,
                         strokeWidth: _strokeWidth,
                         annotation: annotationController.text,
+                        tool: selectedTool,
                       );
                       _activeLayer!.shapes.add(shape);
                       widget.layersNotifier.value =
                           List.from(widget.layersNotifier.value);
                       _undoRedoManager.addAction(widget.layersNotifier.value);
+                      undoCalled += 1;
                     }
                   },
                   child: const Text("Save"),
@@ -434,10 +449,12 @@ class DrawingCanvasState extends State<DrawingCanvas> {
               : _fillColor,
           strokeColor: _strokeColor,
           strokeWidth: _strokeWidth,
+          tool: selectedTool,
         );
         _activeLayer!.shapes.add(shape);
         widget.layersNotifier.value = List.from(widget.layersNotifier.value);
         _undoRedoManager.addAction(widget.layersNotifier.value);
+        undoCalled += 1;
       }
     });
   }
@@ -475,23 +492,22 @@ class DrawingCanvasState extends State<DrawingCanvas> {
           return Stack(
             children: [
               GestureDetector(
-                onPanStart: !_isZoomEnabled
-                    ? (details) {
+                onPanStart: (details) {
                   onPanStartHandler(details.localPosition);
                   _previewPointsNotifier.value =
                       List.from(_previewPointsNotifier.value);
-                }
-                    : null,
-                onPanUpdate: !_isZoomEnabled
-                    ? (details) {
+                },
+                onPanUpdate: (details) {
                   onPanUpdateHandler(details.localPosition);
                   _previewPointsNotifier.value =
                       List.from(_previewPointsNotifier.value);
-                }
-                    : null,
-                onPanEnd: !_isZoomEnabled
-                    ? (details) {
+                },
+                onPanEnd: (details) {
                   onPanEndHandler(details.localPosition);
+                  if (getToolTypeForTool(selectedTool) == "Delete") {
+                    _undoRedoManager.addAction(widget.layersNotifier.value);
+                    undoCalled += 1;
+                  }
                   if (_previewPointsNotifier.value.isNotEmpty) {
                     _addShape(DrawingShape(
                       points: List.from(_previewPointsNotifier.value),
@@ -499,6 +515,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                       fillColor: _fillColor,
                       strokeColor: _strokeColor,
                       strokeWidth: _strokeWidth,
+                      tool: selectedTool,
                     ));
                   }
                   _pointsNotifier.value = [
@@ -506,8 +523,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                     ..._previewPointsNotifier.value,
                   ];
                   _previewPointsNotifier.value = [];
-                }
-                    : null,
+                },
                 child: ValueListenableBuilder<List<Offset?>>(
                   valueListenable: _pointsNotifier,
                   builder: (context, points, _) {
@@ -526,6 +542,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                               strokeColor: _strokeColor,
                               strokeWidth: _strokeWidth,
                               gridSize: _gridSize,
+                              undoCalled: undoCalled,
                             ),
                             size: Size.infinite,
                           ),
@@ -533,6 +550,26 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                       },
                     );
                   },
+                ),
+              ),
+              // Positioned widget to display the Undo count
+              Positioned(
+                top: 10.0,
+                left: 10.0,
+                child: Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Text(
+                    'Undo Count: $undoCalled',
+                    style: const TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
               ),
             ],
