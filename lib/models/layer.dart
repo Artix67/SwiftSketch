@@ -32,4 +32,13 @@ class Layer {
           .toList(),
     );
   }
+
+  Layer copy() {
+    return Layer(
+      id: id,
+      name: name,
+      isVisible: isVisible,
+      shapes: shapes.map((shape) => shape.copy()).toList()
+    );
+  }
 }

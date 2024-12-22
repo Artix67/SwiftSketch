@@ -58,4 +58,15 @@ class DrawingShape {
   bool containsPoint(Offset point) {
     return path.contains(point);
   }
+
+  DrawingShape copy() {
+    return DrawingShape(
+        points: List.from(points),
+        toolType: toolType,
+        fillColor: fillColor,
+        strokeColor: strokeColor,
+        strokeWidth: strokeWidth,
+        annotation: annotation
+    );
+  }
 }

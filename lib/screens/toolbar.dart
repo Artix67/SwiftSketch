@@ -259,17 +259,17 @@ class Toolbar extends StatelessWidget {
           tooltip: 'Redo',
           onPressed: () {
             drawingCanvasKey.currentState?.redo();
+            refreshUI();
           },
         ),
-
         IconButton(
           icon: const Icon(Icons.undo),
           tooltip: 'Undo',
           onPressed: () {
             drawingCanvasKey.currentState?.undo();
+            refreshUI();
           },
         ),
-
         IconButton(
           icon: const Icon(Icons.clear),
           tooltip: 'Clear Canvas',

@@ -284,23 +284,19 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   }
 
   void undo() {
-    List<DrawingShape>? previousShapes = _undoRedoManager.undo(shapes);
-    if (previousShapes != null) {
+    List<Layer>? previousLayers = _undoRedoManager.undo(widget.layersNotifier.value);
+    if (previousLayers != null) {
       setState(() {
-        shapes = previousShapes;
-        // Ensuring the UI updates with the new shapes
-        widget.layersNotifier.value = [Layer(id: "1", name: "Layer 1", shapes: shapes, isVisible: true)];
+        widget.layersNotifier.value = previousLayers;
       });
     }
   }
 
   void redo() {
-    List<DrawingShape>? newShapes = _undoRedoManager.redo();
-    if (newShapes != null) {
+    List<Layer>? newLayers = _undoRedoManager.redo();
+    if (newLayers != null) {
       setState(() {
-        shapes = newShapes;
-        // Ensuring the UI updates with the new shapes
-        widget.layersNotifier.value = [Layer(id: "1", name: "Layer 1", shapes: shapes, isVisible: true)];
+        widget.layersNotifier.value = newLayers;
       });
     }
   }
@@ -416,7 +412,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                       _activeLayer!.shapes.add(shape);
                       widget.layersNotifier.value =
                           List.from(widget.layersNotifier.value);
-                      _undoRedoManager.addAction(List.from(_activeLayer!.shapes));
+                      _undoRedoManager.addAction(widget.layersNotifier.value);
                     }
                   },
                   child: const Text("Save"),
@@ -441,7 +437,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
         );
         _activeLayer!.shapes.add(shape);
         widget.layersNotifier.value = List.from(widget.layersNotifier.value);
-        _undoRedoManager.addAction(List.from(_activeLayer!.shapes));
+        _undoRedoManager.addAction(widget.layersNotifier.value);
       }
     });
   }
@@ -539,19 +535,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                   },
                 ),
               ),
-
-              // Taylor - Removed this bit, added coloring to the toolbar that would imply the zoom tool is on
-
-              /*
-             Positioned(
-               bottom: 20,
-               right: 20,
-               child: FloatingActionButton(
-                 onPressed: toggleZoom,
-                 child: Icon(_isZoomEnabled ? Icons.zoom_out : Icons.zoom_in),
-               ),
-             ),
-             */
             ],
           );
         },
