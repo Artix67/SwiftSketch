@@ -20,7 +20,6 @@ class DrawingPainter extends CustomPainter {
   final Color strokeColor;
   final double strokeWidth;
   final double gridSize;
-  final int undoCalled;
 
   DrawingPainter(
       this.layers,
@@ -30,7 +29,6 @@ class DrawingPainter extends CustomPainter {
         required this.strokeColor,
         required this.strokeWidth,
         required this.gridSize,
-        required this.undoCalled,
       });
 
   @override
@@ -137,20 +135,6 @@ class DrawingPainter extends CustomPainter {
       }
     }
 
-    final textPainter = TextPainter(
-      text: TextSpan(
-        text: 'Undo Count: $undoCalled',
-        style: const TextStyle(
-          color: Colors.black,
-          fontSize: 14,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-      textDirection: TextDirection.ltr,
-    );
-    textPainter.layout();
-    textPainter.paint(canvas, const Offset(10, 10));
-
   }
 
   @override
@@ -161,8 +145,7 @@ class DrawingPainter extends CustomPainter {
         oldDelegate.showGrid != showGrid ||
         oldDelegate.strokeColor != strokeColor ||
         oldDelegate.strokeWidth != strokeWidth ||
-        oldDelegate.gridSize != gridSize ||
-        oldDelegate.undoCalled != undoCalled;
+        oldDelegate.gridSize != gridSize;
   }
 }
 
@@ -186,8 +169,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
   // final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
   final ValueNotifier<bool> isZoomEnabledNotifier = ValueNotifier(false);
-
-  int undoCalled = 0;
 
   Layer? _activeLayer;
 
@@ -305,12 +286,10 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
   void undo() {
     widget.layersNotifier.value = _undoRedoManager.undo(widget.layersNotifier.value);
-    undoCalled += 1;
   }
 
   void redo() {
     widget.layersNotifier.value = _undoRedoManager.redo();
-    undoCalled += 1;
   }
 
   void clearCanvas() {
@@ -427,7 +406,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                       widget.layersNotifier.value =
                           List.from(widget.layersNotifier.value);
                       _undoRedoManager.addAction(widget.layersNotifier.value);
-                      undoCalled += 1;
                     }
                   },
                   child: const Text("Save"),
@@ -454,7 +432,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
         _activeLayer!.shapes.add(shape);
         widget.layersNotifier.value = List.from(widget.layersNotifier.value);
         _undoRedoManager.addAction(widget.layersNotifier.value);
-        undoCalled += 1;
       }
     });
   }
@@ -506,7 +483,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                   onPanEndHandler(details.localPosition);
                   if (getToolTypeForTool(selectedTool) == "Delete") {
                     _undoRedoManager.addAction(widget.layersNotifier.value);
-                    undoCalled += 1;
                   }
                   if (_previewPointsNotifier.value.isNotEmpty) {
                     _addShape(DrawingShape(
@@ -542,7 +518,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                               strokeColor: _strokeColor,
                               strokeWidth: _strokeWidth,
                               gridSize: _gridSize,
-                              undoCalled: undoCalled,
                             ),
                             size: Size.infinite,
                           ),
@@ -550,26 +525,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                       },
                     );
                   },
-                ),
-              ),
-              // Positioned widget to display the Undo count
-              Positioned(
-                top: 10.0,
-                left: 10.0,
-                child: Container(
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Text(
-                    'Undo Count: $undoCalled',
-                    style: const TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
                 ),
               ),
             ],

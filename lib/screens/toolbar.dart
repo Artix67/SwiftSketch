@@ -409,6 +409,7 @@ class Toolbar extends StatelessWidget {
         ),
 
         //TODO: DEVELOP A TOOL FOR PANNING THAT IS SEPARATE FROM ZOOM
+        // currently zoom also handles pan, but we may change that
         //MARK: - PAN TOOL SELECTOR
         // Transform.scale(
         //   scale: iconSize,
