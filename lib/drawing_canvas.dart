@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:swift_sketch/export_drawing.dart';
+import '/export_drawing.dart';
 import '/drawing_tools/drawing_tool.dart';
 import '/drawing_tools/freeform_tool.dart';
 import '/drawing_tools/line_tool.dart';
@@ -166,7 +166,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final GlobalKey exportGlobalKey = GlobalKey();
   final ValueNotifier<List<Offset?>> _pointsNotifier = ValueNotifier<List<Offset?>>([]);
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
-  final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
+  // final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
   final ValueNotifier<bool> isZoomEnabledNotifier = ValueNotifier(false);
 
   Layer? _activeLayer;
@@ -179,7 +179,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
-  UndoRedoManager _undoRedoManager = UndoRedoManager(); // Undo/Redo manager initialization
+  final UndoRedoManager _undoRedoManager = UndoRedoManager(); // Undo/Redo manager initialization
 
   // final ZoomTool _zoomTool = ZoomTool(); // Daniel - New ZoomTool instance
   Color _fillColor = Colors.transparent;
@@ -199,8 +199,12 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     throw Exception('Unknown tool type');
   }
 
-  Offset snapToGridOrExistingPoint(Offset position, List<Offset> snapPoints,
-      double gridSize, double snapSensitivity) {
+  Offset snapToGridOrExistingPoint(
+      Offset position, List<Offset> snapPoints, double gridSize, double snapSensitivity) {
+    if (!_snapToGrid) {
+      return position;
+    }
+
     double snapRadius = gridSize * snapSensitivity;
 
     for (final snapPoint in snapPoints) {
@@ -452,7 +456,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
       /* if (!_isZoomEnabled) {
          _transformationController.value = Matrix4.identity();
        } */
-
     });
   }
 
@@ -475,80 +478,80 @@ class DrawingCanvasState extends State<DrawingCanvas> {
         builder: (context, layers, _) {
           return Stack(
             children: [
-              InteractiveViewer(
-                transformationController: _transformationController,
-                panEnabled: _isZoomEnabled,
-                scaleEnabled: _isZoomEnabled,
-                child: GestureDetector(
-                  onPanStart: !_isZoomEnabled ? (details) {
-                    onPanStartHandler(details.localPosition);
-                    _previewPointsNotifier.value =
-                        List.from(_previewPointsNotifier.value);
-                  } : null,
-                  onPanUpdate: !_isZoomEnabled ? (details) {
-                    onPanUpdateHandler(details.localPosition);
-                    _previewPointsNotifier.value =
-                        List.from(_previewPointsNotifier.value);
-                  } : null,
-                  onPanEnd: !_isZoomEnabled ? (details) {
-                    onPanEndHandler(details.localPosition);
-                    if (_previewPointsNotifier.value.isNotEmpty) {
-                      _addShape(DrawingShape(
-                        points: List.from(_previewPointsNotifier.value),
-                        toolType: getToolTypeForTool(selectedTool),
-                        fillColor: _fillColor,
-                        strokeColor: _strokeColor,
-                        strokeWidth: _strokeWidth,
-                      ));
-                    }
-                    _pointsNotifier.value = [
-                      ..._pointsNotifier.value,
-                      ..._previewPointsNotifier.value,
-                    ];
-                    _previewPointsNotifier.value = [];
-                  } : null,
-                  child: ValueListenableBuilder<List<Offset?>>(
-                    valueListenable: _pointsNotifier,
-                    builder: (context, points, _) {
-                      return ValueListenableBuilder<List<Offset?>>(
-                        valueListenable: _previewPointsNotifier,
-                        builder: (context, previewPoints, _) {
-                          return Container(
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: CustomPaint(
-                              painter: DrawingPainter(
-                                layers,
-                                points,
-                                previewPoints: previewPoints,
-                                showGrid: _showGrid,
-                                strokeColor: _strokeColor,
-                                strokeWidth: _strokeWidth,
-                                gridSize: _gridSize,
-                              ),
-                              size: Size.infinite,
+              GestureDetector(
+                onPanStart: !_isZoomEnabled
+                    ? (details) {
+                  onPanStartHandler(details.localPosition);
+                  _previewPointsNotifier.value =
+                      List.from(_previewPointsNotifier.value);
+                }
+                    : null,
+                onPanUpdate: !_isZoomEnabled
+                    ? (details) {
+                  onPanUpdateHandler(details.localPosition);
+                  _previewPointsNotifier.value =
+                      List.from(_previewPointsNotifier.value);
+                }
+                    : null,
+                onPanEnd: !_isZoomEnabled
+                    ? (details) {
+                  onPanEndHandler(details.localPosition);
+                  if (_previewPointsNotifier.value.isNotEmpty) {
+                    _addShape(DrawingShape(
+                      points: List.from(_previewPointsNotifier.value),
+                      toolType: getToolTypeForTool(selectedTool),
+                      fillColor: _fillColor,
+                      strokeColor: _strokeColor,
+                      strokeWidth: _strokeWidth,
+                    ));
+                  }
+                  _pointsNotifier.value = [
+                    ..._pointsNotifier.value,
+                    ..._previewPointsNotifier.value,
+                  ];
+                  _previewPointsNotifier.value = [];
+                }
+                    : null,
+                child: ValueListenableBuilder<List<Offset?>>(
+                  valueListenable: _pointsNotifier,
+                  builder: (context, points, _) {
+                    return ValueListenableBuilder<List<Offset?>>(
+                      valueListenable: _previewPointsNotifier,
+                      builder: (context, previewPoints, _) {
+                        return Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          child: CustomPaint(
+                            painter: DrawingPainter(
+                              layers,
+                              points,
+                              previewPoints: previewPoints,
+                              showGrid: _showGrid,
+                              strokeColor: _strokeColor,
+                              strokeWidth: _strokeWidth,
+                              gridSize: _gridSize,
                             ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                            size: Size.infinite,
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
 
-              //Taylor - Removed this bit, added coloring to the toolbar that would imply the zoom tool is on
+              // Taylor - Removed this bit, added coloring to the toolbar that would imply the zoom tool is on
 
               /*
-               Positioned(
-                 bottom: 20,
-                 right: 20,
-                 child: FloatingActionButton(
-                   onPressed: toggleZoom,
-                   child: Icon(_isZoomEnabled ? Icons.zoom_out : Icons.zoom_in),
-                 ),
+             Positioned(
+               bottom: 20,
+               right: 20,
+               child: FloatingActionButton(
+                 onPressed: toggleZoom,
+                 child: Icon(_isZoomEnabled ? Icons.zoom_out : Icons.zoom_in),
                ),
-               */
-
+             ),
+             */
             ],
           );
         },
