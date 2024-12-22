@@ -12,6 +12,7 @@ class DrawingSettingsScreen extends StatelessWidget{
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor: Colors.orange[100],
           appBar: AppBar(
             centerTitle: true,

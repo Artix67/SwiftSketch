@@ -10,6 +10,7 @@ class PrivacySecurityScreen extends StatelessWidget{
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
+          resizeToAvoidBottomInset: false,
           backgroundColor: Colors.orange[100],
           appBar: AppBar(
             centerTitle: true,
@@ -25,12 +26,12 @@ class PrivacySecurityScreen extends StatelessWidget{
             },
                 icon: const Icon(Icons.arrow_back)),
           ),
-          body: Center(
+          body: const Center(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Biometric Authentication: "),
-                  const Enable(),
+                  Text("Biometric Authentication: "),
+                  Enable(),
                 ],
               )
           ),

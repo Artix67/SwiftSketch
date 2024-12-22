@@ -24,6 +24,7 @@ class _Drawscreen extends State<Drawscreen>{
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
+          resizeToAvoidBottomInset: false,
           appBar: AppBar(
             backgroundColor: Colors.orange[100],
             actions: <Widget>[

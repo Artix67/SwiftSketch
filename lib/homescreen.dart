@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/drawscreen.dart';
 import 'package:swift_sketch/settingsscreen.dart';
-const Color mcolor = Color(0xFF2C2C2C);
+const Color dgreencolor = Color(0xFF181C14);
 class HomeScreen extends StatelessWidget{
   const HomeScreen({super.key});
 
@@ -10,32 +10,25 @@ class HomeScreen extends StatelessWidget{
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
+            resizeToAvoidBottomInset: false,
           backgroundColor: Colors.orange[100],
             appBar: AppBar(
                 backgroundColor: Colors.orange[100],
-
-                // title: const Text("SwiftSketch"),
-                // elevation: 0, //adds shadow to appbar
-                // titleSpacing: 20,
-                // titleTextStyle: const TextStyle(
-                //   fontSize: 41,
-                //   color: mcolor,
-                // ),
                 actions: <Widget>[
                   Container(
                     decoration: const BoxDecoration(
 
                     ),
                     child: Row(
-                      children: [
-                        SizedBox(width: 20,),
+                      children: <Widget>[
+                        const SizedBox(width: 20,),
                         Image.asset('images/SSLogo.png',
                           height: 90,
                           width: 90,
                         ),
-                        SizedBox(width: 20,),
-                        Text("Swift Sketch",
-                        style: TextStyle(fontSize: 32),
+                        const SizedBox(width: 20,),
+                        const Text("Swift Sketch",
+                        style: TextStyle(fontSize: 32, color: dgreencolor),
                         ),
                         SizedBox(width: MediaQuery.sizeOf(context).width * 0.35,),
                         SizedBox(
