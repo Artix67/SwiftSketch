@@ -308,7 +308,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                         height: 58,
                         child: const Text("Grid Visibility:"),
                       ),
-                      const Text("Grid Visibility:"),
                       Container(alignment: Alignment.center,
                         width: 150,
                         height: 58,
@@ -359,8 +358,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                           height: 58,
                             child: const Text("App Updates:"),
                         ),
-                        const Text("App Updates:"),
-
                         Container(alignment: Alignment.center,
                             width: 150,
                           height: 58,

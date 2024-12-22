@@ -111,9 +111,9 @@ class SettingsScreen extends StatelessWidget{
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
                           onPressed: (){
-                            Navigator.push(                                 //This will need to be changed to Navigator.pushNamedAndRemoveUntil(context, ## your routename here ##, (_) => false);
-                                context,                                    //This will make it so that since were logging out the user can never return to this screen completely emptying the
-                                MaterialPageRoute(builder: (context){       //navigator stack
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context){
                                   return const LoginScreen();
                                 })
                             );
