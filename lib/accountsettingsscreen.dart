@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/settingsscreen.dart';
 import 'FirebaseAuthService.dart';
-import 'DatabaseHelper.dart';
+import 'FirestoreService.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -15,7 +15,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final FirebaseAuthService _authService = FirebaseAuthService();
-  final DatabaseHelper _dbHelper = DatabaseHelper();
+  final FirestoreService _firestoreService = FirestoreService();
   String _currentUID = '';
 
   @override
@@ -33,7 +33,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         _currentUID = uid;
       });
 
-      final userData = await _dbHelper.getUserByUID(uid);
+      final userData = await _firestoreService.getUserByUID(uid);
       if (userData != null) {
         setState(() {
           _firstNameController.text = userData['firstName'] ?? '';
@@ -47,13 +47,13 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     final user = _authService.auth.currentUser;
     if (user != null) {
       try {
-        // Update email in Firebase
+        // Update email in Firebase Auth
         await user.updateEmail(_emailController.text);
         await user.reload();
         _authService.auth.currentUser!.sendEmailVerification();
 
-        // Update SQLite database
-        await _dbHelper.updateUser({
+        // Update Firestore
+        await _firestoreService.updateUser({
           'uid': user.uid,
           'email': _emailController.text,
           'firstName': _firstNameController.text,
@@ -76,7 +76,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     final user = _authService.auth.currentUser;
     if (user != null) {
       try {
-        await _dbHelper.deleteUser(user.uid);
+        await _firestoreService.deleteUser(user.uid);
         await user.delete();
         Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
       } catch (e) {

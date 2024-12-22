@@ -25,11 +25,13 @@ class FirebaseAuthService {
         email: email,
         password: password,
       );
+
       User? user = userCredential.user;
       if (user != null) {
         // Send email verification
         await user.sendEmailVerification();
 
+        // Ensure user is authenticated before performing Firestore operations
         // Add user to Firestore
         await _firestoreService.addUser({
           'uid': user.uid,
@@ -60,18 +62,35 @@ class FirebaseAuthService {
           'autoSaveFrequency': '5 min',
         });
 
+        // Add an initial project to Firestore
+        await _firestoreService.addProject({
+          'id': 'initial_project_${user.uid}',
+          'userUID': user.uid,
+          'name': 'Welcome Project',
+          'date': DateTime.now().toIso8601String(),
+          'jsonData': '{}', // Initial empty JSON data
+        });
+
         // Sign in the user automatically after account creation and Firestore operations
         await signInWithEmailAndPassword(email, password);
 
-      }
-      return user;
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        print('The email address is already in use by another account.');
-      } else {
-        print('Account creation failed: ${e.message}');
+        return user;
       }
       return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'too-many-requests') {
+        print('Too many requests. Try again later.');
+        throw FirebaseAuthException(
+          code: 'too-many-requests',
+          message: 'Too many requests. Please try again later.',
+        );
+      } else {
+        print('Account creation failed: ${e.message}');
+        throw FirebaseAuthException(
+          code: e.code,
+          message: e.message,
+        );
+      }
     } catch (e) {
       print('An unknown error occurred: $e');
       return null;

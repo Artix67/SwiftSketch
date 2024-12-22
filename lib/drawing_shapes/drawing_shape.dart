@@ -1,5 +1,10 @@
-import '/drawing_tools/drawing_tool.dart';
 import 'package:flutter/material.dart';
+import '/drawing_tools/drawing_tool.dart';
+import '/drawing_tools/freeform_tool.dart';
+import '/drawing_tools/line_tool.dart';
+import '/drawing_tools/circle_tool.dart';
+import '/drawing_tools/rectangle_tool.dart';
+import '/drawing_tools/triangle_tool.dart';
 
 class DrawingShape {
   final List<Offset?> points;
@@ -24,5 +29,41 @@ class DrawingShape {
 
   bool containsPoint(Offset point) {
     return path.contains(point);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'points': points.map((point) => point != null ? {'x': point.dx, 'y': point.dy} : null).toList(),
+      'tool': tool.runtimeType.toString(),
+    };
+  }
+
+  static DrawingShape fromJson(Map<String, dynamic> json) {
+    List<Offset?> points = (json['points'] as List)
+        .map((point) => point != null ? Offset(point['x'], point['y']) : null)
+        .toList();
+    DrawingTool tool;
+
+    switch (json['tool']) {
+      case 'FreeformTool':
+        tool = FreeformTool();
+        break;
+      case 'LineTool':
+        tool = LineTool();
+        break;
+      case 'CircleTool':
+        tool = CircleTool();
+        break;
+      case 'RectangleTool':
+        tool = RectangleTool();
+        break;
+      case 'TriangleTool':
+        tool = TriangleTool();
+        break;
+      default:
+        tool = FreeformTool();
+    }
+
+    return DrawingShape(points: points, tool: tool);
   }
 }

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/settingsscreen.dart';
-import 'DatabaseHelper.dart';
 import 'FirebaseAuthService.dart';
+import 'FirestoreService.dart';
 
 const List<String> themelist = <String>['Light', 'Dark'];
 const List<String> toolbarposlist = <String>['Top', 'Bottom', 'Left', 'Right'];
 const List<String> finstsizelist = <String>['6', '8', '10', '12', '14', '16', '18'];
 const List<String> gridsizelist = <String>['5', '10', '15', '20'];
-const List<String> layerpresetslist = <String>['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5', 'Layer 6', 'Layer 7', 'Layer 8','Layer 9', 'Layer 10'];
+const List<String> layerpresetslist = <String>['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5', 'Layer 6', 'Layer 7', 'Layer 8', 'Layer 9', 'Layer 10'];
 const Color dgreencolor = Color(0xFF181C14);
 const Color lgreencolor = Color(0xFF2C2C2C);
 const Color biegecolor = Color(0xFF2C2C2C);
@@ -22,7 +22,7 @@ class AppSettingsScreen extends StatefulWidget{
 
 class _AppSettingsScreenState extends State<AppSettingsScreen> {
   final FirebaseAuthService _authService = FirebaseAuthService();
-  final DatabaseHelper _dbHelper = DatabaseHelper();
+  final FirestoreService _firestoreService = FirestoreService();
 
   String _theme = 'Light';
   String _toolbarPosition = 'Top';
@@ -43,7 +43,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   void _loadSettings() async {
     final user = _authService.auth.currentUser;
     if (user != null) {
-      final settings = await _dbHelper.getSettings(user.email!);
+      final settings = await _firestoreService.getSettings(user.uid);
       if (settings != null) {
         setState(() {
           _theme = settings['theme'] ?? 'Light';
@@ -63,8 +63,8 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   void _updateSettings() async {
     final user = _authService.auth.currentUser;
     if (user != null) {
-      await _dbHelper.updateSettings({
-        'userEmail': user.email,
+      await _firestoreService.updateSettings({
+        'userUID': user.uid,
         'theme': _theme,
         'toolbarPosition': _toolbarPosition,
         'fontSize': _fontSize,
@@ -75,10 +75,13 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
         'appUpdates': _appUpdates ? 1 : 0,
         'lineThickness': _lineThickness,
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Settings updated successfully')),
+      );
     }
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(

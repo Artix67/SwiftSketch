@@ -2,10 +2,67 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/drawscreen.dart';
 import 'package:swift_sketch/settingsscreen.dart';
+
 const Color mcolor = Color(0xFF2C2C2C);
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _searchQuery = '';
+
+  void _updateSearchQuery(String query) {
+    setState(() {
+      _searchQuery = query;
+    });
+  }
+
+  void _createNewProject() async {
+    String projectName = await _showProjectNameDialog(context);
+    if (projectName.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return Drawscreen(projectName: projectName); // Correctly reference Drawscreen
+        }),
+      );
+    }
+  }
+
+  Future<String> _showProjectNameDialog(BuildContext context) async {
+    TextEditingController _nameController = TextEditingController();
+
+    return await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Enter Project Name'),
+          content: TextField(
+            controller: _nameController,
+            decoration: const InputDecoration(hintText: 'Project Name'),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, '');
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, _nameController.text);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    ) ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +93,7 @@ class HomeScreen extends StatelessWidget {
                     width: 400,
                     child: Column(
                       children: [
-                        SearchBar(),
+                        SearchBar(onSearchChanged: _updateSearchQuery),
                       ],
                     ),
                   ),
@@ -88,11 +145,30 @@ class HomeScreen extends StatelessWidget {
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance.collection('projects').snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    debugPrint('Error: ${snapshot.error}');
+                    return const Center(child: Text('Error connecting to Firestore.'));
+                  }
                   if (snapshot.hasData) {
+                    var projects = snapshot.data!.docs;
+                    if (_searchQuery.isNotEmpty) {
+                      projects = projects.where((project) {
+                        return project['name']
+                            .toString()
+                            .toLowerCase()
+                            .contains(_searchQuery.toLowerCase());
+                      }).toList();
+                    }
+                    if (projects.isEmpty) {
+                      return const Center(child: Text('No projects found.'));
+                    }
                     return ListView.builder(
-                      itemCount: snapshot.data!.docs.length,
+                      itemCount: projects.length,
                       itemBuilder: (context, index) {
-                        var project = snapshot.data!.docs[index];
+                        var project = projects[index];
                         return Padding(
                           padding: const EdgeInsets.all(8),
                           child: Container(
@@ -118,7 +194,7 @@ class HomeScreen extends StatelessWidget {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) {
-                                          return const Drawscreen();
+                                          return Drawscreen(projectName: project['name']); // Correctly reference Drawscreen with projectName
                                         },
                                       ),
                                     );
@@ -147,7 +223,7 @@ class HomeScreen extends StatelessWidget {
                       },
                     );
                   } else {
-                    return const Center(child: CircularProgressIndicator());
+                    return const Center(child: Text('No projects yet created.'));
                   }
                 },
               ),
@@ -158,14 +234,7 @@ class HomeScreen extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return const Drawscreen();
-                        }),
-                      );
-                    },
+                    onPressed: _createNewProject,
                     child: const Text('New Project'),
                   ),
                 ),
@@ -179,16 +248,21 @@ class HomeScreen extends StatelessWidget {
 }
 
 class SearchBar extends StatelessWidget {
+  final Function(String) onSearchChanged;
+
+  const SearchBar({required this.onSearchChanged, super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: const TextField(
-        style: TextStyle(fontSize: 14),
-        decoration: InputDecoration(
+      child: TextField(
+        style: const TextStyle(fontSize: 14),
+        decoration: const InputDecoration(
           hintText: 'Search Projects',
           border: OutlineInputBorder(),
           suffixIcon: Icon(Icons.search),
         ),
+        onChanged: onSearchChanged,
       ),
     );
   }
