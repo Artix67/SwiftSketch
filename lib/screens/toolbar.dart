@@ -377,36 +377,39 @@ class Toolbar extends StatelessWidget {
         //TODO: CONFORM THIS TO TOOL STYLING
         // You may want to add this styling to other buttons as well. Via a bool the button
         // changes looks to indicate that it is selected.
-        //MARK: - ZOOM IN/OUT TOGGLE
-        ValueListenableBuilder<bool>(
-          valueListenable: drawingCanvasKey.currentState?.isZoomEnabledNotifier ?? ValueNotifier(false),
-          builder: (context, isZoomEnabled, child) {
-            return Container(
-              decoration: isZoomEnabled
-                  ? BoxDecoration(
-                color: Colors.grey[50], // Background color when zoom is enabled
-                borderRadius: BorderRadius.circular(8),
-              )
-                  : null,
-              child: Row(
-                children: [
-                  Transform.scale(
-                  scale: iconSize,
-                  child: IconButton(
-                    icon: ImageIcon(isZoomEnabled ? AssetImage("icons/zoomout.png") : AssetImage("icons/zoomin.png")),
-                    tooltip: 'Toggle Zoom',
-                    onPressed: () {
-                      drawingCanvasKey.currentState?.toggleZoom();
-                    },
-                  ),
-                  ),
-                  SizedBox(width: spacerSize),
-                ],
-              ),
 
-            );
-          },
-        ),
+        //Removed for Video
+
+        //MARK: - ZOOM IN/OUT TOGGLE
+        // ValueListenableBuilder<bool>(
+        //   valueListenable: drawingCanvasKey.currentState?.isZoomEnabledNotifier ?? ValueNotifier(false),
+        //   builder: (context, isZoomEnabled, child) {
+        //     return Container(
+        //       decoration: isZoomEnabled
+        //           ? BoxDecoration(
+        //         color: Colors.grey[50], // Background color when zoom is enabled
+        //         borderRadius: BorderRadius.circular(8),
+        //       )
+        //           : null,
+        //       child: Row(
+        //         children: [
+        //           Transform.scale(
+        //           scale: iconSize,
+        //           child: IconButton(
+        //             icon: ImageIcon(isZoomEnabled ? AssetImage("icons/zoomout.png") : AssetImage("icons/zoomin.png")),
+        //             tooltip: 'Toggle Zoom',
+        //             onPressed: () {
+        //               drawingCanvasKey.currentState?.toggleZoom();
+        //             },
+        //           ),
+        //           ),
+        //           SizedBox(width: spacerSize),
+        //         ],
+        //       ),
+        //
+        //     );
+        //   },
+        // ),
 
         //TODO: DEVELOP A TOOL FOR PANNING THAT IS SEPARATE FROM ZOOM
         // currently zoom also handles pan, but we may change that
