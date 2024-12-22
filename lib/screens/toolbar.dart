@@ -11,6 +11,8 @@ import '../drawing_tools/triangle_tool.dart';
 import '../drawing_tools/annotation_tool.dart';
 import 'homescreen.dart';
 
+
+
 class Toolbar extends StatelessWidget {
   final Color fillColor;
   final Color strokeColor;
@@ -25,6 +27,7 @@ class Toolbar extends StatelessWidget {
   final VoidCallback onDeleteToolUpdate;
   final List<DrawingShape> activeLayerShapes;
   final VoidCallback refreshUI;
+
 
   const Toolbar({
     super.key,
@@ -41,6 +44,7 @@ class Toolbar extends StatelessWidget {
     required this.onDeleteToolUpdate,
     required this.activeLayerShapes,
     required this.refreshUI,
+
   });
 
   void _pickColor(BuildContext context, bool isFill) {
@@ -250,6 +254,22 @@ class Toolbar extends StatelessWidget {
             );
           },
         ),
+        IconButton(
+          icon: const Icon(Icons.redo),
+          tooltip: 'Redo',
+          onPressed: () {
+            drawingCanvasKey.currentState?.redo();
+          },
+        ),
+
+        IconButton(
+          icon: const Icon(Icons.undo),
+          tooltip: 'Undo',
+          onPressed: () {
+            drawingCanvasKey.currentState?.undo();
+          },
+        ),
+
         IconButton(
           icon: const Icon(Icons.clear),
           tooltip: 'Clear Canvas',
