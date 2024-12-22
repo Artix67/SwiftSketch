@@ -45,15 +45,19 @@ class _Drawscreen extends State<Drawscreen> {
   }
 
   Future<void> _loadProject() async {
-    List<DrawingShape> shapes = await _projectManager.loadProject(widget.projectName);
+    List<Layer> layers = await _projectManager.loadProject(widget.projectName);
     setState(() {
-      _drawingCanvasKey.currentState?.shapes = shapes;
+      if (layers.isNotEmpty) {
+        print('Loaded Layers: $layers');
+        _layersNotifier.value = layers;
+        _drawingCanvasKey.currentState?.setActiveLayer(layers[_selectedLayerIndex.value]);
+      }
     });
   }
 
   void _saveProject() async {
-    List<DrawingShape> shapes = _drawingCanvasKey.currentState?.shapes ?? [];
-    await _projectManager.saveProject(widget.projectName, shapes);
+    List<Layer> layers = _layersNotifier.value;
+    await _projectManager.saveProject(widget.projectName, layers);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Project saved successfully')),
     );

@@ -34,7 +34,9 @@ class DrawingShape {
       'toolType': toolType,
       'fillColor': fillColor.value,
       'strokeColor': strokeColor.value,
+      'strokeWidth': strokeWidth,
       'tool': tool.runtimeType.toString(),
+      'annotation': annotation,
     };
   }
 
@@ -43,6 +45,7 @@ class DrawingShape {
     List<Offset?> points = (json['points'] as List)
         .map((point) => point != null ? Offset(point['x'], point['y']) : null)
         .toList();
+
     DrawingTool tool;
     switch (json['tool']) {
       case 'FreeformTool':
@@ -62,6 +65,7 @@ class DrawingShape {
         break;
       case 'AnnotationTool':
         tool = AnnotationTool();
+        break;
       default:
         tool = FreeformTool();
     }
@@ -71,8 +75,9 @@ class DrawingShape {
       toolType: json['toolType'],
       fillColor: Color(json['fillColor']),
       strokeColor: Color(json['strokeColor']),
-      strokeWidth: json['strokeWidth'],
+      strokeWidth: json['strokeWidth'] ?? 1.0,
       tool: tool,
+      annotation: json['annotation'],
     );
   }
 
@@ -95,12 +100,12 @@ class DrawingShape {
 
   DrawingShape copy() {
     return DrawingShape(
-        points: List.from(this.points),
-        toolType: this.toolType,
-        fillColor: this.fillColor,
-        strokeColor: this.strokeColor,
-        strokeWidth: this.strokeWidth,
-        annotation: this.annotation,
+      points: List.from(this.points),
+      toolType: this.toolType,
+      fillColor: this.fillColor,
+      strokeColor: this.strokeColor,
+      strokeWidth: this.strokeWidth,
+      annotation: this.annotation,
       tool: this.tool,
     );
   }

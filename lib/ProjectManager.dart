@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'FirebaseAuthService.dart';
-import 'package:swift_sketch/drawing_shapes/drawing_shape.dart';
+import '../models/layer.dart';
 
 class ProjectManager {
   final FirebaseAuthService _authService = FirebaseAuthService();
 
-  Future<void> saveProject(String projectName, List<DrawingShape> shapes) async {
+  Future<void> saveProject(String projectName, List<Layer> layers) async {
     final user = _authService.auth.currentUser;
+    print(user?.uid);
     if (user != null) {
-      String jsonData = _convertShapesToJson(shapes);
+      String jsonData = _convertLayersToJson(layers);
       var existingProject = await FirebaseFirestore.instance
           .collection('projects')
           .where('userUID', isEqualTo: user.uid)
@@ -35,7 +36,7 @@ class ProjectManager {
     }
   }
 
-  Future<List<DrawingShape>> loadProject(String projectName) async {
+  Future<List<Layer>> loadProject(String projectName) async {
     final user = _authService.auth.currentUser;
     if (user != null) {
       var existingProject = await FirebaseFirestore.instance
@@ -46,16 +47,18 @@ class ProjectManager {
 
       if (existingProject.docs.isNotEmpty) {
         var jsonData = existingProject.docs.first.data()['jsonData'];
-        List<dynamic> shapesJson = jsonDecode(jsonData);
-        List<DrawingShape> shapes = shapesJson.map((shape) => DrawingShape.fromJson(shape)).toList();
-        return shapes;
+        print('Loaded JSON Data: $jsonData');
+        List<dynamic> layersJson = jsonDecode(jsonData);
+        List<Layer> layers = layersJson.map((layerJson) => Layer.fromJson(layerJson)).toList();
+        print('Deserialized Layers: $layers');
+        return layers;
       }
     }
     return [];
   }
 
-  String _convertShapesToJson(List<DrawingShape> shapes) {
-    List<Map<String, dynamic>> shapeData = shapes.map((shape) => shape.toJson()).toList();
-    return jsonEncode(shapeData);
+  String _convertLayersToJson(List<Layer> layers) {
+    List<Map<String, dynamic>> layerData = layers.map((layer) => layer.toJson()).toList();
+    return jsonEncode(layerData);
   }
 }
