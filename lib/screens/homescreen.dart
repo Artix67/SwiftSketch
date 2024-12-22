@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '/screens/draw_screen.dart';
 import 'package:swift_sketch/screens/settingsscreen.dart';
+import '/FirebaseAuthService.dart';
 
 const Color mcolor = Color(0xFF2C2C2C);
 
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
+  final FirebaseAuthService _authService = FirebaseAuthService(); // Initialize the auth service
 
   void _updateSearchQuery(String query) {
     setState(() {
@@ -27,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {
-          return Drawscreen(projectName: projectName); // Correctly reference Drawscreen
+          return Drawscreen(projectName: projectName);
         }),
       );
     }
@@ -143,7 +145,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: StreamBuilder(
-                stream: FirebaseFirestore.instance.collection('projects').snapshots(),
+                stream: FirebaseFirestore.instance
+                    .collection('projects')
+                    .where('userUID', isEqualTo: _authService.auth.currentUser?.uid) // Filter by the current user's UID
+                    .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
