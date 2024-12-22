@@ -33,6 +33,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        uid TEXT UNIQUE,
         email TEXT UNIQUE
       )
     ''');
@@ -40,7 +41,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE settings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        userEmail TEXT,
+        userUID TEXT,
         theme TEXT,
         toolbarPosition TEXT,
         fontSize TEXT,
@@ -49,7 +50,6 @@ class DatabaseHelper {
         gridVisibility INTEGER,
         tipsTutorials INTEGER,
         appUpdates INTEGER,
-        gridSize REAL,
         defaultColor TEXT,
         defaultTool TEXT,
         gridSnapOnOff INTEGER,
@@ -61,16 +61,16 @@ class DatabaseHelper {
         snapToGridSensitivity TEXT,
         zoomSensitivity TEXT,
         autoSaveFrequency TEXT,
-        FOREIGN KEY(userEmail) REFERENCES users(email)
+        FOREIGN KEY(userUID) REFERENCES users(uid)
       )
     ''');
 
     await db.execute('''
       CREATE TABLE projects (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        userEmail TEXT,
+        userUID TEXT,
         jsonData TEXT,
-        FOREIGN KEY(userEmail) REFERENCES users(email)
+        FOREIGN KEY(userUID) REFERENCES users(uid)
       )
     ''');
   }
@@ -81,12 +81,12 @@ class DatabaseHelper {
     return await db.insert('users', user, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<Map<String, dynamic>?> getUserByEmail(String email) async {
+  Future<Map<String, dynamic>?> getUserByUID(String uid) async {
     Database db = await database;
     List<Map<String, dynamic>> results = await db.query(
       'users',
-      where: 'email = ?',
-      whereArgs: [email],
+      where: 'uid = ?',
+      whereArgs: [uid],
     );
     return results.isNotEmpty ? results.first : null;
   }
@@ -101,17 +101,17 @@ class DatabaseHelper {
     return await db.update(
       'users',
       user,
-      where: 'email = ?',
-      whereArgs: [user['email']],
+      where: 'uid = ?',
+      whereArgs: [user['uid']],
     );
   }
 
-  Future<int> deleteUser(String email) async {
+  Future<int> deleteUser(String uid) async {
     Database db = await database;
     return await db.delete(
       'users',
-      where: 'email = ?',
-      whereArgs: [email],
+      where: 'uid = ?',
+      whereArgs: [uid],
     );
   }
 
@@ -121,12 +121,12 @@ class DatabaseHelper {
     return await db.insert('settings', settings, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<Map<String, dynamic>?> getSettings(String userEmail) async {
+  Future<Map<String, dynamic>?> getSettings(String userUID) async {
     Database db = await database;
     List<Map<String, dynamic>> results = await db.query(
       'settings',
-      where: 'userEmail = ?',
-      whereArgs: [userEmail],
+      where: 'userUID = ?',
+      whereArgs: [userUID],
     );
     return results.isNotEmpty ? results.first : null;
   }
@@ -136,17 +136,17 @@ class DatabaseHelper {
     return await db.update(
       'settings',
       settings,
-      where: 'userEmail = ?',
-      whereArgs: [settings['userEmail']],
+      where: 'userUID = ?',
+      whereArgs: [settings['userUID']],
     );
   }
 
-  Future<int> deleteSettings(String userEmail) async {
+  Future<int> deleteSettings(String userUID) async {
     Database db = await database;
     return await db.delete(
       'settings',
-      where: 'userEmail = ?',
-      whereArgs: [userEmail],
+      where: 'userUID = ?',
+      whereArgs: [userUID],
     );
   }
 
@@ -156,9 +156,9 @@ class DatabaseHelper {
     return await db.insert('projects', project, conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  Future<List<Map<String, dynamic>>> getProjects(String userEmail) async {
+  Future<List<Map<String, dynamic>>> getProjects(String userUID) async {
     Database db = await database;
-    return await db.query('projects', where: 'userEmail = ?', whereArgs: [userEmail]);
+    return await db.query('projects', where: 'userUID = ?', whereArgs: [userUID]);
   }
 
   Future<int> updateProject(Map<String, dynamic> project) async {

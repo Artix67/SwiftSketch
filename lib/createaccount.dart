@@ -22,7 +22,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
         _passwordController.text,
       );
       if (user != null) {
-        await _authService.sendEmailVerification(user);
+        await user.sendEmailVerification();  // Call sendEmailVerification on the User object
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Verification email sent')),
         );

@@ -16,7 +16,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   final TextEditingController _emailController = TextEditingController();
   final FirebaseAuthService _authService = FirebaseAuthService();
   final DatabaseHelper _dbHelper = DatabaseHelper();
-  String _currentEmail = '';
+  String _currentUID = '';
 
   @override
   void initState() {
@@ -27,13 +27,13 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   void _loadUserData() async {
     final user = _authService.auth.currentUser;
     if (user != null) {
-      final email = user.email!;
+      final uid = user.uid;
       setState(() {
-        _emailController.text = email;
-        _currentEmail = email;
+        _emailController.text = user.email!;
+        _currentUID = uid;
       });
 
-      final userData = await _dbHelper.getUserByEmail(email);
+      final userData = await _dbHelper.getUserByUID(uid);
       if (userData != null) {
         setState(() {
           _firstNameController.text = userData['firstName'] ?? '';
@@ -54,6 +54,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
 
         // Update SQLite database
         await _dbHelper.updateUser({
+          'uid': user.uid,
           'email': _emailController.text,
           'firstName': _firstNameController.text,
           'lastName': _lastNameController.text,
@@ -75,7 +76,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     final user = _authService.auth.currentUser;
     if (user != null) {
       try {
-        await _dbHelper.deleteUser(user.email!);
+        await _dbHelper.deleteUser(user.uid);
         await user.delete();
         Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
       } catch (e) {

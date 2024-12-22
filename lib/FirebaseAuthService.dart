@@ -5,7 +5,7 @@ class FirebaseAuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = FirestoreService();
 
-  FirebaseAuth get auth => _auth; // Public getter for _auth
+  FirebaseAuth get auth => _auth;
 
   Future<User?> signInWithEmailAndPassword(String email, String password) async {
     UserCredential result = await _auth.signInWithEmailAndPassword(
@@ -20,48 +20,65 @@ class FirebaseAuthService {
   }
 
   Future<User?> createUserWithEmailAndPassword(String email, String password) async {
-    UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    User? user = userCredential.user;
-    if (user != null) {
-      await _firestoreService.addUser({
-        'email': email,
-      });
-      await _firestoreService.addSettings({
-        'userEmail': email,
-        'theme': 'Light',
-        'toolbarPosition': 'Top',
-        'fontSize': '12',
-        'gridSize': '10',
-        'layerPresets': 'Layer 1',
-        'gridVisibility': 1,
-        'tipsTutorials': 1,
-        'appUpdates': 1,
-        'gridSize': 0.0,
-        'defaultColor': 'FFFFFF',
-        'defaultTool': '',
-        'gridSnapOnOff': 0,
-        'gridOnOff': 0,
-        'currentProject': '',
-        'snapSensitivity': 0.0,
-        'biometricEnabled': 0,
-        'unitOfMeasurement': 'Metric',
-        'snapToGridSensitivity': '10px',
-        'zoomSensitivity': '10',
-        'autoSaveFrequency': '5 min'
-      });
-    }
-    return user;
-  }
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      User? user = userCredential.user;
+      if (user != null) {
+        // Send email verification
+        await user.sendEmailVerification();
 
-  Future<void> sendEmailVerification(User user) async {
-    await user.sendEmailVerification();
+        // Add user to Firestore
+        await _firestoreService.addUser({
+          'uid': user.uid,
+          'email': email,
+        });
+
+        // Add settings to Firestore
+        await _firestoreService.addSettings({
+          'userUID': user.uid,
+          'theme': 'Light',
+          'toolbarPosition': 'Top',
+          'fontSize': '12',
+          'gridSize': '10',
+          'layerPresets': 'Layer 1',
+          'gridVisibility': 1,
+          'tipsTutorials': 1,
+          'appUpdates': 1,
+          'defaultColor': 'FFFFFF',
+          'defaultTool': '',
+          'gridSnapOnOff': 0,
+          'gridOnOff': 0,
+          'currentProject': '',
+          'snapSensitivity': 0.0,
+          'biometricEnabled': 0,
+          'unitOfMeasurement': 'Metric',
+          'snapToGridSensitivity': '10px',
+          'zoomSensitivity': '10',
+          'autoSaveFrequency': '5 min',
+        });
+
+        // Sign in the user automatically after account creation and Firestore operations
+        await signInWithEmailAndPassword(email, password);
+
+      }
+      return user;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        print('The email address is already in use by another account.');
+      } else {
+        print('Account creation failed: ${e.message}');
+      }
+      return null;
+    } catch (e) {
+      print('An unknown error occurred: $e');
+      return null;
+    }
   }
 
   Future<void> signOut() async {
     await _auth.signOut();
   }
 }
-
