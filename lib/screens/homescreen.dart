@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '/screens/draw_screen.dart';
 import 'package:swift_sketch/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
+import 'package:intl/intl.dart';
 
 const Color mcolor = Color(0xFF2C2C2C);
 
@@ -66,6 +67,38 @@ class _HomeScreenState extends State<HomeScreen> {
     ) ?? '';
   }
 
+  String formatDateTime(String dateTime) {
+    try {
+      final DateTime parsedDateTime = DateTime.parse(dateTime);
+
+      // Get date components
+      final String month = _getMonthName(parsedDateTime.month);
+      final String day = parsedDateTime.day.toString();
+      final String year = parsedDateTime.year.toString();
+
+      // Get time components
+      int hour = parsedDateTime.hour;
+      final String minute = parsedDateTime.minute.toString().padLeft(2, '0');
+      final String period = hour >= 12 ? 'PM' : 'AM';
+
+      // Convert hour to 12-hour format
+      hour = hour % 12 == 0 ? 12 : hour % 12;
+
+      // Create a formatted string: "December 22, 2024 at 2:30 PM"
+      return '$month $day, $year at $hour:$minute $period';
+    } catch (e) {
+      return dateTime; // Fallback in case of an error
+    }
+  }
+
+  String _getMonthName(int month) {
+    const List<String> months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return months[month - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -73,58 +106,65 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.orange[100],
         appBar: AppBar(
           backgroundColor: Colors.orange[100],
-          actions: <Widget>[
-            Container(
-              decoration: const BoxDecoration(),
-              child: Row(
+          title: Row(
+            children: [
+              // Left section (logo and text)
+              Row(
                 children: [
                   const SizedBox(width: 20),
-                  Image.asset(
-                    'images/SSLogo.png',
-                    height: 90,
-                    width: 90,
-                  ),
-                  const SizedBox(width: 20),
-                  const Text(
-                    "Swift Sketch",
-                    style: TextStyle(fontSize: 32),
-                  ),
-                  SizedBox(width: MediaQuery.sizeOf(context).width * 0.35),
-                  SizedBox(
-                    height: 70,
-                    width: 400,
-                    child: Column(
-                      children: [
-                        SearchBar(onSearchChanged: _updateSearchQuery),
-                      ],
+                  FittedBox(
+                    fit: BoxFit.contain,
+                    child: Image.asset(
+                      'images/SSLogo.png',
+                      height: 40, // Adjust size as needed
+                      width: 40,
                     ),
                   ),
-                  const SizedBox(width: 30),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return const SettingsScreen();
-                        }),
-                      );
-                    },
-                    tooltip: 'Settings',
-                    icon: const ImageIcon(AssetImage("icons/settings.png")),
+                  const SizedBox(width: 10),
+                  const Text(
+                    "Swift Sketch",
+                    style: TextStyle(fontSize: 24), // Adjust font size as needed
                   ),
-                  const SizedBox(width: 19),
                 ],
               ),
-            ),
-          ],
+              // Spacer to push the right section to the end
+              const Spacer(),
+              // Right section (search bar and settings)
+              Flexible(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end, // Align widgets to the right
+                  children: [
+                    SizedBox(
+                      height: 40,
+                      width: 300,
+                      child: SearchBar(onSearchChanged: _updateSearchQuery),
+                    ),
+                    const SizedBox(width: 20),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return const SettingsScreen();
+                          }),
+                        );
+                      },
+                      tooltip: 'Settings',
+                      icon: const ImageIcon(AssetImage("icons/settings.png")),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         body: Column(
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               child: Container(
-                width: MediaQuery.sizeOf(context).width,
-                height: MediaQuery.sizeOf(context).height * .05,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * .05,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.black,
@@ -136,8 +176,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     children: [
                       const Text("Project Name"),
-                      SizedBox(width: MediaQuery.sizeOf(context).width * 0.55),
+                      const Spacer(),
                       const Text("Date"),
+                      const Spacer(),
                     ],
                   ),
                 ),
@@ -147,7 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('projects')
-                    .where('userUID', isEqualTo: _authService.auth.currentUser?.uid) // Filter by the current user's UID
+                    .where('userUID',
+                    isEqualTo: _authService.auth.currentUser?.uid) // Filter by the current user's UID
                     .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -175,9 +217,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         var project = projects[index];
                         return Padding(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
                           child: Container(
-                            height: 60,
+                            height: 50,
                             decoration: BoxDecoration(
                               color: Colors.grey,
                               borderRadius: BorderRadius.circular(8),
@@ -186,20 +228,25 @@ class _HomeScreenState extends State<HomeScreen> {
                               children: [
                                 const SizedBox(width: 10),
                                 Container(
-                                  width: 160,
+                                  width: 250,
                                   child: Text(project['name']),
                                 ),
+                                const Spacer(),
                                 Container(
-                                  width: 140,
-                                  child: Text(project['date']),
+                                  width: 250,
+                                  child: Text(
+                                    formatDateTime(project['date']), // Call the formatting function here
+                                  ),
                                 ),
+                                const Spacer(),
                                 IconButton(
                                   onPressed: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) {
-                                          return Drawscreen(projectName: project['name']); // Correctly reference Drawscreen with projectName
+                                          return Drawscreen(
+                                              projectName: project['name']);
                                         },
                                       ),
                                     );
@@ -208,10 +255,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    // Implement export functionality here
+                                    //TODO: ADD EXPORT FUNCTION HERE
                                   },
                                   icon: const ImageIcon(AssetImage("icons/export2.png")),
                                 ),
+                                // TODO: ADD DELETION ALERT, ALLOW USER TO CONFIRM BEFORE DELETING
                                 IconButton(
                                   onPressed: () async {
                                     await FirebaseFirestore.instance
@@ -233,15 +281,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-            Expanded(
-              child: Align(
-                alignment: FractionalOffset.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
-                  child: ElevatedButton(
-                    onPressed: _createNewProject,
-                    child: const Text('New Project'),
-                  ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ElevatedButton(
+                  onPressed: _createNewProject,
+                  child: const Text('New Project'),
                 ),
               ),
             ),
