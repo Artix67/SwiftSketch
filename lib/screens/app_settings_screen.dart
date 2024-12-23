@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
-import '/FirestoreService.dart';
 import '/SettingsManager.dart';
 
 
@@ -28,8 +27,7 @@ class AppSettingsScreen extends StatefulWidget {
 
 class _AppSettingsScreenState extends State<AppSettingsScreen> {
   final FirebaseAuthService _authService = FirebaseAuthService();
-  final FirestoreService _firestoreService = FirestoreService();
-  final SettingsManager _settingsManager = SettingsManager(); // Initialize SettingsManager
+  final SettingsManager _settingsManager = SettingsManager();
 
   String _toolbarPosition = 'Top';
   String _gridSize = '10';
@@ -93,6 +91,37 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
+              // Toolbar Position Setting
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width * 0.3,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      alignment: Alignment.centerRight,
+                      width: 150,
+                      height: 58,
+                      child: const Text("Tool Bar Position:"),
+                    ),
+                    DropdownMenu(
+                      initialSelection: _toolbarPosition,
+                      width: 150,
+                      dropdownMenuEntries: toolbarposlist.map(
+                            (e) => DropdownMenuEntry(value: e, label: e),
+                      ).toList(),
+                      onSelected: (value) {
+                        debugPrint('Tool Bar Position: $value');
+                        setState(() {
+                          _toolbarPosition = value!;
+                          _updateSettings('toolbarPosition', value);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Line Thickness Setting
               SizedBox(
                 width: MediaQuery.sizeOf(context).width * 0.3,
                 child: Row(
@@ -114,6 +143,66 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                           setState(() {
                             _lineThickness = value;
                             _updateSettings('lineThickness', value);
+                          });
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Grid Size Setting
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width * 0.3,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      alignment: Alignment.centerRight,
+                      width: 150,
+                      height: 58,
+                      child: const Text("Grid Size:"),
+                    ),
+                    DropdownMenu(
+                      initialSelection: _gridSize,
+                      width: 150,
+                      dropdownMenuEntries: gridsizelist.map(
+                            (e) => DropdownMenuEntry(value: e, label: e),
+                      ).toList(),
+                      onSelected: (value) {
+                        debugPrint('Grid Size: $value');
+                        setState(() {
+                          _gridSize = value!;
+                          _updateSettings('gridSize', value);
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+
+              // Grid Visibility Setting
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width * 0.3,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Container(
+                      alignment: Alignment.centerRight,
+                      width: 150,
+                      height: 58,
+                      child: const Text("Grid Visibility:"),
+                    ),
+                    Container(
+                      alignment: Alignment.center,
+                      width: 150,
+                      height: 58,
+                      child: Enable(
+                        initialSwitchValue: _gridVisibility,
+                        onChanged: (value) {
+                          setState(() {
+                            _gridVisibility = value;
+                            _updateSettings('gridVisibility', value ? 1 : 0);
                           });
                         },
                       ),
