@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'loginscreen.dart';
 import '/FirebaseAuthService.dart';
 import 'homescreen.dart';
+
 const Color dgreencolor = Color(0xFF181C14);
 const Color lgreencolor = Color(0xFF697565);
-const Color biegecolor = Color(0xFFECDFCC);
+const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
 const Color blackcolor = Color(0xFF181818);
@@ -59,50 +60,90 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        resizeToAvoidBottomInset: false,
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints.expand(height: 350, width: 350),
+    return Scaffold(
+      backgroundColor: biegecolor,
+      body: Center(
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'images/SSLogo.png',
+                height: 80,
+                width: 80,
+              ),
+              Text(
+                "SwiftSketch",
+                style: TextStyle(fontSize: 32),
+              )
+            ],
+          ),
+          ConstrainedBox(
+            constraints: const BoxConstraints.expand(height: 302, width: 350),
             child: Container(
-              color: Colors.white,
+              decoration: BoxDecoration(
+                color: whitecolor,
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Column(
                 children: [
-                  ElevatedButton(
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 40,
+                    width: 300,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: blackcolor),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: 'Email',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    height: 40,
+                    width: 300,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: blackcolor),
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: TextField(
+                      controller: _passwordController,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: 'Password',
+                      ),
+                      obscureText: true,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(200, 40),
+                        backgroundColor: dgreencolor,
+                        foregroundColor: biegecolor),
+                    onPressed: _createAccount,
+                    child: const Text('Create Account'),
+                  ),
+                  TextButton(
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) {
-                          return const LoginScreen();
-                        }),
+                        MaterialPageRoute(builder: (context) => const LoginScreen()),
                       );
                     },
-                    child: const Text('Back'),
-                  ),
-                  TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
+                    child: const Text(
+                      'Back to Login',
+                      style: TextStyle(color: dgreencolor),
                     ),
-                  ),
-                  TextField(
-                    controller: _passwordController,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                    ),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: _createAccount,
-                    child: const Text('Create Account'),
                   ),
                 ],
               ),
             ),
           ),
-        ),
+        ]),
       ),
     );
   }
