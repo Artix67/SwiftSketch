@@ -343,13 +343,13 @@ class SearchBar extends StatelessWidget {
       ),
       child: TextField(
         style: const TextStyle(fontSize: 14, color: Colors.black),
-        textAlignVertical: TextAlignVertical.center, // Ensures vertical centering
+        textAlignVertical: TextAlignVertical.center,
         decoration: const InputDecoration(
           hintText: 'Search Projects',
           hintStyle: TextStyle(color: Colors.grey),
           border: InputBorder.none,
-          isDense: true, // Reduces the default internal padding
-          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Adjusts vertical padding
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         ),
         onChanged: onSearchChanged,
       ),
