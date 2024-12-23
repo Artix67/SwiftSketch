@@ -5,7 +5,13 @@ import 'package:swift_sketch/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import 'package:intl/intl.dart';
 
-const Color mcolor = Color(0xFF2C2C2C);
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFCBC2B4);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -81,9 +87,9 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.orange[100],
+        backgroundColor: biegecolor,
         appBar: AppBar(
-          backgroundColor: Colors.orange[100],
+          backgroundColor: biegecolor,
           title: Row(
             children: [
               Row(
@@ -147,8 +153,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: Row(
                     children: [
                       const Text("Project Name"),
@@ -301,7 +307,11 @@ class _HomeScreenState extends State<HomeScreen> {
               alignment: Alignment.bottomRight,
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: ElevatedButton(
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: lgreencolor,
+                    foregroundColor: biegecolor
+                  ),
                   onPressed: _createNewProject,
                   child: const Text('New Project'),
                 ),
