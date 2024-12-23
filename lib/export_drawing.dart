@@ -6,7 +6,13 @@ import 'package:flutter/rendering.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:share_plus/share_plus.dart';
-
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFECDFCC);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
 // Taylor - By commenting out a lot of this, I made the export function a public Utility.
 // This is to make it easier to call on the drawscreen, specifically about drawing_canvas.
 
@@ -30,7 +36,7 @@ import 'package:share_plus/share_plus.dart';
 //   final GlobalKey globalKey = GlobalKey();
 
   // Asynchronous function to export the drawing content to a PDF file.
-  Future<void> exportToPdf(BuildContext context, GlobalKey globalKey) async {
+  Future<void> exportToPdf(BuildContext context, GlobalKey globalKey, String name) async {
     try {
       // Get the render object from the global key and check if it's a RenderRepaintBoundary.
       final boundary = globalKey.currentContext?.findRenderObject();
@@ -55,7 +61,7 @@ import 'package:share_plus/share_plus.dart';
 
           //Taylor - Set directory as temporary
           final Directory tempDir = await getTemporaryDirectory();
-          final String path = '${tempDir.path}/drawing.pdf';
+          final String path = '${tempDir.path}/${name}.pdf';
           final File file = File(path);
           await file.writeAsBytes(await pdf.save());
 

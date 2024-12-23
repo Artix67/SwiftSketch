@@ -455,8 +455,9 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     super.dispose();
   }
 
-  void export() {
-    exportToPdf(context, exportGlobalKey);
+  void export(String name) {
+    print("export ran");
+    exportToPdf(context, exportGlobalKey, name);
   }
 
   @override

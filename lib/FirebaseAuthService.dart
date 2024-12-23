@@ -28,38 +28,21 @@ class FirebaseAuthService {
 
       User? user = userCredential.user;
       if (user != null) {
-        // Send email verification
         await user.sendEmailVerification();
 
-        // Ensure user is authenticated before performing Firestore operations
-        // Add user to Firestore
         await _firestoreService.addUser({
           'uid': user.uid,
           'email': email,
         });
 
-        // Add settings to Firestore
         await _firestoreService.addSettings({
           'userUID': user.uid,
-          'theme': 'Light',
           'toolbarPosition': 'Top',
-          'fontSize': '12',
           'gridSize': '10',
-          'layerPresets': 'Layer 1',
           'gridVisibility': 1,
-          'tipsTutorials': 1,
-          'appUpdates': 1,
-          'defaultColor': 'FFFFFF',
-          'defaultTool': '',
-          'gridSnapOnOff': 0,
-          'gridOnOff': 0,
-          'currentProject': '',
-          'snapSensitivity': 0.0,
-          'biometricEnabled': 0,
-          'unitOfMeasurement': 'Metric',
+          'lineThickness': 0.0,
           'snapToGridSensitivity': '10px',
           'zoomSensitivity': '10',
-          'autoSaveFrequency': '5 min',
         });
 
         // Add an initial project to Firestore
@@ -68,7 +51,7 @@ class FirebaseAuthService {
           'userUID': user.uid,
           'name': 'Welcome Project',
           'date': DateTime.now().toIso8601String(),
-          'jsonData': '{}', // Initial empty JSON data
+          'jsonData': '{}',
         });
 
         // Sign in the user automatically after account creation and Firestore operations

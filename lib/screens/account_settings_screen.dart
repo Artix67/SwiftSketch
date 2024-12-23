@@ -2,6 +2,18 @@ import 'package:flutter/material.dart';
 import '/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import '/FirestoreService.dart';
+import '/SettingsManager.dart';
+
+
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFCBC2B4);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
+const Color whitecolor = Color(0xFFEEEEEE);
+
 
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -16,6 +28,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   final TextEditingController _emailController = TextEditingController();
   final FirebaseAuthService _authService = FirebaseAuthService();
   final FirestoreService _firestoreService = FirestoreService();
+  final SettingsManager _settingsManager = SettingsManager(); // Initialize SettingsManager
   String _currentUID = '';
 
   @override
@@ -60,6 +73,11 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           'lastName': _lastNameController.text,
         });
 
+        // Save updated profile settings
+        _settingsManager.updateUserSetting('email', _emailController.text);
+        _settingsManager.updateUserSetting('firstName', _firstNameController.text);
+        _settingsManager.updateUserSetting('lastName', _lastNameController.text);
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully')),
         );
@@ -67,22 +85,6 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         print('Failed to update profile: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Failed to update profile')),
-        );
-      }
-    }
-  }
-
-  void _deleteAccount() async {
-    final user = _authService.auth.currentUser;
-    if (user != null) {
-      try {
-        await _firestoreService.deleteUser(user.uid);
-        await user.delete();
-        Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
-      } catch (e) {
-        print('Failed to delete account: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to delete account')),
         );
       }
     }
@@ -111,10 +113,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
       home: Scaffold(
         resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
-        backgroundColor: Colors.orange[100],
+        backgroundColor: biegecolor,
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.orange[100],
+          backgroundColor: biegecolor,
           title: const Text('Account Settings'),
           leading: IconButton(
             onPressed: () {
@@ -148,6 +150,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     decoration: const InputDecoration(
                       hintText: 'First Name',
                     ),
+                    onChanged: (value) => _settingsManager.updateUserSetting('firstName', value), // Save on change
                   ),
                   const SizedBox(height: 10),
                   const SelectionContainer.disabled(
@@ -158,6 +161,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     decoration: const InputDecoration(
                       hintText: 'Last Name',
                     ),
+                    onChanged: (value) => _settingsManager.updateUserSetting('lastName', value), // Save on change
                   ),
                   const SizedBox(height: 10),
                   const SelectionContainer.disabled(
@@ -168,12 +172,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     decoration: const InputDecoration(
                       hintText: 'Email Address',
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
-                    onPressed: _deleteAccount,
-                    child: const Text("Delete Account"),
+                    onChanged: (value) => _settingsManager.updateUserSetting('email', value), // Save on change
                   ),
                   const SizedBox(height: 10),
                   OutlinedButton(

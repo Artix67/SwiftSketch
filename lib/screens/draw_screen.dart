@@ -2,14 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:swift_sketch/screens/toolbar.dart';
 import 'package:swift_sketch/screens/layers_tab.dart';
 import '../drawing_canvas.dart';
-import '../drawing_shapes/drawing_shape.dart';
 import '../models/layer.dart';
 import 'package:swift_sketch/ProjectManager.dart';
 
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFCBC2B4);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
+
 class Drawscreen extends StatefulWidget {
   final String projectName;
+  final bool exportImmediately;
+  final bool isGuest;
 
-  const Drawscreen({super.key, required this.projectName});
+  const Drawscreen({super.key, required this.projectName, required this.exportImmediately, required this.isGuest});
 
   @override
   State<Drawscreen> createState() => _Drawscreen();
@@ -24,7 +33,7 @@ class _Drawscreen extends State<Drawscreen> {
   double _strokeWidth = 4.0;
   double _gridSize = 10.0;
   double _snapSensitivity = 2.0;
-  double _iconSize = 1.5;
+  double _iconSize = 1.25;
   double _spacerSize = 15;
 
   final ValueNotifier<List<Layer>> _layersNotifier = ValueNotifier([
@@ -41,6 +50,15 @@ class _Drawscreen extends State<Drawscreen> {
       if (_layersNotifier.value.isNotEmpty) {
         _drawingCanvasKey.currentState?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
       }
+    });
+    if (widget.exportImmediately) {
+      _triggerExport();
+    }
+  }
+
+  void _triggerExport() {
+    Future.delayed(Duration(milliseconds: 500), () {
+      _drawingCanvasKey.currentState?.export(widget.projectName);
     });
   }
 
@@ -174,6 +192,8 @@ class _Drawscreen extends State<Drawscreen> {
             onUpdateSnapSensitivity: _updateSnapSensitivity,
             iconSize: _iconSize,
             spacerSize: _spacerSize,
+            name: widget.projectName,
+            isGuest: widget.isGuest,
           ),
         ),
         body: Row(
