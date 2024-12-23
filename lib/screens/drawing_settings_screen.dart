@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
-import '/FirestoreService.dart';
 import '/SettingsManager.dart';
 
 const List<String> unitlist = <String>['Metric', 'Imperial'];
@@ -17,8 +16,7 @@ class DrawingSettingsScreen extends StatefulWidget {
 
 class _DrawingSettingsScreenState extends State<DrawingSettingsScreen> {
   final FirebaseAuthService _authService = FirebaseAuthService();
-  final FirestoreService _firestoreService = FirestoreService();
-  final SettingsManager _settingsManager = SettingsManager(); // Initialize SettingsManager
+  final SettingsManager _settingsManager = SettingsManager();
 
   // String _unitOfMeasurement = 'Metric';
   String _gridSensitivity = '10px';
