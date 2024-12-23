@@ -3,8 +3,15 @@ import 'package:flutter/material.dart';
 import '/screens/draw_screen.dart';
 import 'package:swift_sketch/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
+import 'package:intl/intl.dart';
 
-const Color mcolor = Color(0xFF2C2C2C);
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFCBC2B4);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {
-          return Drawscreen(projectName: projectName);
+          return Drawscreen(projectName: projectName, exportImmediately: false, isGuest: false,);
         }),
       );
     }
@@ -66,78 +73,95 @@ class _HomeScreenState extends State<HomeScreen> {
     ) ?? '';
   }
 
+  String formatDateTime(String dateTime) {
+    try {
+      final DateTime parsedDateTime = DateTime.parse(dateTime);
+      final DateFormat formatter = DateFormat('MMMM d, y \'at\' h:mm a'); // AM/PM format
+      return formatter.format(parsedDateTime);
+    } catch (e) {
+      return dateTime; // Fallback in case of an error
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        backgroundColor: Colors.orange[100],
+        backgroundColor: biegecolor,
         appBar: AppBar(
-          backgroundColor: Colors.orange[100],
-          actions: <Widget>[
-            Container(
-              decoration: const BoxDecoration(),
-              child: Row(
+          backgroundColor: biegecolor,
+          title: Row(
+            children: [
+              Row(
                 children: [
                   const SizedBox(width: 20),
-                  Image.asset(
-                    'images/SSLogo.png',
-                    height: 90,
-                    width: 90,
-                  ),
-                  const SizedBox(width: 20),
-                  const Text(
-                    "Swift Sketch",
-                    style: TextStyle(fontSize: 32),
-                  ),
-                  SizedBox(width: MediaQuery.sizeOf(context).width * 0.35),
-                  SizedBox(
-                    height: 70,
-                    width: 400,
-                    child: Column(
-                      children: [
-                        SearchBar(onSearchChanged: _updateSearchQuery),
-                      ],
+                  FittedBox(
+                    fit: BoxFit.contain,
+                    child: Image.asset(
+                      'images/SSLogo.png',
+                      height: 40,
+                      width: 40,
                     ),
                   ),
-                  const SizedBox(width: 30),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return const SettingsScreen();
-                        }),
-                      );
-                    },
-                    tooltip: 'Settings',
-                    icon: const ImageIcon(AssetImage("icons/settings.png")),
+                  const SizedBox(width: 10),
+                  const Text(
+                    "Swift Sketch",
+                    style: TextStyle(fontSize: 24),
                   ),
-                  const SizedBox(width: 19),
                 ],
               ),
-            ),
-          ],
+              const Spacer(),
+              Flexible(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    SizedBox(
+                      height: 40,
+                      width: 300,
+                      child: SearchBar(onSearchChanged: _updateSearchQuery),
+                    ),
+                    const SizedBox(width: 20),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return const SettingsScreen();
+                          }),
+                        );
+                      },
+                      tooltip: 'Settings',
+                      icon: const ImageIcon(AssetImage("icons/settings.png")),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
         body: Column(
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               child: Container(
-                width: MediaQuery.sizeOf(context).width,
-                height: MediaQuery.sizeOf(context).height * .05,
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * .055,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.black,
                     width: 2,
                   ),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: const Padding(
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: Row(
                     children: [
                       const Text("Project Name"),
-                      SizedBox(width: MediaQuery.sizeOf(context).width * 0.55),
+                      const Spacer(),
                       const Text("Date"),
+                      const Spacer(),
+                      const Text("Actions")
                     ],
                   ),
                 ),
@@ -147,7 +171,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('projects')
-                    .where('userUID', isEqualTo: _authService.auth.currentUser?.uid) // Filter by the current user's UID
+                    .where('userUID',
+                    isEqualTo: _authService.auth.currentUser?.uid) // Filter by the current user's UID
                     .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -175,31 +200,39 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         var project = projects[index];
                         return Padding(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
                           child: Container(
-                            height: 60,
+                            height: 40,
                             decoration: BoxDecoration(
-                              color: Colors.grey,
+                              color: Colors.white60,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
                               children: [
                                 const SizedBox(width: 10),
                                 Container(
-                                  width: 160,
+                                  width: 250,
                                   child: Text(project['name']),
                                 ),
+                                const Spacer(),
                                 Container(
-                                  width: 140,
-                                  child: Text(project['date']),
+                                  width: 250,
+                                  child: Text(
+                                    formatDateTime(project['date']), // Call the formatting function here
+                                  ),
                                 ),
+                                const Spacer(),
                                 IconButton(
                                   onPressed: () {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) {
-                                          return Drawscreen(projectName: project['name']); // Correctly reference Drawscreen with projectName
+                                          return Drawscreen(
+                                              projectName: project['name'],
+                                            exportImmediately: false,
+                                            isGuest: false,
+                                          );
                                         },
                                       ),
                                     );
@@ -208,16 +241,53 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    // Implement export functionality here
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return Drawscreen(
+                                            projectName: project['name'],
+                                            exportImmediately: true,
+                                            isGuest: false,
+                                          );
+                                        },
+                                      ),
+                                    );
                                   },
                                   icon: const ImageIcon(AssetImage("icons/export2.png")),
                                 ),
                                 IconButton(
                                   onPressed: () async {
-                                    await FirebaseFirestore.instance
-                                        .collection('projects')
-                                        .doc(project.id)
-                                        .delete();
+                                    final bool confirmDelete = await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Delete Project'),
+                                          content: const Text('Are you sure you want to delete this project? This action cannot be undone.'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(false); // User chose not to delete
+                                              },
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(true); // User confirmed deletion
+                                              },
+                                              child: const Text('Delete'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+
+                                    if (confirmDelete == true) {
+                                      await FirebaseFirestore.instance
+                                          .collection('projects')
+                                          .doc(project.id)
+                                          .delete();
+                                    }
                                   },
                                   icon: const Icon(Icons.delete),
                                 ),
@@ -233,15 +303,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             ),
-            Expanded(
-              child: Align(
-                alignment: FractionalOffset.bottomRight,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 0, 10, 10),
-                  child: ElevatedButton(
-                    onPressed: _createNewProject,
-                    child: const Text('New Project'),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: lgreencolor,
+                    foregroundColor: biegecolor
                   ),
+                  onPressed: _createNewProject,
+                  child: const Text('New Project'),
                 ),
               ),
             ),
@@ -260,12 +332,24 @@ class SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: Colors.black,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: TextField(
-        style: const TextStyle(fontSize: 14),
+        style: const TextStyle(fontSize: 14, color: Colors.black),
+        textAlignVertical: TextAlignVertical.center,
         decoration: const InputDecoration(
           hintText: 'Search Projects',
-          border: OutlineInputBorder(),
-          suffixIcon: Icon(Icons.search),
+          hintStyle: TextStyle(color: Colors.grey),
+          border: InputBorder.none,
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         ),
         onChanged: onSearchChanged,
       ),
