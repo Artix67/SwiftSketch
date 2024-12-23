@@ -118,7 +118,6 @@ class Toolbar extends StatelessWidget {
                       ),
                     ),
                   if (!isGuest)
-                    SizedBox(width: spacerSize),
 
                   //MARK: - EXPORT BUTTON
                   Transform.scale(
@@ -131,7 +130,6 @@ class Toolbar extends StatelessWidget {
                       },
                     ),
                   ),
-                  SizedBox(width: spacerSize,),
 
                   //MARK: - UNDO BUTTON
                   Transform.scale(
@@ -450,9 +448,6 @@ class Toolbar extends StatelessWidget {
                       },
                     ),
                   ),
-                  SizedBox(
-                    width: spacerSize,
-                  ),
                   Transform.scale(
                     scale: iconSize,
                     child: IconButton(
@@ -472,10 +467,6 @@ class Toolbar extends StatelessWidget {
                       tooltip: 'Home',
                     ),
                   ),
-                  SizedBox(
-                    width: spacerSize,
-                  ),
-
                 ],
               )
           )

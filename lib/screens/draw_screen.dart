@@ -31,7 +31,7 @@ class _Drawscreen extends State<Drawscreen> {
   double _strokeWidth = 4.0;
   double _gridSize = 10.0;
   double _snapSensitivity = 2.0;
-  double _iconSize = 1.5;
+  double _iconSize = 1.25;
   double _spacerSize = 15;
 
   final ValueNotifier<List<Layer>> _layersNotifier = ValueNotifier([
