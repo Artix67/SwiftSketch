@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import '/FirestoreService.dart';
+import '/SettingsManager.dart';
 
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -16,6 +17,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   final TextEditingController _emailController = TextEditingController();
   final FirebaseAuthService _authService = FirebaseAuthService();
   final FirestoreService _firestoreService = FirestoreService();
+  final SettingsManager _settingsManager = SettingsManager(); // Initialize SettingsManager
   String _currentUID = '';
 
   @override
@@ -60,6 +62,11 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           'lastName': _lastNameController.text,
         });
 
+        // Save updated profile settings
+        _settingsManager.updateUserSetting('email', _emailController.text);
+        _settingsManager.updateUserSetting('firstName', _firstNameController.text);
+        _settingsManager.updateUserSetting('lastName', _lastNameController.text);
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile updated successfully')),
         );
@@ -71,23 +78,6 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
       }
     }
   }
-
-  //TODO: Adjust to delete in Firebase (Must also remove user data, like projects)
-  // void _deleteAccount() async {
-  //   final user = _authService.auth.currentUser;
-  //   if (user != null) {
-  //     try {
-  //       await _firestoreService.deleteUser(user.uid);
-  //       await user.delete();
-  //       Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
-  //     } catch (e) {
-  //       print('Failed to delete account: $e');
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         const SnackBar(content: Text('Failed to delete account')),
-  //       );
-  //     }
-  //   }
-  // }
 
   void _changePassword() async {
     final user = _authService.auth.currentUser;
@@ -149,6 +139,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     decoration: const InputDecoration(
                       hintText: 'First Name',
                     ),
+                    onChanged: (value) => _settingsManager.updateUserSetting('firstName', value), // Save on change
                   ),
                   const SizedBox(height: 10),
                   const SelectionContainer.disabled(
@@ -159,6 +150,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     decoration: const InputDecoration(
                       hintText: 'Last Name',
                     ),
+                    onChanged: (value) => _settingsManager.updateUserSetting('lastName', value), // Save on change
                   ),
                   const SizedBox(height: 10),
                   const SelectionContainer.disabled(
@@ -169,16 +161,9 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     decoration: const InputDecoration(
                       hintText: 'Email Address',
                     ),
+                    onChanged: (value) => _settingsManager.updateUserSetting('email', value), // Save on change
                   ),
                   const SizedBox(height: 10),
-
-                  //TODO: Complete Account Deletion functionality
-                  // OutlinedButton(
-                  //   style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
-                  //   onPressed: _deleteAccount,
-                  //   child: const Text("Delete Account"),
-                  // ),
-                  // const SizedBox(height: 10),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
                     onPressed: _changePassword,

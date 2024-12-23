@@ -41,25 +41,18 @@ class FirebaseAuthService {
         // Add settings to Firestore
         await _firestoreService.addSettings({
           'userUID': user.uid,
-          'theme': 'Light',
           'toolbarPosition': 'Top',
-          'fontSize': '12',
           'gridSize': '10',
-          'layerPresets': 'Layer 1',
           'gridVisibility': 1,
-          'tipsTutorials': 1,
-          'appUpdates': 1,
           'defaultColor': 'FFFFFF',
           'defaultTool': '',
           'gridSnapOnOff': 0,
           'gridOnOff': 0,
           'currentProject': '',
           'snapSensitivity': 0.0,
-          'biometricEnabled': 0,
-          'unitOfMeasurement': 'Metric',
+          //'unitOfMeasurement': 'Metric',
           'snapToGridSensitivity': '10px',
           'zoomSensitivity': '10',
-          'autoSaveFrequency': '5 min',
         });
 
         // Add an initial project to Firestore
