@@ -162,30 +162,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                       Container(alignment: Alignment.centerRight,
                         width: 150,
                         height: 58,
-                        child: const Text("Font Size:"),
-                      ),
-                      DropdownMenu(
-                        initialSelection: '12',
-                        width: 150,
-                        dropdownMenuEntries: finstsizelist.map(
-                                (e) => DropdownMenuEntry(
-                                value: e, label: e)
-                        ).toList(),
-                        onSelected: (value){
-                          debugPrint('Font Size: $value');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.3,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(alignment: Alignment.centerRight,
-                        width: 150,
-                        height: 58,
                         child:  const Text("Line Thickness:"),
                       ),
                       Container(alignment: Alignment.centerRight,
@@ -204,64 +180,69 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.3,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(alignment: Alignment.centerRight,
-                        width: 150,
-                        height: 58,
-                        child: const Text("Recent Tools:"),
-                      ),
-                      Container(
-                        width: 150,
-                        height: 58,
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black,
-                            )
-                        ),
-                        child: const Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ImageIcon(AssetImage("icons/draw.png")),
-                            ImageIcon(AssetImage("icons/line.png")),
-                            ImageIcon(AssetImage("icons/square.png")),
-                            ImageIcon(AssetImage("icons/freeformshapes.png")),
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.3,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(alignment: Alignment.centerRight,
-                        width: 150,
-                        height: 58,
-                        child: const Text("Default Colors:"),
-                      ),
-                      Container(
-                        width: 150,
-                        height: 58,
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Colors.black,
-                            )
-                        ),
-                        child: const Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Icon(Icons.square),
-                            Icon(Icons.square),
-                            Icon(Icons.square),
-                            Icon(Icons.square)
-                          ],
-                        ),
-                      )
-                    ],
-                  ),
-                ),
+
+                //TODO: Change this to "default tool" and set the user's start up tool
+                // SizedBox(
+                //   width: MediaQuery.sizeOf(context).width * 0.3,
+                //   child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //     children: [
+                //       Container(alignment: Alignment.centerRight,
+                //         width: 150,
+                //         height: 58,
+                //         child: const Text("Recent Tools:"),
+                //       ),
+                //       Container(
+                //         width: 150,
+                //         height: 58,
+                //         decoration: BoxDecoration(
+                //             border: Border.all(
+                //               color: Colors.black,
+                //             )
+                //         ),
+                //         child: const Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //           children: [
+                //             ImageIcon(AssetImage("icons/draw.png")),
+                //             ImageIcon(AssetImage("icons/line.png")),
+                //             ImageIcon(AssetImage("icons/square.png")),
+                //             ImageIcon(AssetImage("icons/freeformshapes.png")),
+                //           ],
+                //         ),
+                //       )
+                //     ],
+                //   ),
+                // ),
+
+                //TODO: Change this to starting colors (one for fill and one for stroke)
+                // SizedBox(
+                //   width: MediaQuery.sizeOf(context).width * 0.3,
+                //   child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //     children: [
+                //       Container(alignment: Alignment.centerRight,
+                //         width: 150,
+                //         height: 58,
+                //         child: const Text("Default Colors:"),
+                //       ),
+                //       Container(
+                //         width: 150,
+                //         height: 58,
+                //         decoration: BoxDecoration(
+                //             border: Border.all(
+                //               color: Colors.black,
+                //             )
+                //         ),
+                //         child: const Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //           children: [
+                //             Icon(Icons.square),
+                //             Icon(Icons.square),
+                //             Icon(Icons.square),
+                //             Icon(Icons.square)
+                //           ],
+                //         ),
+                //       )
+                //     ],
+                //   ),
+                // ),
+
                 SizedBox(
                   width: MediaQuery.sizeOf(context).width * 0.3,
                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -285,29 +266,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.3,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(alignment: Alignment.centerRight,
-                        width: 150,
-                        height: 58,
-                        child: const Text("Layer Presets:"),
-                      ),
-                      DropdownMenu(
-                        initialSelection: 'Layer 1',
-                        width: 150,
-                        dropdownMenuEntries: layerpresetslist.map(
-                                (e) => DropdownMenuEntry(
-                                value: e, label: e)
-                        ).toList(),
-                        onSelected: (value){
-                          debugPrint('Layer Presets: $value');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+
                 SizedBox(
                   width: MediaQuery.sizeOf(context).width * 0.3,
                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -333,55 +292,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                     ],
                   ),
                 ),
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.3,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(alignment: Alignment.centerRight,
-                        width: 150,
-                        height: 58,
-                        child: const Text("Tips & Tutorials:"),
-                      ),
-                      Container(alignment: Alignment.center,
-                        width: 150,
-                        height: 58,
-                        child: Enable(
-                          initialSwitchValue: _tipsTutorials,
-                          onChanged: (value) {
-                            setState(() {
-                              _tipsTutorials = value;
-                              _updateSettings();
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.3,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(alignment: Alignment.centerRight,
-                        width: 150,
-                        height: 58,
-                        child: const Text("App Updates:"),
-                      ),
-                      Container(alignment: Alignment.center,
-                        width: 150,
-                        height: 58,
-                        child: Enable(
-                          initialSwitchValue: _appUpdates,
-                          onChanged: (value) {
-                            setState(() {
-                              _appUpdates = value;
-                              _updateSettings();
-                            });
-                          },),
-                      ),
-                    ],
-                  ),
-                ),
               ],
             ),
           ),
@@ -389,8 +299,6 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     );
   }
 }
-
-
 
 class Enable extends StatefulWidget {
   final bool initialSwitchValue;

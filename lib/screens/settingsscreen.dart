@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:swift_sketch/screens/account_settings_screen.dart';
 import 'package:swift_sketch/screens/app_settings_screen.dart';
 import 'package:swift_sketch/screens/drawing_settings_screen.dart';
-import 'package:swift_sketch/screens/exportsettingsscreen.dart';
-import 'package:swift_sketch/screens/helpsupportscreen.dart';
 import 'package:swift_sketch/screens/homescreen.dart';
 import 'package:swift_sketch/screens/loginscreen.dart';
 
@@ -82,48 +80,19 @@ class SettingsScreen extends StatelessWidget{
                           child: const Text("Drawing Settings"),
                         ),
                         const SizedBox(height: 10),
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
-                          onPressed: (){
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context){
-                                  return const ExportSettingsScreen();
-                                })
-                            );
-                          },
-                          child: const Text("Export Settings"),
-                        ),
-                        const SizedBox(height: 10),
-
-                        //TODO: ADD BIOMETRIC DEPENDENCIES
                         // OutlinedButton(
                         //   style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
                         //   onPressed: (){
                         //     Navigator.push(
                         //         context,
                         //         MaterialPageRoute(builder: (context){
-                        //           return const PrivacySecurityScreen();
+                        //           return const ExportSettingsScreen();
                         //         })
                         //     );
                         //   },
-                        //   child: const Text("Privacy & Security"),
+                        //   child: const Text("Export Settings"),
                         // ),
                         // const SizedBox(height: 10),
-
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
-                          onPressed: (){
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context){
-                                  return const HelpSupportScreen();
-                                })
-                            );
-                          },
-                          child: const Text("Help & Support"),
-                        ),
-                        const SizedBox(height: 10),
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
                           onPressed: (){

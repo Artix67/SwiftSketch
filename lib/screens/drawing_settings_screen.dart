@@ -19,7 +19,7 @@ class _DrawingSettingsScreenState extends State<DrawingSettingsScreen> {
   final FirebaseAuthService _authService = FirebaseAuthService();
   final FirestoreService _firestoreService = FirestoreService();
 
-  String _unitOfMeasurement = 'Metric';
+  // String _unitOfMeasurement = 'Metric';
   String _gridSensitivity = '10px';
   String _zoomSensitivity = '10';
   String _autoSaveFrequency = '5 min';
@@ -36,7 +36,7 @@ class _DrawingSettingsScreenState extends State<DrawingSettingsScreen> {
       final settings = await _firestoreService.getSettings(user.uid);
       if (settings != null) {
         setState(() {
-          _unitOfMeasurement = settings['unitOfMeasurement'] ?? 'Metric';
+          // _unitOfMeasurement = settings['unitOfMeasurement'] ?? 'Metric';
           _gridSensitivity = settings['gridSensitivity'] ?? '10px';
           _zoomSensitivity = settings['zoomSensitivity'] ?? '10';
           _autoSaveFrequency = settings['autoSaveFrequency'] ?? '5 min';
@@ -50,7 +50,7 @@ class _DrawingSettingsScreenState extends State<DrawingSettingsScreen> {
     if (user != null) {
       await _firestoreService.updateSettings({
         'userUID': user.uid,
-        'unitOfMeasurement': _unitOfMeasurement,
+        // 'unitOfMeasurement': _unitOfMeasurement,
         'gridSensitivity': _gridSensitivity,
         'zoomSensitivity': _zoomSensitivity,
         'autoSaveFrequency': _autoSaveFrequency,
@@ -87,22 +87,25 @@ class _DrawingSettingsScreenState extends State<DrawingSettingsScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Text('Unit of Measurement:'),
-              DropdownMenu(
-                initialSelection: _unitOfMeasurement,
-                width: 150,
-                dropdownMenuEntries: unitlist.map(
-                      (e) => DropdownMenuEntry(value: e, label: e),
-                ).toList(),
-                onSelected: (value) {
-                  setState(() {
-                    _unitOfMeasurement = value!;
-                    _updateSettings();
-                  });
-                  debugPrint('Unit of Measurement: $value');
-                },
-              ),
-              const SizedBox(height: 10),
+              //TODO: Not a bad idea but not yet, reassess at your will
+              // const Text('Unit of Measurement:'),
+              // DropdownMenu(
+              //   // initialSelection: _unitOfMeasurement,
+              //   width: 150,
+              //   dropdownMenuEntries: unitlist.map(
+              //         (e) => DropdownMenuEntry(value: e, label: e),
+              //   ).toList(),
+              //   onSelected: (value) {
+              //     setState(() {
+              //       _unitOfMeasurement = value!;
+              //       _updateSettings();
+              //     });
+              //     debugPrint('Unit of Measurement: $value');
+              //   },
+              // ),
+              // const SizedBox(height: 10),
+
+              //TODO: move to app settings?
               const Text('Snap to Grid Sensitivity:'),
               DropdownMenu(
                 initialSelection: _gridSensitivity,
@@ -119,6 +122,8 @@ class _DrawingSettingsScreenState extends State<DrawingSettingsScreen> {
                 },
               ),
               const SizedBox(height: 10),
+
+              //TODO: move to app settings?
               const Text('Zoom Sensitivity:'),
               DropdownMenu(
                 initialSelection: _zoomSensitivity,
@@ -135,21 +140,21 @@ class _DrawingSettingsScreenState extends State<DrawingSettingsScreen> {
                 },
               ),
               const SizedBox(height: 10),
-              const Text('Auto Save Frequency:'),
-              DropdownMenu(
-                initialSelection: _autoSaveFrequency,
-                width: 150,
-                dropdownMenuEntries: autosavelist.map(
-                      (e) => DropdownMenuEntry(value: e, label: e),
-                ).toList(),
-                onSelected: (value) {
-                  setState(() {
-                    _autoSaveFrequency = value!;
-                    _updateSettings();
-                  });
-                  debugPrint('Auto Save Frequency: $value');
-                },
-              ),
+              // const Text('Auto Save Frequency:'),
+              // DropdownMenu(
+              //   initialSelection: _autoSaveFrequency,
+              //   width: 150,
+              //   dropdownMenuEntries: autosavelist.map(
+              //         (e) => DropdownMenuEntry(value: e, label: e),
+              //   ).toList(),
+              //   onSelected: (value) {
+              //     setState(() {
+              //       _autoSaveFrequency = value!;
+              //       _updateSettings();
+              //     });
+              //     debugPrint('Auto Save Frequency: $value');
+              //   },
+              // ),
             ],
           ),
         ),
