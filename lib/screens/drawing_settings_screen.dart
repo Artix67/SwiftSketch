@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import '/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import '/FirestoreService.dart';
-
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFECDFCC);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
 const List<String> unitlist = <String>['Metric', 'Imperial'];
 const List<String> gridsensitivitylist = <String>['5px', '10px', '15px', '20px'];
 const List<String> zoomlist = <String>['5', '10', '15', '20'];
@@ -66,10 +72,10 @@ class _DrawingSettingsScreenState extends State<DrawingSettingsScreen> {
     return MaterialApp(
       home: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.orange[100],
+        backgroundColor: biegecolor,
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.orange[100],
+          backgroundColor: biegecolor,
           title: const Text('Drawing Settings'),
           leading: IconButton(
             onPressed: () {

@@ -3,7 +3,13 @@ import 'package:flutter/material.dart';
 import 'loginscreen.dart';
 import '/FirebaseAuthService.dart';
 import 'homescreen.dart';
-
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFECDFCC);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
 

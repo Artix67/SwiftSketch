@@ -9,10 +9,12 @@ const List<String> finstsizelist = <String>['6', '8', '10', '12', '14', '16', '1
 const List<String> gridsizelist = <String>['5', '10', '15', '20'];
 const List<String> layerpresetslist = <String>['Layer 1', 'Layer 2', 'Layer 3', 'Layer 4', 'Layer 5', 'Layer 6', 'Layer 7', 'Layer 8', 'Layer 9', 'Layer 10'];
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF2C2C2C);
-const Color biegecolor = Color(0xFF2C2C2C);
-const Color redcolor = Color(0xFF2C2C2C);
-
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFECDFCC);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
 class AppSettingsScreen extends StatefulWidget{
   const AppSettingsScreen({super.key});
 
@@ -86,10 +88,10 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     return MaterialApp(
         home: Scaffold(
           resizeToAvoidBottomInset: false,
-          backgroundColor: Colors.orange[100],
+          backgroundColor: biegecolor,
           appBar: AppBar(
             centerTitle: true,
-            backgroundColor: Colors.orange[100],
+            backgroundColor: biegecolor,
             title: const Text("App Settings"),
             leading: IconButton(onPressed: (){
               Navigator.push(
@@ -365,7 +367,7 @@ class _LineThicknessState extends State<LineThickness> {
         data: SliderThemeData(
           inactiveTrackColor: Colors.grey[500],
           activeTrackColor: Colors.green[900],
-          thumbColor: redcolor,
+          thumbColor: Colors.black,
           thumbShape:const  RoundSliderThumbShape(enabledThumbRadius: 6.0),
           overlayShape:const  RoundSliderOverlayShape(overlayRadius: 5.0),
           activeTickMarkColor: Colors.black,

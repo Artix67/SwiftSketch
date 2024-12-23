@@ -1,6 +1,12 @@
 // import 'package:flutter/material.dart';
 // import 'package:swift_sketch/screens/settingsscreen.dart';
-//
+// const Color dgreencolor = Color(0xFF181C14);
+// const Color lgreencolor = Color(0xFF697565);
+// const Color biegecolor = Color(0xFFECDFCC);
+// const Color redcolor = Color(0xFFAB3E2B);
+// const Color bluecolor = Color(0xFF11487A);
+// const Color blackcolor = Color(0xFF181818);
+// const Color midgreencolor = Color(0xFF3C3D37);
 // const List<String> exportlist = <String>['PDF', 'JPEG', 'PNG'];
 // const List<String> reslist = <String>['Low', 'Medium', 'High', 'Ultra'];
 // const List<String> filenamelist = <String>['Date', ' Title', 'Custom'];
@@ -11,10 +17,10 @@
 //   Widget build(BuildContext context) {
 //     return MaterialApp(
 //         home: Scaffold(
-//           backgroundColor: Colors.orange[100],
+//           backgroundColor: biegecolor,
 //           appBar: AppBar(
 //             centerTitle: true,
-//             backgroundColor: Colors.orange[100],
+//             backgroundColor: biegecolor,
 //             title: const Text('Export Settings'),
 //             leading: IconButton(onPressed: (){
 //               Navigator.push(
@@ -67,11 +73,13 @@
 //                     debugPrint('File Naming: $value');
 //                   },
 //                 )
+//
 //               ],
 //             ),
 //           ),
+//
 //         )
 //     );
 //   }
 // }
-//
+

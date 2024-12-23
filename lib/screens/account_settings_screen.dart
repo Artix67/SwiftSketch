@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import '/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import '/FirestoreService.dart';
-
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFECDFCC);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
 
@@ -112,10 +118,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
       home: Scaffold(
         resizeToAvoidBottomInset: false,
         extendBodyBehindAppBar: true,
-        backgroundColor: Colors.orange[100],
+        backgroundColor: biegecolor,
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.orange[100],
+          backgroundColor: biegecolor,
           title: const Text('Account Settings'),
           leading: IconButton(
             onPressed: () {
@@ -133,60 +139,84 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints.expand(height: 500, width: 500),
             child: SizedBox(
-              child: Column(
+              child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   const ImageIcon(
                     AssetImage("icons/userprofile.png"),
                     color: Colors.black,
                     size: 50.0,
                   ),
-                  const SizedBox(height: 10),
+
                   const SelectionContainer.disabled(
-                    child: Text('First Name:'),
+                    child: Text('First Name:',),
                   ),
-                  TextField(
-                    controller: _firstNameController,
-                    decoration: const InputDecoration(
-                      hintText: 'First Name',
+                  Container(
+                      height: 50,
+                      width: 300,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: blackcolor)
+                      ),
+                    child: TextField(
+                      controller: _firstNameController,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: 'First Name',
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
+
                   const SelectionContainer.disabled(
                     child: Text('Last Name:'),
                   ),
-                  TextField(
-                    controller: _lastNameController,
-                    decoration: const InputDecoration(
-                      hintText: 'Last Name',
+                  Container(
+                      height: 50,
+                      width: 300,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: blackcolor)
+                      ),
+                    child:  TextField(
+                      controller: _lastNameController,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: 'Last Name',
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
                   const SelectionContainer.disabled(
                     child: Text('Email Address:'),
                   ),
-                  TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      hintText: 'Email Address',
+                  Container(
+                      height: 50,
+                      width: 300,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: blackcolor)
+                      ),
+                    child: TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration.collapsed(
+                        hintText: 'Email Address',
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-
                   //TODO: Complete Account Deletion functionality
                   // OutlinedButton(
-                  //   style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
+                  //   style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50),
+                  //   backgroundColor: lgreencolor,
+                  //   foregroundColor: biegecolor),
                   //   onPressed: _deleteAccount,
                   //   child: const Text("Delete Account"),
                   // ),
-                  // const SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   OutlinedButton(
-                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
+                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50),
+                        backgroundColor: lgreencolor,
+                        foregroundColor: biegecolor),
                     onPressed: _changePassword,
                     child: const Text("Change Password"),
                   ),
                   const SizedBox(height: 10),
                   OutlinedButton(
-                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
+                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50),
+                        backgroundColor: lgreencolor,
+                        foregroundColor: biegecolor),
                     onPressed: _updateProfile,
                     child: const Text("Update Profile"),
                   ),
