@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:swift_sketch/screens/toolbar.dart';
 import 'package:swift_sketch/screens/layers_tab.dart';
 import '../drawing_canvas.dart';
-import '../drawing_shapes/drawing_shape.dart';
 import '../models/layer.dart';
 import 'package:swift_sketch/ProjectManager.dart';
 
 class Drawscreen extends StatefulWidget {
   final String projectName;
+  final bool exportImmediately;
 
-  const Drawscreen({super.key, required this.projectName});
+  const Drawscreen({super.key, required this.projectName, required this.exportImmediately});
 
   @override
   State<Drawscreen> createState() => _Drawscreen();
@@ -41,6 +41,15 @@ class _Drawscreen extends State<Drawscreen> {
       if (_layersNotifier.value.isNotEmpty) {
         _drawingCanvasKey.currentState?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
       }
+    });
+    if (widget.exportImmediately) {
+      _triggerExport();
+    }
+  }
+
+  void _triggerExport() {
+    Future.delayed(Duration(milliseconds: 500), () {
+      _drawingCanvasKey.currentState?.export(widget.projectName);
     });
   }
 
@@ -174,6 +183,7 @@ class _Drawscreen extends State<Drawscreen> {
             onUpdateSnapSensitivity: _updateSnapSensitivity,
             iconSize: _iconSize,
             spacerSize: _spacerSize,
+            name: widget.projectName,
           ),
         ),
         body: Row(

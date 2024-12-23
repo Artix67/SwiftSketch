@@ -30,6 +30,7 @@ class Toolbar extends StatelessWidget {
   final VoidCallback refreshUI;
   final double spacerSize;
   final double iconSize;
+  final String name;
 
 
   const Toolbar({
@@ -50,6 +51,7 @@ class Toolbar extends StatelessWidget {
     required this.refreshUI,
     required this.spacerSize,
     required this.iconSize,
+    required this.name,
   });
 
   void _pickColor(BuildContext context, bool isFill) {
@@ -119,7 +121,7 @@ class Toolbar extends StatelessWidget {
             icon: const ImageIcon(AssetImage("icons/export2.png")),
             tooltip: 'Export',
             onPressed: () {
-              drawingCanvasKey.currentState?.export();
+              drawingCanvasKey.currentState?.export(name);
             },
           ),
         ),

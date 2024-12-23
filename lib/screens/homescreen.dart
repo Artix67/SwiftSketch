@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {
-          return Drawscreen(projectName: projectName);
+          return Drawscreen(projectName: projectName, exportImmediately: false,);
         }),
       );
     }
@@ -70,33 +70,11 @@ class _HomeScreenState extends State<HomeScreen> {
   String formatDateTime(String dateTime) {
     try {
       final DateTime parsedDateTime = DateTime.parse(dateTime);
-
-      // Get date components
-      final String month = _getMonthName(parsedDateTime.month);
-      final String day = parsedDateTime.day.toString();
-      final String year = parsedDateTime.year.toString();
-
-      // Get time components
-      int hour = parsedDateTime.hour;
-      final String minute = parsedDateTime.minute.toString().padLeft(2, '0');
-      final String period = hour >= 12 ? 'PM' : 'AM';
-
-      // Convert hour to 12-hour format
-      hour = hour % 12 == 0 ? 12 : hour % 12;
-
-      // Create a formatted string: "December 22, 2024 at 2:30 PM"
-      return '$month $day, $year at $hour:$minute $period';
+      final DateFormat formatter = DateFormat('MMMM d, y \'at\' h:mm a'); // AM/PM format
+      return formatter.format(parsedDateTime);
     } catch (e) {
       return dateTime; // Fallback in case of an error
     }
-  }
-
-  String _getMonthName(int month) {
-    const List<String> months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return months[month - 1];
   }
 
   @override
@@ -221,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Container(
                             height: 50,
                             decoration: BoxDecoration(
-                              color: Colors.grey,
+                              color: Colors.white60,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -246,7 +224,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                       MaterialPageRoute(
                                         builder: (context) {
                                           return Drawscreen(
-                                              projectName: project['name']);
+                                              projectName: project['name'],
+                                            exportImmediately: false,
+                                          );
                                         },
                                       ),
                                     );
@@ -255,17 +235,52 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 IconButton(
                                   onPressed: () {
-                                    //TODO: ADD EXPORT FUNCTION HERE
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) {
+                                          return Drawscreen(
+                                            projectName: project['name'],
+                                            exportImmediately: true,
+                                          );
+                                        },
+                                      ),
+                                    );
                                   },
                                   icon: const ImageIcon(AssetImage("icons/export2.png")),
                                 ),
-                                // TODO: ADD DELETION ALERT, ALLOW USER TO CONFIRM BEFORE DELETING
                                 IconButton(
                                   onPressed: () async {
-                                    await FirebaseFirestore.instance
-                                        .collection('projects')
-                                        .doc(project.id)
-                                        .delete();
+                                    final bool confirmDelete = await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: const Text('Delete Project'),
+                                          content: const Text('Are you sure you want to delete this project? This action cannot be undone.'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(false); // User chose not to delete
+                                              },
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop(true); // User confirmed deletion
+                                              },
+                                              child: const Text('Delete'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+
+                                    if (confirmDelete == true) {
+                                      await FirebaseFirestore.instance
+                                          .collection('projects')
+                                          .doc(project.id)
+                                          .delete();
+                                    }
                                   },
                                   icon: const Icon(Icons.delete),
                                 ),

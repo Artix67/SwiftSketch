@@ -30,7 +30,7 @@ import 'package:share_plus/share_plus.dart';
 //   final GlobalKey globalKey = GlobalKey();
 
   // Asynchronous function to export the drawing content to a PDF file.
-  Future<void> exportToPdf(BuildContext context, GlobalKey globalKey) async {
+  Future<void> exportToPdf(BuildContext context, GlobalKey globalKey, String name) async {
     try {
       // Get the render object from the global key and check if it's a RenderRepaintBoundary.
       final boundary = globalKey.currentContext?.findRenderObject();
@@ -55,7 +55,7 @@ import 'package:share_plus/share_plus.dart';
 
           //Taylor - Set directory as temporary
           final Directory tempDir = await getTemporaryDirectory();
-          final String path = '${tempDir.path}/drawing.pdf';
+          final String path = '${tempDir.path}/${name}.pdf';
           final File file = File(path);
           await file.writeAsBytes(await pdf.save());
 
