@@ -4,9 +4,10 @@ import 'package:swift_sketch/screens/app_settings_screen.dart';
 import 'package:swift_sketch/screens/drawing_settings_screen.dart';
 import 'package:swift_sketch/screens/homescreen.dart';
 import 'package:swift_sketch/screens/loginscreen.dart';
+
 const Color dgreencolor = Color(0xFF181C14);
 const Color lgreencolor = Color(0xFF697565);
-const Color biegecolor = Color(0xFFECDFCC);
+const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
 const Color blackcolor = Color(0xFF181818);

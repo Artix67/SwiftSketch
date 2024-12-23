@@ -12,6 +12,14 @@ import '../drawing_tools/annotation_tool.dart';
 import 'homescreen.dart';
 import 'loginscreen.dart';
 
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFCBC2B4);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
+const Color whitecolor = Color(0xFFEEEEEE);
 
 
 class Toolbar extends StatelessWidget {
@@ -101,7 +109,7 @@ class Toolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-        backgroundColor: Colors.orange[100],
+        backgroundColor: biegecolor,
         actions: <Widget>[
           Expanded(
               child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,

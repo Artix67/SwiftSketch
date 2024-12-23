@@ -3,12 +3,20 @@ import '/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import '/SettingsManager.dart';
 
+
+
 const List<String> toolbarposlist = <String>['Top', 'Bottom', 'Left', 'Right'];
 const List<String> gridsizelist = <String>['5', '10', '15', '20'];
+
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF2C2C2C);
-const Color biegecolor = Color(0xFF2C2C2C);
-const Color redcolor = Color(0xFF2C2C2C);
+const Color lgreencolor = Color(0xFF697565);
+const Color biegecolor = Color(0xFFCBC2B4);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
+const Color whitecolor = Color(0xFFEEEEEE);
+
 
 class AppSettingsScreen extends StatefulWidget {
   const AppSettingsScreen({super.key});
@@ -62,10 +70,10 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
     return MaterialApp(
       home: Scaffold(
         resizeToAvoidBottomInset: false,
-        backgroundColor: Colors.orange[100],
+        backgroundColor: biegecolor,
         appBar: AppBar(
           centerTitle: true,
-          backgroundColor: Colors.orange[100],
+          backgroundColor: biegecolor,
           title: const Text("App Settings"),
           leading: IconButton(
             onPressed: () {

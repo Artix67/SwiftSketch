@@ -3,11 +3,12 @@ import 'package:flutter/material.dart' show BorderRadius, BoxDecoration, BuildCo
 import '../models/layer.dart';
 const Color dgreencolor = Color(0xFF181C14);
 const Color lgreencolor = Color(0xFF697565);
-const Color biegecolor = Color(0xFFECDFCC);
+const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
 const Color blackcolor = Color(0xFF181818);
 const Color midgreencolor = Color(0xFF3C3D37);
+
 class LayersTab extends StatelessWidget {
   final ValueNotifier<List<Layer>> layersNotifier;
   final ValueNotifier<int> selectedLayerIndexNotifier;
@@ -66,7 +67,7 @@ class LayersTab extends StatelessWidget {
                             margin: const EdgeInsets.symmetric(vertical: 2.0),
                             decoration: BoxDecoration(
                               color: selectedLayerIndex == index
-                                  ? Colors.orange
+                                  ? lgreencolor
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(6.0),
                             ),
