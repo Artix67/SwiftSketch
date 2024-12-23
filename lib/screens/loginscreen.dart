@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:swift_sketch/screens/draw_screen.dart';
 import '/FirebaseAuthService.dart';
 import 'create_account_screen.dart';
 import 'homescreen.dart';
@@ -88,13 +89,47 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: const Text('Sign In'),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return const HomeScreen();
-                        }),
+                    onPressed: () async {
+                      bool proceedAsGuest = await showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Continue as Guest?'),
+                            content: const Text(
+                              'You cannot save drawings without an account. Are you sure you want to sign in as a guest?',
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(false); // User chose not to proceed
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(true); // User chose to proceed
+                                },
+                                child: const Text('Proceed'),
+                              ),
+                            ],
+                          );
+                        },
                       );
+
+                      if (proceedAsGuest == true) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return const Drawscreen(
+                                projectName: "none",
+                                exportImmediately: false,
+                                isGuest: true,
+                              );
+                            },
+                          ),
+                        );
+                      }
                     },
                     child: const Text('Guest'),
                   ),

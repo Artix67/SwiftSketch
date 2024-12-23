@@ -8,8 +8,9 @@ import 'package:swift_sketch/ProjectManager.dart';
 class Drawscreen extends StatefulWidget {
   final String projectName;
   final bool exportImmediately;
+  final bool isGuest;
 
-  const Drawscreen({super.key, required this.projectName, required this.exportImmediately});
+  const Drawscreen({super.key, required this.projectName, required this.exportImmediately, required this.isGuest});
 
   @override
   State<Drawscreen> createState() => _Drawscreen();
@@ -184,6 +185,7 @@ class _Drawscreen extends State<Drawscreen> {
             iconSize: _iconSize,
             spacerSize: _spacerSize,
             name: widget.projectName,
+            isGuest: widget.isGuest,
           ),
         ),
         body: Row(

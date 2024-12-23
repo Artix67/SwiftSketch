@@ -104,52 +104,57 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
           body: Center(
             child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.3,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(alignment: Alignment.centerRight,
-                        width: 150,
-                        height: 58,
-                        child: const Text("Theme:"),
-                      ),
-                      DropdownMenu(
-                        initialSelection: 'Light',
-                        width: 150,
-                        dropdownMenuEntries: themelist.map(
-                                (e) => DropdownMenuEntry(
-                                value: e, label: e)
-                        ).toList(),
-                        onSelected: (value){
-                          debugPrint('Theme: $value');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: MediaQuery.sizeOf(context).width * 0.3,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(alignment: Alignment.centerRight,
-                        width: 150,
-                        height: 58,
-                        child: const Text("Tool Bar Position:"),
-                      ),
-                      DropdownMenu(
-                        initialSelection: 'Top',
-                        width: 150,
-                        dropdownMenuEntries: toolbarposlist.map(
-                                (e) => DropdownMenuEntry(
-                                value: e, label: e)
-                        ).toList(),
-                        onSelected: (value){
-                          debugPrint('Tool Bar Position: $value');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+
+                //TODO: Add theme changing functionality for light and dark mode. Colors must change accordingly
+                // SizedBox(
+                //   width: MediaQuery.sizeOf(context).width * 0.3,
+                //   child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //     children: [
+                //       Container(alignment: Alignment.centerRight,
+                //         width: 150,
+                //         height: 58,
+                //         child: const Text("Theme:"),
+                //       ),
+                //       DropdownMenu(
+                //         initialSelection: 'Light',
+                //         width: 150,
+                //         dropdownMenuEntries: themelist.map(
+                //                 (e) => DropdownMenuEntry(
+                //                 value: e, label: e)
+                //         ).toList(),
+                //         onSelected: (value){
+                //           debugPrint('Theme: $value');
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                // ),
+
+                //TODO: Add logic to draw the toolbar in all positions
+                // SizedBox(
+                //   width: MediaQuery.sizeOf(context).width * 0.3,
+                //   child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                //     children: [
+                //       Container(alignment: Alignment.centerRight,
+                //         width: 150,
+                //         height: 58,
+                //         child: const Text("Tool Bar Position:"),
+                //       ),
+                //       DropdownMenu(
+                //         initialSelection: 'Top',
+                //         width: 150,
+                //         dropdownMenuEntries: toolbarposlist.map(
+                //                 (e) => DropdownMenuEntry(
+                //                 value: e, label: e)
+                //         ).toList(),
+                //         onSelected: (value){
+                //           debugPrint('Tool Bar Position: $value');
+                //         },
+                //       ),
+                //     ],
+                //   ),
+                // ),
+
                 SizedBox(
                   width: MediaQuery.sizeOf(context).width * 0.3,
                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -173,6 +178,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                     ],
                   ),
                 ),
+
                 SizedBox(
                   width: MediaQuery.sizeOf(context).width * 0.3,
                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,

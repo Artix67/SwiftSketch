@@ -72,21 +72,22 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     }
   }
 
-  void _deleteAccount() async {
-    final user = _authService.auth.currentUser;
-    if (user != null) {
-      try {
-        await _firestoreService.deleteUser(user.uid);
-        await user.delete();
-        Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
-      } catch (e) {
-        print('Failed to delete account: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to delete account')),
-        );
-      }
-    }
-  }
+  //TODO: Adjust to delete in Firebase (Must also remove user data, like projects)
+  // void _deleteAccount() async {
+  //   final user = _authService.auth.currentUser;
+  //   if (user != null) {
+  //     try {
+  //       await _firestoreService.deleteUser(user.uid);
+  //       await user.delete();
+  //       Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false);
+  //     } catch (e) {
+  //       print('Failed to delete account: $e');
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Failed to delete account')),
+  //       );
+  //     }
+  //   }
+  // }
 
   void _changePassword() async {
     final user = _authService.auth.currentUser;
@@ -170,12 +171,14 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
-                    onPressed: _deleteAccount,
-                    child: const Text("Delete Account"),
-                  ),
-                  const SizedBox(height: 10),
+
+                  //TODO: Complete Account Deletion functionality
+                  // OutlinedButton(
+                  //   style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
+                  //   onPressed: _deleteAccount,
+                  //   child: const Text("Delete Account"),
+                  // ),
+                  // const SizedBox(height: 10),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
                     onPressed: _changePassword,

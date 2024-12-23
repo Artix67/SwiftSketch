@@ -10,6 +10,7 @@ import '../drawing_tools/rectangle_tool.dart';
 import '../drawing_tools/triangle_tool.dart';
 import '../drawing_tools/annotation_tool.dart';
 import 'homescreen.dart';
+import 'loginscreen.dart';
 
 
 
@@ -31,6 +32,7 @@ class Toolbar extends StatelessWidget {
   final double spacerSize;
   final double iconSize;
   final String name;
+  final bool isGuest;
 
 
   const Toolbar({
@@ -52,6 +54,7 @@ class Toolbar extends StatelessWidget {
     required this.spacerSize,
     required this.iconSize,
     required this.name,
+    required this.isGuest,
   });
 
   void _pickColor(BuildContext context, bool isFill) {
@@ -102,17 +105,19 @@ class Toolbar extends StatelessWidget {
       actions: <Widget>[
 
         //MARK: - SAVE BUTTON
-        Transform.scale(
-          scale: iconSize,
-          child: IconButton(
-            onPressed: () {
-              onSaved();
-            },
-            icon: const ImageIcon(AssetImage("icons/save.png")),
-            tooltip: "Save",
+        if (!isGuest)
+          Transform.scale(
+            scale: iconSize,
+            child: IconButton(
+              onPressed: () {
+                onSaved();
+              },
+              icon: const ImageIcon(AssetImage("icons/save.png")),
+              tooltip: "Save",
+            ),
           ),
-        ),
-        SizedBox(width: spacerSize,),
+        if (!isGuest)
+          SizedBox(width: spacerSize),
 
         //MARK: - EXPORT BUTTON
         Transform.scale(
@@ -468,18 +473,29 @@ class Toolbar extends StatelessWidget {
            },
           ),
         ),
-        SizedBox(width: spacerSize,),
+        SizedBox(
+          width: spacerSize,
+        ),
 
-        //TODO: Resdeign to match desired style
-        //MARK: - RETURN TO HOME SCREEN
-        IconButton(
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
+        Transform.scale(
+          scale: iconSize,
+          child: IconButton(
+            onPressed: () {
+              if (!isGuest)
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
               return const HomeScreen();
-            }));
-          },
-          icon: const Icon(Icons.keyboard_return),
-          tooltip: 'Home',
+              }));
+              if (isGuest)
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return const LoginScreen();
+              }));
+            },
+            icon: const Icon(Icons.keyboard_return),
+            tooltip: 'Home',
+          ),
+        ),
+        SizedBox(
+          width: spacerSize,
         ),
       ],
     );

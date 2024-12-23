@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {
-          return Drawscreen(projectName: projectName, exportImmediately: false,);
+          return Drawscreen(projectName: projectName, exportImmediately: false, isGuest: false,);
         }),
       );
     }
@@ -86,7 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
           backgroundColor: Colors.orange[100],
           title: Row(
             children: [
-              // Left section (logo and text)
               Row(
                 children: [
                   const SizedBox(width: 20),
@@ -94,23 +93,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     fit: BoxFit.contain,
                     child: Image.asset(
                       'images/SSLogo.png',
-                      height: 40, // Adjust size as needed
+                      height: 40,
                       width: 40,
                     ),
                   ),
                   const SizedBox(width: 10),
                   const Text(
                     "Swift Sketch",
-                    style: TextStyle(fontSize: 24), // Adjust font size as needed
+                    style: TextStyle(fontSize: 24),
                   ),
                 ],
               ),
-              // Spacer to push the right section to the end
               const Spacer(),
-              // Right section (search bar and settings)
               Flexible(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end, // Align widgets to the right
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     SizedBox(
                       height: 40,
@@ -142,12 +139,13 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               child: Container(
                 width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * .05,
+                height: MediaQuery.of(context).size.height * .055,
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.black,
                     width: 2,
                   ),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
@@ -157,6 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Spacer(),
                       const Text("Date"),
                       const Spacer(),
+                      const Text("Actions")
                     ],
                   ),
                 ),
@@ -195,9 +194,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         var project = projects[index];
                         return Padding(
-                          padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+                          padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
                           child: Container(
-                            height: 50,
+                            height: 40,
                             decoration: BoxDecoration(
                               color: Colors.white60,
                               borderRadius: BorderRadius.circular(8),
@@ -226,6 +225,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           return Drawscreen(
                                               projectName: project['name'],
                                             exportImmediately: false,
+                                            isGuest: false,
                                           );
                                         },
                                       ),
@@ -242,6 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           return Drawscreen(
                                             projectName: project['name'],
                                             exportImmediately: true,
+                                            isGuest: false,
                                           );
                                         },
                                       ),
@@ -321,12 +322,24 @@ class SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(
+          color: Colors.black,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: TextField(
-        style: const TextStyle(fontSize: 14),
+        style: const TextStyle(fontSize: 14, color: Colors.black),
+        textAlignVertical: TextAlignVertical.center, // Ensures vertical centering
         decoration: const InputDecoration(
           hintText: 'Search Projects',
-          border: OutlineInputBorder(),
-          suffixIcon: Icon(Icons.search),
+          hintStyle: TextStyle(color: Colors.grey),
+          border: InputBorder.none,
+          isDense: true, // Reduces the default internal padding
+          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8), // Adjusts vertical padding
         ),
         onChanged: onSearchChanged,
       ),
