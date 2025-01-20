@@ -112,58 +112,505 @@ class Toolbar extends StatelessWidget {
         backgroundColor: biegecolor,
         actions: <Widget>[
           Expanded(
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (!isGuest)
-                    Transform.scale(
-                      scale: iconSize,
-                      child: IconButton(
-                        onPressed: () {
-                          onSaved();
-                        },
-                        icon: const ImageIcon(AssetImage("icons/save.png")),
-                        tooltip: "Save",
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          onPressed: () {
+                            if (!isGuest)
+                              Navigator.push(
+                                  context, MaterialPageRoute(builder: (context) {
+                                return const HomeScreen();
+                              }));
+                            if (isGuest)
+                              Navigator.push(
+                                  context, MaterialPageRoute(builder: (context) {
+                                return const LoginScreen();
+                              }));
+                          },
+                          icon: Column(
+                            children: [
+                              const Icon(Icons.keyboard_return),
+                              Text("Return",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Home',
+                        ),
                       ),
-                    ),
-                  if (!isGuest)
+                      if (!isGuest)
+                        Transform.scale(
+                          scale: iconSize,
+                          child: IconButton(
+                            onPressed: () {
+                              onSaved();
+                            },
+                            icon: Column(
+                              children: [
+                                const ImageIcon(AssetImage("icons/save.png")),
+                                Text("Save",
+                                style: TextStyle(
+                                  fontSize: 6
+                                ),)
+                              ],
+                            ),
+                            tooltip: "Save",
+                          ),
+                        ),
+                      if (!isGuest)
 
-                  //MARK: - EXPORT BUTTON
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/export2.png")),
-                      tooltip: 'Export',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.export(name);
-                      },
-                    ),
+                      //MARK: - EXPORT BUTTON
+                        Transform.scale(
+                          scale: iconSize,
+                          child: IconButton(
+                            icon: Column(
+                              children: [
+                                const ImageIcon(AssetImage("icons/export2.png")),
+                                Text("Export",
+                                style: TextStyle(
+                                  fontSize: 6
+                                ),)
+                              ],
+                            ),
+                            tooltip: 'Export',
+                            onPressed: () {
+                              drawingCanvasKey.currentState?.export(name);
+                            },
+                          ),
+                        ),
+
+                      //MARK: - UNDO BUTTON
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.undo();
+                            refreshUI();
+                          },
+                          icon: Column(
+                            children: [
+                              const ImageIcon(AssetImage("icons/undo.png")),
+                              Text("Undo",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: "Undo",
+                        ),
+                      ),
+
+                      //MARK: - REDO BUTTON
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.redo();
+                            refreshUI();
+                          },
+                          icon: Column(
+                            children: [
+                              const ImageIcon(AssetImage("icons/redo.png")),
+                              Text("Redo",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: "Redo",
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      //TODO: Redesign to match desired style
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: Column(
+                            children: [
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.square_rounded,
+                                    color:
+                                    fillColor == Colors.transparent
+                                        ? Colors.grey
+                                        : fillColor,
+                                  ),
+                                  if (fillColor == Colors.transparent)
+                                    const Icon(
+                                      //indicates no fill color, otherwise icon would be invisible
+                                      Icons.blur_off_outlined,
+                                      color: Colors.redAccent,
+                                      size: 16,
+                                    ),
+                                ],
+                              ),
+                              Text("Fill Color",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Set Fill Color',
+                          onPressed: () {
+                            _pickColor(context, true);
+                          },
+                        ),
+                      ),
+
+                      //TODO: Redesign to match desired style
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: Column(
+                            children: [
+                              Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.crop_square_rounded,
+                                    color: strokeColor == Colors.transparent
+                                        ? Colors.grey
+                                        : strokeColor,
+                                  ),
+                                  if (strokeColor == Colors.transparent)
+                                    const Icon(
+                                      //indicates no stroke color, otherwise icon would be invisible
+                                      Icons.blur_off_outlined,
+                                      color: Colors.redAccent,
+                                      size: 16,
+                                    ),
+                                ],
+                              ),
+                              Text("Stroke Color",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Set Stroke Color',
+                          onPressed: () {
+                            _pickColor(context, false);
+                          },
+                        ),
+                      ),
+                      //MARK: - TOGGLE GRID VISIBILITY
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: const Column(
+                            children: [
+                              ImageIcon(AssetImage("icons/grid.png")),
+                              Text("Grid Toggle",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Toggle Grid',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.toggleGrid();
+                          },
+                        ),
+                      ),
+                      //MARK: - TOGGLE SNAP TO GRID
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: const Column(
+                            children: [
+                              Icon(Icons.square_foot),
+                              Text("Snap to Grid",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),),
+
+                            ],
+                          ),
+                          tooltip: 'Snap to Grid',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.toggleSnapToGrid();
+                          },
+                        ),
+                      ),
+
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      // MARK: - FREEFORM TOOL SELECTOR
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: Column(
+                            children: [
+                              const ImageIcon(AssetImage("icons/draw.png")),
+                              Text("Draw",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Freeform',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.switchTool(
+                                FreeformTool());
+                          },
+                        ),
+                      ),
+                      //MARK: - ERASER TOOL SELECTOR
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: Column(
+                            children: [
+                              const ImageIcon(AssetImage("icons/eraser.png")),
+                              Text("Erase",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Eraser',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.switchTool(DeleteTool(
+                              activeLayerShapes,
+                                  () {
+                                refreshUI();
+                              },
+                            ));
+                          },
+                        ),
+                      ),
+
+
+                      //MARK: - LINE TOOL SELECTOR
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: Column(
+                            children: [
+                              const ImageIcon(AssetImage("icons/line.png")),
+                              Text("Line",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Line',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.switchTool(LineTool());
+                          },
+                        ),
+                      ),
+
+                      //MARK: - TRIANGLE TOOL SELECTOR
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: Column(
+                            children: [
+                              const ImageIcon(AssetImage("icons/triangle.png")),
+                              Text("Triangle",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Triangle',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.switchTool(
+                                TriangleTool());
+                          },
+                        ),
+                      ),
+
+                      //MARK: - SQUARE TOOL SELECTOR
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: Column(
+                            children: [
+                              const ImageIcon(AssetImage("icons/square.png")),
+                              Text("Rectangle",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Rectangle',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.switchTool(
+                                RectangleTool());
+                          },
+                        ),
+                      ),
+
+                      //MARK: - CIRCLE TOOL SELECTOR
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: Column(
+                            children: [
+                              const ImageIcon(AssetImage("icons/circle.png")),
+                              Text("Circle",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Circle',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.switchTool(CircleTool());
+                          },
+                        ),
+                      ),
+
+                      //TODO: CREATE POLYGON TOOL
+                      // Transform.scale(
+                      //                 scale: 2,
+                      //                 child:  IconButton(onPressed: (){
+                      //                    drawingCanvasKey.currentState?.switchTool(PolygonTool());
+                      //                 },
+                      //                     icon:  const ImageIcon(AssetImage("icons/freeformshapes.png"))
+                      //                 ),
+                      //               ),
+                      //               const SizedBox(width: 15,),
+
+                      //TODO: CONFORM THIS TO TOOL STYLING
+                      // You may want to add this styling to other buttons as well. Via a bool the button
+                      // changes looks to indicate that it is selected.
+
+                      //Removed for Video
+
+                      //MARK: - ZOOM IN/OUT TOGGLE
+                      // ValueListenableBuilder<bool>(
+                      //   valueListenable: drawingCanvasKey.currentState?.isZoomEnabledNotifier ?? ValueNotifier(false),
+                      //   builder: (context, isZoomEnabled, child) {
+                      //     return Container(
+                      //       decoration: isZoomEnabled
+                      //           ? BoxDecoration(
+                      //         color: Colors.grey[50], // Background color when zoom is enabled
+                      //         borderRadius: BorderRadius.circular(8),
+                      //       )
+                      //           : null,
+                      //       child: Row(
+                      //         children: [
+                      //           Transform.scale(
+                      //           scale: iconSize,
+                      //           child: IconButton(
+                      //             icon: ImageIcon(isZoomEnabled ? AssetImage("icons/zoomout.png") : AssetImage("icons/zoomin.png")),
+                      //             tooltip: 'Toggle Zoom',
+                      //             onPressed: () {
+                      //               drawingCanvasKey.currentState?.toggleZoom();
+                      //             },
+                      //           ),
+                      //           ),
+                      //           SizedBox(width: spacerSize),
+                      //         ],
+                      //       ),
+                      //
+                      //     );
+                      //   },
+                      // ),
+
+                      //TODO: DEVELOP A TOOL FOR PANNING THAT IS SEPARATE FROM ZOOM
+                      // currently zoom also handles pan, but we may change that
+                      //MARK: - PAN TOOL SELECTOR
+                      // Transform.scale(
+                      //   scale: iconSize,
+                      //   child: IconButton(onPressed: (){},
+                      //       icon:  const ImageIcon(AssetImage("icons/pan.png"))
+                      //   ),
+                      // ),
+                      // SizedBox(width: iconSize,),
+
+                      //MARK: - CURSOR TOOL SELECTOR
+                      //This may be unnecessary, currently we don't have a tool that would use this.
+                      //Keeping just in case.
+                      // Transform.scale(
+                      //   scale: iconSize,
+                      //   child: IconButton(onPressed: (){},
+                      //       icon:  const ImageIcon(AssetImage("icons/cursor.png"))
+                      //   ),
+                      // ),
+                      // SizedBox(width: iconSize,),
+                      //MARK: - ANNOTATION TOOL
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(onPressed: () {
+                          drawingCanvasKey.currentState?.switchTool(
+                              AnnotationTool());
+                        },
+                          icon: Column(
+                            children: [
+                              const ImageIcon(AssetImage("icons/label.png")),
+                              Text("Text Box",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Annotation Tool',
+                        ),
+                      ),
+
+                      Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          icon: Column(
+                            children: [
+                              const Icon(Icons.delete),
+                              Text("Delete",
+                              style: TextStyle(
+                                fontSize: 6
+                              ),)
+                            ],
+                          ),
+                          tooltip: 'Clear Canvas',
+                          onPressed: () async {
+                            final shouldClear = await showDialog<bool>(
+                              context: context,
+                              builder: (context) =>
+                                  AlertDialog(
+                                    title: const Text('Reset Drawing and Layers'),
+                                    content: const Text(
+                                      'Are you sure you want to reset the drawing and all layers? This action cannot be undone.',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: const Text('Reset'),
+                                      ),
+                                    ],
+                                  ),
+                            );
+
+                            if (shouldClear == true) {
+                              drawingCanvasKey.currentState?.clearCanvas();
+                            }
+                          },
+                        ),
+                      ),
+
+                    ],
                   ),
 
-                  //MARK: - UNDO BUTTON
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.undo();
-                        refreshUI();
-                      },
-                      icon: const ImageIcon(AssetImage("icons/undo.png")),
-                      tooltip: "Undo",
-                    ),
-                  ),
-
-                  //MARK: - REDO BUTTON
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.redo();
-                        refreshUI();
-                      },
-                      icon: const ImageIcon(AssetImage("icons/redo.png")),
-                      tooltip: "Redo",
-                    ),
-                  ),
 
                   //MARK: - STROKE WIDTH SLIDER
                   //StrokeWidth(),
@@ -176,305 +623,6 @@ class Toolbar extends StatelessWidget {
                   //   onChanged: onUpdateStrokeWidth,
                   // ),
 
-                  //TODO: Redesign to match desired style
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Icon(
-                            Icons.square_rounded,
-                            color:
-                            fillColor == Colors.transparent
-                                ? Colors.grey
-                                : fillColor,
-                          ),
-                          if (fillColor == Colors.transparent)
-                            const Icon(
-                              //indicates no fill color, otherwise icon would be invisible
-                              Icons.blur_off_outlined,
-                              color: Colors.redAccent,
-                              size: 16,
-                            ),
-                        ],
-                      ),
-                      tooltip: 'Set Fill Color',
-                      onPressed: () {
-                        _pickColor(context, true);
-                      },
-                    ),
-                  ),
-
-                  //TODO: Redesign to match desired style
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Icon(
-                            Icons.crop_square_rounded,
-                            color: strokeColor == Colors.transparent
-                                ? Colors.grey
-                                : strokeColor,
-                          ),
-                          if (strokeColor == Colors.transparent)
-                            const Icon(
-                              //indicates no stroke color, otherwise icon would be invisible
-                              Icons.blur_off_outlined,
-                              color: Colors.redAccent,
-                              size: 16,
-                            ),
-                        ],
-                      ),
-                      tooltip: 'Set Stroke Color',
-                      onPressed: () {
-                        _pickColor(context, false);
-                      },
-                    ),
-                  ),
-
-                  // MARK: - FREEFORM TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/draw.png")),
-                      tooltip: 'Freeform',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(
-                            FreeformTool());
-                      },
-                    ),
-                  ),
-
-                  //MARK: - LINE TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/line.png")),
-                      tooltip: 'Line',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(LineTool());
-                      },
-                    ),
-                  ),
-
-                  //MARK: - TRIANGLE TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/triangle.png")),
-                      tooltip: 'Triangle',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(
-                            TriangleTool());
-                      },
-                    ),
-                  ),
-
-                  //MARK: - SQUARE TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/square.png")),
-                      tooltip: 'Rectangle',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(
-                            RectangleTool());
-                      },
-                    ),
-                  ),
-
-                  //MARK: - CIRCLE TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/circle.png")),
-                      tooltip: 'Circle',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(CircleTool());
-                      },
-                    ),
-                  ),
-
-                  //TODO: CREATE POLYGON TOOL
-                  // Transform.scale(
-                  //                 scale: 2,
-                  //                 child:  IconButton(onPressed: (){
-                  //                    drawingCanvasKey.currentState?.switchTool(PolygonTool());
-                  //                 },
-                  //                     icon:  const ImageIcon(AssetImage("icons/freeformshapes.png"))
-                  //                 ),
-                  //               ),
-                  //               const SizedBox(width: 15,),
-
-                  //MARK: - ANNOTATION TOOL
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(onPressed: () {
-                      drawingCanvasKey.currentState?.switchTool(
-                          AnnotationTool());
-                    },
-                      icon: const ImageIcon(AssetImage("icons/label.png")),
-                      tooltip: 'Annotation Tool',
-                    ),
-                  ),
-
-                  //MARK: - ERASER TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/eraser.png")),
-                      tooltip: 'Eraser',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(DeleteTool(
-                          activeLayerShapes,
-                              () {
-                            refreshUI();
-                          },
-                        ));
-                      },
-                    ),
-                  ),
-
-                  //MARK: - TOGGLE GRID VISIBILITY
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/grid.png")),
-                      tooltip: 'Toggle Grid',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.toggleGrid();
-                      },
-                    ),
-                  ),
-
-                  //MARK: - TOGGLE SNAP TO GRID
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const Icon(Icons.square_foot),
-                      tooltip: 'Snap to Grid',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.toggleSnapToGrid();
-                      },
-                    ),
-                  ),
-
-                  //TODO: CONFORM THIS TO TOOL STYLING
-                  // You may want to add this styling to other buttons as well. Via a bool the button
-                  // changes looks to indicate that it is selected.
-
-                  //Removed for Video
-
-                  //MARK: - ZOOM IN/OUT TOGGLE
-                  // ValueListenableBuilder<bool>(
-                  //   valueListenable: drawingCanvasKey.currentState?.isZoomEnabledNotifier ?? ValueNotifier(false),
-                  //   builder: (context, isZoomEnabled, child) {
-                  //     return Container(
-                  //       decoration: isZoomEnabled
-                  //           ? BoxDecoration(
-                  //         color: Colors.grey[50], // Background color when zoom is enabled
-                  //         borderRadius: BorderRadius.circular(8),
-                  //       )
-                  //           : null,
-                  //       child: Row(
-                  //         children: [
-                  //           Transform.scale(
-                  //           scale: iconSize,
-                  //           child: IconButton(
-                  //             icon: ImageIcon(isZoomEnabled ? AssetImage("icons/zoomout.png") : AssetImage("icons/zoomin.png")),
-                  //             tooltip: 'Toggle Zoom',
-                  //             onPressed: () {
-                  //               drawingCanvasKey.currentState?.toggleZoom();
-                  //             },
-                  //           ),
-                  //           ),
-                  //           SizedBox(width: spacerSize),
-                  //         ],
-                  //       ),
-                  //
-                  //     );
-                  //   },
-                  // ),
-
-                  //TODO: DEVELOP A TOOL FOR PANNING THAT IS SEPARATE FROM ZOOM
-                  // currently zoom also handles pan, but we may change that
-                  //MARK: - PAN TOOL SELECTOR
-                  // Transform.scale(
-                  //   scale: iconSize,
-                  //   child: IconButton(onPressed: (){},
-                  //       icon:  const ImageIcon(AssetImage("icons/pan.png"))
-                  //   ),
-                  // ),
-                  // SizedBox(width: iconSize,),
-
-                  //MARK: - CURSOR TOOL SELECTOR
-                  //This may be unnecessary, currently we don't have a tool that would use this.
-                  //Keeping just in case.
-                  // Transform.scale(
-                  //   scale: iconSize,
-                  //   child: IconButton(onPressed: (){},
-                  //       icon:  const ImageIcon(AssetImage("icons/cursor.png"))
-                  //   ),
-                  // ),
-                  // SizedBox(width: iconSize,),
-
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const Icon(Icons.delete),
-                      tooltip: 'Clear Canvas',
-                      onPressed: () async {
-                        final shouldClear = await showDialog<bool>(
-                          context: context,
-                          builder: (context) =>
-                              AlertDialog(
-                                title: const Text('Reset Drawing and Layers'),
-                                content: const Text(
-                                  'Are you sure you want to reset the drawing and all layers? This action cannot be undone.',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(false),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(true),
-                                    child: const Text('Reset'),
-                                  ),
-                                ],
-                              ),
-                        );
-
-                        if (shouldClear == true) {
-                          drawingCanvasKey.currentState?.clearCanvas();
-                        }
-                      },
-                    ),
-                  ),
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      onPressed: () {
-                        if (!isGuest)
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (context) {
-                            return const HomeScreen();
-                          }));
-                        if (isGuest)
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (context) {
-                            return const LoginScreen();
-                          }));
-                      },
-                      icon: const Icon(Icons.keyboard_return),
-                      tooltip: 'Home',
-                    ),
-                  ),
                 ],
               )
           )
