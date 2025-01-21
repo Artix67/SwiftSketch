@@ -40,7 +40,7 @@ class DrawingPainter extends CustomPainter {
 
     if (showGrid) {
       final gridPaint = Paint()
-        ..color = Colors.grey.withOpacity(0.3)
+        ..color = Colors.black.withOpacity(0.2)
         ..strokeWidth = 0.5;
 
       for (double x = 0; x < size.width; x += gridSize) {
@@ -169,6 +169,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
   // final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
   final ValueNotifier<bool> isZoomEnabledNotifier = ValueNotifier(false);
+  final ValueNotifier<DrawingTool> selectedToolNotifier = ValueNotifier<DrawingTool>(FreeformTool());
 
   Layer? _activeLayer;
 
@@ -184,6 +185,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   Color _fillColor = Colors.transparent;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
+  double get strokeWidth => _strokeWidth;
 
   bool get isZoomEnabled => _isZoomEnabled;
 
@@ -271,9 +273,9 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
-  void updateStrokeWidth(double strokeWidth) {
+  void updateStrokeWidth(double newWidth) {
     setState(() {
-      _strokeWidth = strokeWidth;
+      _strokeWidth = newWidth;
     });
   }
 
@@ -285,6 +287,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
       // Set the new tool
       selectedTool = tool;
+      selectedToolNotifier.value = tool;
       selectedTool.setSnapToGrid(_snapToGrid);
     });
   }
@@ -518,6 +521,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   @override
   void dispose() {
     isZoomEnabledNotifier.dispose();
+    selectedToolNotifier.dispose();
     super.dispose();
   }
 
