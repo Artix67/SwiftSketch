@@ -49,7 +49,24 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         await _authService.resetPassword(_emailController.text);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset email sent')),
+          const SnackBar(content: Text('Password reset email sent. Please check your email.')),
+        );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Password Reset'),
+              content: const Text('A password reset email has been sent. Please check your email to reset your password.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
         );
       } catch (e) {
         print('Password reset failed: $e');
@@ -63,6 +80,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
