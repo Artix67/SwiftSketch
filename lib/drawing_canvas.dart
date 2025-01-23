@@ -40,7 +40,7 @@ class DrawingPainter extends CustomPainter {
 
     if (showGrid) {
       final gridPaint = Paint()
-        ..color = Colors.grey.withOpacity(0.3)
+        ..color = Colors.black.withOpacity(0.2)
         ..strokeWidth = 0.5;
 
       for (double x = 0; x < size.width; x += gridSize) {
@@ -169,6 +169,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
   // final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
   final ValueNotifier<bool> isZoomEnabledNotifier = ValueNotifier(false);
+  final ValueNotifier<DrawingTool> selectedToolNotifier = ValueNotifier<DrawingTool>(FreeformTool());
 
   Layer? _activeLayer;
 
@@ -184,6 +185,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   Color _fillColor = Colors.transparent;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
+  double get strokeWidth => _strokeWidth;
 
   bool get isZoomEnabled => _isZoomEnabled;
 
@@ -271,15 +273,21 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
-  void updateStrokeWidth(double strokeWidth) {
+  void updateStrokeWidth(double newWidth) {
     setState(() {
-      _strokeWidth = strokeWidth;
+      _strokeWidth = newWidth;
     });
   }
 
   void switchTool(DrawingTool tool) {
     setState(() {
+      // Clear the current points and preview points
+      _pointsNotifier.value = [];
+      _previewPointsNotifier.value = [];
+
+      // Set the new tool
       selectedTool = tool;
+      selectedToolNotifier.value = tool;
       selectedTool.setSnapToGrid(_snapToGrid);
     });
   }
@@ -349,16 +357,65 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
   void onPanEndHandler(Offset position) {
     final snapPoints = getSnapPoints(widget.layersNotifier.value);
+
+    // Handle the end of the gesture
     if (selectedTool is FreeformTool) {
       selectedTool.onPanEnd(position, _previewPointsNotifier.value);
     } else {
       selectedTool.onPanEnd(
         snapToGridOrExistingPoint(
-            position, snapPoints, _gridSize, _snapSensitivity),
+          position,
+          snapPoints,
+          _gridSize,
+          _snapSensitivity,
+        ),
         _previewPointsNotifier.value,
       );
     }
 
+    // Adjust for annotation tool
+    if (selectedTool is AnnotationTool && _previewPointsNotifier.value.isNotEmpty) {
+      List<Offset?> adjustedPoints = List.from(_previewPointsNotifier.value);
+
+      // Get the bounds of the annotation
+      Offset? start = adjustedPoints.first;
+      Offset? end = adjustedPoints.length > 1 ? adjustedPoints[2] : null;
+
+      if (start != null && end != null) {
+        // Calculate dimensions
+        double width = (end.dx - start.dx).abs();
+        double height = (end.dy - start.dy).abs();
+
+        // Minimum size constraints
+        const double minWidth = 50.0;
+        const double minHeight = 30.0;
+
+        // Adjust points if below minimum size
+        if (width < minWidth || height < minHeight) {
+          double adjustedWidth = width < minWidth ? minWidth : width;
+          double adjustedHeight = height < minHeight ? minHeight : height;
+
+          Offset adjustedEnd = Offset(
+            start.dx + adjustedWidth * (end.dx > start.dx ? 1 : -1),
+            start.dy + adjustedHeight * (end.dy > start.dy ? 1 : -1),
+          );
+
+          // Update the points list
+          adjustedPoints = [
+            start,
+            Offset(adjustedEnd.dx, start.dy),
+            adjustedEnd,
+            Offset(start.dx, adjustedEnd.dy),
+            start,
+          ];
+        }
+      }
+
+      // Update the points with the adjusted values
+      _previewPointsNotifier.value = adjustedPoints;
+    }
+
+    // Add the shape to the canvas if there are points
     if (_previewPointsNotifier.value.isNotEmpty) {
       _addShape(DrawingShape(
         points: List.from(_previewPointsNotifier.value),
@@ -370,7 +427,9 @@ class DrawingCanvasState extends State<DrawingCanvas> {
       ));
     }
 
+    // Ensure points are cleared for the next tool
     _previewPointsNotifier.value = [];
+    _pointsNotifier.value = [];
   }
 
   void _addShape(DrawingShape shape) {
@@ -384,9 +443,19 @@ class DrawingCanvasState extends State<DrawingCanvas> {
             TextEditingController annotationController = TextEditingController();
             return AlertDialog(
               title: const Text("Add Annotation"),
-              content: TextField(
-                controller: annotationController,
-                decoration: const InputDecoration(hintText: "Enter your note"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: annotationController,
+                    decoration: const InputDecoration(hintText: "Enter your note"),
+                  ),
+                  const SizedBox(height: 8.0),
+                  const Text(
+                    "If your text box ends up too small, try dragging the annotation tool to create a larger box.",
+                    style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                  ),
+                ],
               ),
               actions: [
                 TextButton(
@@ -452,6 +521,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   @override
   void dispose() {
     isZoomEnabledNotifier.dispose();
+    selectedToolNotifier.dispose();
     super.dispose();
   }
 
