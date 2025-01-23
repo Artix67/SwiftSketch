@@ -114,9 +114,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                         debugPrint('Tool Bar Position: $value');
                         setState(() {
                           _toolbarPosition = value!;
+
                           if (_toolbarPosition != 'Top'){
                             _isToolbarOnTop == false;
                           }
+													
                           _updateSettings('toolbarPosition', value);
                         });
                       },
