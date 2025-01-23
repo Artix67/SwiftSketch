@@ -27,6 +27,13 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuthService _authService = FirebaseAuthService();
 
   void _signIn() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter both email and password.')),
+      );
+      return;
+    }
+
     try {
       User? user = await _authService.signInWithEmailAndPassword(
         _emailController.text,
@@ -41,8 +48,12 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       // Handle login error
       print('Login failed: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login failed. Please check your email and password or create a new account.')),
+      );
     }
   }
+
 
   void _resetPassword() async {
     if (_emailController.text.isNotEmpty) {
@@ -80,7 +91,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
