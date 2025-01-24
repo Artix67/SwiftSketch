@@ -67,7 +67,7 @@ class LayersTab extends StatelessWidget {
                             margin: const EdgeInsets.symmetric(vertical: 2.0),
                             decoration: BoxDecoration(
                               color: selectedLayerIndex == index
-                                  ? lgreencolor
+                                  ? biegecolor
                                   : Colors.white,
                               borderRadius: BorderRadius.circular(6.0),
                             ),

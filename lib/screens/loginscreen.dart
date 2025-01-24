@@ -165,16 +165,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
                         minimumSize: const Size(300, 40),
-                        backgroundColor: dgreencolor,
-                        foregroundColor: biegecolor),
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,),
                     onPressed: _signIn,
                     child: const Text("Sign In"),
                   ),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
                         minimumSize: const Size(300, 40),
-                        backgroundColor: dgreencolor,
-                        foregroundColor: biegecolor),
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,),
                     onPressed: () async {
                       bool proceedAsGuest = await showDialog(
                         context: context,
