@@ -133,6 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: TextField(
                       controller: _emailController,
+                      textAlign: TextAlign.center,
                       decoration: const InputDecoration.collapsed(
                         hintText: 'Email',
                       ),
@@ -150,6 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: TextField(
                       controller: _passwordController,
+                      textAlign: TextAlign.center,
                       textAlignVertical: TextAlignVertical.center,
                       decoration: const InputDecoration.collapsed(
                         hintText: 'Password',
@@ -162,7 +164,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(200, 40),
+                        minimumSize: const Size(300, 40),
                         backgroundColor: dgreencolor,
                         foregroundColor: biegecolor),
                     onPressed: _signIn,
@@ -170,7 +172,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(200, 40),
+                        minimumSize: const Size(300, 40),
                         backgroundColor: dgreencolor,
                         foregroundColor: biegecolor),
                     onPressed: () async {
