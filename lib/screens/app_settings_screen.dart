@@ -9,7 +9,7 @@ const List<String> toolbarposlist = <String>['Top', 'Bottom'];
 const List<String> gridsizelist = <String>['5', '10', '15', '20'];
 
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF697565);
+const Color lgreencolor = Color(0xFF406040);
 const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
