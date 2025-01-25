@@ -84,14 +84,20 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         // Show pop-up message (Snackbar)
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Profile updated successfully')),
+            const SnackBar(
+              content: Text('Profile updated successfully'),
+              duration: Duration(seconds: 5), // Toast duration
+            ),
           );
         }
       } catch (e) {
         print('Failed to update profile: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to update profile')),
+            const SnackBar(
+              content: Text('Failed to update profile'),
+              duration: Duration(seconds: 5), // Toast duration
+            ),
           );
         }
       }
@@ -106,7 +112,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         // Show pop-up message (Snackbar)
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('An email has been sent to your email. Wait 5 minutes before clicking again.')),
+            const SnackBar(
+              content: Text('An email has been sent to your email. Wait 5 minutes before clicking again.'),
+              duration: Duration(seconds: 5), // Toast duration
+            ),
           );
         }
 
@@ -132,11 +141,20 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         print('Failed to change password: $e');
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to change password')),
+            const SnackBar(
+              content: Text('Failed to change password'),
+              duration: Duration(seconds: 5), // Toast duration
+            ),
           );
         }
       }
     }
+  }
+
+  String _formatTime(int seconds) {
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final secs = (seconds % 60).toString().padLeft(2, '0');
+    return '$minutes:$secs';
   }
 
   @override
@@ -168,6 +186,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
               constraints: const BoxConstraints.expand(height: 500, width: 500),
               child: SizedBox(
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     const ImageIcon(
                       AssetImage("icons/userprofile.png"),
@@ -212,7 +231,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(200, 50),
                         backgroundColor: _isButtonDisabled ? disablecolor : lgreencolor, // Dark gray when disabled, lgreencolor otherwise
-                        foregroundColor: biegecolor,
+                        foregroundColor: _isButtonDisabled ? Colors.white : biegecolor, // White font when disabled
                       ),
                       onPressed: _isButtonDisabled ? null : () => _changePassword(context),
                       child: Row(
@@ -223,7 +242,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                             Padding(
                               padding: const EdgeInsets.only(left: 10),
                               child: Text(
-                                '$_secondsRemaining',
+                                _formatTime(_secondsRemaining), // Format MM:SS
                                 style: const TextStyle(color: Colors.white),
                               ),
                             ),
