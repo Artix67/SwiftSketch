@@ -12,6 +12,14 @@ import '/drawing_shapes/drawing_shape.dart';
 import 'models/layer.dart';
 import '/drawing_tools/undo_redo_manager.dart';
 
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF406040);
+const Color biegecolor = Color(0xFFCBC2B4);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
+
 class DrawingPainter extends CustomPainter {
   final List<Layer> layers;
   final List<Offset?> points;
@@ -90,7 +98,7 @@ class DrawingPainter extends CustomPainter {
           );
 
           double fontSize = 100.0;
-          const double minFontSize = 12.0;
+          const double minFontSize = 8.0;
           const double paddingReduction = padding * 2;
 
           while (fontSize > minFontSize) {
@@ -170,12 +178,18 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   // final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
   final ValueNotifier<bool> isZoomEnabledNotifier = ValueNotifier(false);
   final ValueNotifier<DrawingTool> selectedToolNotifier = ValueNotifier<DrawingTool>(FreeformTool());
+  final ValueNotifier<bool> showGridNotifier = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> snapToGridNotifier = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> gridSizeNotifier = ValueNotifier<bool>(true);
 
   Layer? _activeLayer;
-
+  Offset? _startPosition;
   bool _showGrid = true;
   bool _snapToGrid = true;
   bool _isZoomEnabled = false; // Daniel - New variable to manage zoom state
+  bool get isGridVisible => showGridNotifier.value;
+  bool get isSnapEnabled => snapToGridNotifier.value;
+  bool get isGridSmall => gridSizeNotifier.value;
   double _gridSize = 10.0;
   late double _snapSensitivity;
 
@@ -238,6 +252,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     widget.layersNotifier.addListener(_updateActiveLayer);
   }
 
+  //TODO: UPDATE ACTIVE LAYER
   void _updateActiveLayer() {
     if (_activeLayer == null ||
         !widget.layersNotifier.value.contains(_activeLayer)) {
@@ -248,24 +263,33 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     setState(() {});
   }
 
+  //TODO: SET ACTIVE LAYER
   void setActiveLayer(Layer? layer) {
     setState(() {
       _activeLayer = layer;
     });
   }
 
+  //TODO: UPDATE SNAP SENSITIVITY
   void updateSnapSensitivity(double value) {
     setState(() {
       _snapSensitivity = value;
     });
   }
 
-  void updateGridSize(double gridSize) {
-    setState(() {
-      _gridSize = gridSize;
-    });
+  //TODO: TOGGLE GRID SIZE
+  void toggleGridSize() {
+    if (_gridSize == 10.0) {
+      _gridSize = 20.0;
+      gridSizeNotifier.value = false;
+    } else {
+      _gridSize = 10.0;
+      gridSizeNotifier.value = true;
+    }
+    setState(() {});
   }
 
+  //TODO: UPDATE COLORS
   void updateColors(Color fillColor, Color strokeColor) {
     setState(() {
       _fillColor = fillColor;
@@ -273,12 +297,14 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
+  //TODO: UPDATE STROKE WIDTH
   void updateStrokeWidth(double newWidth) {
     setState(() {
       _strokeWidth = newWidth;
     });
   }
 
+  //TODO: SWITCH TOOLS
   void switchTool(DrawingTool tool) {
     setState(() {
       // Clear the current points and preview points
@@ -292,14 +318,17 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
+  //TODO: UNDO
   void undo() {
     widget.layersNotifier.value = _undoRedoManager.undo(widget.layersNotifier.value);
   }
 
+  //TODO: REDO
   void redo() {
     widget.layersNotifier.value = _undoRedoManager.redo();
   }
 
+  //TODO: CLEAR CANVAS
   void clearCanvas() {
     setState(() {
       if (widget.layersNotifier.value.isNotEmpty) {
@@ -316,13 +345,17 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
+  //TODO: TOGGLE GRID
   void toggleGrid() {
+    showGridNotifier.value = !showGridNotifier.value;
     setState(() {
       _showGrid = !_showGrid;
     });
   }
 
+  //TODO: TOGGLE SNAP TO GRID
   void toggleSnapToGrid() {
+    snapToGridNotifier.value = !snapToGridNotifier.value;
     setState(() {
       _snapToGrid = !_snapToGrid;
       selectedTool.setSnapToGrid(_snapToGrid);
@@ -330,6 +363,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   }
 
   void onPanStartHandler(Offset position) {
+    _startPosition = position;
     final snapPoints = getSnapPoints(widget.layersNotifier.value);
     if (selectedTool is FreeformTool) {
       selectedTool.onPanStart(position, _previewPointsNotifier.value);
@@ -355,10 +389,119 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     }
   }
 
+  // void onPanEndHandler(Offset position) {
+  //   final snapPoints = getSnapPoints(widget.layersNotifier.value);
+  //
+  //   // Check if the gesture is a click
+  //   if (selectedTool is AnnotationTool &&
+  //       _startPosition != null &&
+  //       (position - _startPosition!).distance < 5.0) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: const Text(
+  //           "For annotations, drag to create the box size where your text will go.",
+  //         ),
+  //         duration: const Duration(seconds: 3),
+  //       ),
+  //     );
+  //     return; // Exit early since this is a click
+  //   }
+  //
+  //
+  //   // Handle the end of the gesture
+  //   if (selectedTool is FreeformTool) {
+  //     selectedTool.onPanEnd(position, _previewPointsNotifier.value);
+  //   } else {
+  //     selectedTool.onPanEnd(
+  //       snapToGridOrExistingPoint(
+  //         position,
+  //         snapPoints,
+  //         _gridSize,
+  //         _snapSensitivity,
+  //       ),
+  //       _previewPointsNotifier.value,
+  //     );
+  //   }
+  //
+  //   // Adjust for annotation tool
+  //   if (selectedTool is AnnotationTool && _previewPointsNotifier.value.isNotEmpty) {
+  //     List<Offset?> adjustedPoints = List.from(_previewPointsNotifier.value);
+  //
+  //     // Get the bounds of the annotation
+  //     Offset? start = adjustedPoints.first;
+  //     Offset? end = adjustedPoints.length > 1 ? adjustedPoints[2] : null;
+  //
+  //     if (start != null && end != null) {
+  //       // Calculate dimensions
+  //       double width = (end.dx - start.dx).abs();
+  //       double height = (end.dy - start.dy).abs();
+  //
+  //       // Minimum size constraints
+  //       const double minWidth = 50.0;
+  //       const double minHeight = 30.0;
+  //
+  //       // Adjust points if below minimum size
+  //       if (width < minWidth || height < minHeight) {
+  //         double adjustedWidth = width < minWidth ? minWidth : width;
+  //         double adjustedHeight = height < minHeight ? minHeight : height;
+  //
+  //         Offset adjustedEnd = Offset(
+  //           start.dx + adjustedWidth * (end.dx > start.dx ? 1 : -1),
+  //           start.dy + adjustedHeight * (end.dy > start.dy ? 1 : -1),
+  //         );
+  //
+  //         // Update the points list
+  //         adjustedPoints = [
+  //           start,
+  //           Offset(adjustedEnd.dx, start.dy),
+  //           adjustedEnd,
+  //           Offset(start.dx, adjustedEnd.dy),
+  //           start,
+  //         ];
+  //       }
+  //     }
+  //
+  //     // Update the points with the adjusted values
+  //     _previewPointsNotifier.value = adjustedPoints;
+  //   }
+  //
+  //   // Add the shape to the canvas if there are points
+  //   if (_previewPointsNotifier.value.isNotEmpty) {
+  //     _addShape(DrawingShape(
+  //       points: List.from(_previewPointsNotifier.value),
+  //       toolType: getToolTypeForTool(selectedTool),
+  //       fillColor: _fillColor,
+  //       strokeColor: _strokeColor,
+  //       strokeWidth: _strokeWidth,
+  //       tool: selectedTool,
+  //     ));
+  //   }
+  //
+  //   // Ensure points are cleared for the next tool
+  //   _previewPointsNotifier.value = [];
+  //   _pointsNotifier.value = [];
+  // }
+
   void onPanEndHandler(Offset position) {
     final snapPoints = getSnapPoints(widget.layersNotifier.value);
 
-    // Handle the end of the gesture
+    // 1. Check if it’s a single click for Annotation
+    if (selectedTool is AnnotationTool &&
+        _startPosition != null &&
+        (position - _startPosition!).distance < 5.0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+            "For annotations, drag to create the box size where your text will go.",
+          ),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+      // Exit early since this is a click
+      return;
+    }
+
+    // 2. Call the tool’s onPanEnd with snapping if appropriate
     if (selectedTool is FreeformTool) {
       selectedTool.onPanEnd(position, _previewPointsNotifier.value);
     } else {
@@ -373,16 +516,16 @@ class DrawingCanvasState extends State<DrawingCanvas> {
       );
     }
 
-    // Adjust for annotation tool
+    // 3. If annotation, enforce minimum box constraints
     if (selectedTool is AnnotationTool && _previewPointsNotifier.value.isNotEmpty) {
       List<Offset?> adjustedPoints = List.from(_previewPointsNotifier.value);
 
       // Get the bounds of the annotation
       Offset? start = adjustedPoints.first;
-      Offset? end = adjustedPoints.length > 1 ? adjustedPoints[2] : null;
+      Offset? end =
+      adjustedPoints.length > 1 ? adjustedPoints[2] : null;
 
       if (start != null && end != null) {
-        // Calculate dimensions
         double width = (end.dx - start.dx).abs();
         double height = (end.dy - start.dy).abs();
 
@@ -390,7 +533,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
         const double minWidth = 50.0;
         const double minHeight = 30.0;
 
-        // Adjust points if below minimum size
         if (width < minWidth || height < minHeight) {
           double adjustedWidth = width < minWidth ? minWidth : width;
           double adjustedHeight = height < minHeight ? minHeight : height;
@@ -400,7 +542,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
             start.dy + adjustedHeight * (end.dy > start.dy ? 1 : -1),
           );
 
-          // Update the points list
           adjustedPoints = [
             start,
             Offset(adjustedEnd.dx, start.dy),
@@ -411,25 +552,34 @@ class DrawingCanvasState extends State<DrawingCanvas> {
         }
       }
 
-      // Update the points with the adjusted values
       _previewPointsNotifier.value = adjustedPoints;
     }
 
-    // Add the shape to the canvas if there are points
+    // 4. Actually add the shape if we have preview points
     if (_previewPointsNotifier.value.isNotEmpty) {
-      _addShape(DrawingShape(
-        points: List.from(_previewPointsNotifier.value),
-        toolType: getToolTypeForTool(selectedTool),
-        fillColor: _fillColor,
-        strokeColor: _strokeColor,
-        strokeWidth: _strokeWidth,
-        tool: selectedTool,
-      ));
+      _addShape(
+        DrawingShape(
+          points: List.from(_previewPointsNotifier.value),
+          toolType: getToolTypeForTool(selectedTool),
+          fillColor: _fillColor,
+          strokeColor: _strokeColor,
+          strokeWidth: _strokeWidth,
+          tool: selectedTool,
+        ),
+      );
     }
 
-    // Ensure points are cleared for the next tool
+    // 5. If the tool is "Delete", do the undo action
+    if (getToolTypeForTool(selectedTool) == "Delete") {
+      _undoRedoManager.addAction(widget.layersNotifier.value);
+    }
+
+    // 6. Update your local notifiers for the next gesture
+    _pointsNotifier.value = [
+      ..._pointsNotifier.value,
+      ..._previewPointsNotifier.value,
+    ];
     _previewPointsNotifier.value = [];
-    _pointsNotifier.value = [];
   }
 
   void _addShape(DrawingShape shape) {
@@ -443,45 +593,78 @@ class DrawingCanvasState extends State<DrawingCanvas> {
             TextEditingController annotationController = TextEditingController();
             return AlertDialog(
               title: const Text("Add Annotation"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: annotationController,
-                    decoration: const InputDecoration(hintText: "Enter your note"),
-                  ),
-                  const SizedBox(height: 8.0),
-                  const Text(
-                    "If your text box ends up too small, try dragging the annotation tool to create a larger box.",
-                    style: TextStyle(fontSize: 12.0, color: Colors.grey),
-                  ),
-                ],
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: annotationController,
+                      decoration: const InputDecoration(
+                        hintText: "Enter your note",
+                      ),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                    ),
+                    const SizedBox(height: 8.0),
+                    const Text(
+                      "If your text box ends up too small, try dragging the annotation tool to create a larger box.",
+                      style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    if (annotationController.text.isNotEmpty) {
-                      shape = DrawingShape(
-                        points: shape.points,
-                        toolType: 'Annotation',
-                        fillColor: Colors.transparent,
-                        strokeColor: _strokeColor,
-                        strokeWidth: _strokeWidth,
-                        annotation: annotationController.text,
-                        tool: selectedTool,
-                      );
-                      _activeLayer!.shapes.add(shape);
-                      widget.layersNotifier.value =
-                          List.from(widget.layersNotifier.value);
-                      _undoRedoManager.addAction(widget.layersNotifier.value);
-                    }
-                  },
-                  child: const Text("Save"),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("Cancel"),
+                // Wrap these in a Row or just keep them inside the `actions` array:
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // Cancel Button (Gray Pill)
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        foregroundColor: Colors.black,  // Text color
+                        shape: StadiumBorder(),         // Gives it a pill shape
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text("Cancel"),
+                    ),
+                    const Spacer(),
+                    // Save Button (Green Pill)
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,  // Text color
+                        shape: const StadiumBorder(),   // Pill shape again
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        if (annotationController.text.isNotEmpty) {
+                          shape = DrawingShape(
+                            points: shape.points,
+                            toolType: 'Annotation',
+                            fillColor: Colors.transparent,
+                            strokeColor: _strokeColor,
+                            strokeWidth: _strokeWidth,
+                            annotation: annotationController.text,
+                            tool: selectedTool,
+                          );
+                          _activeLayer!.shapes.add(shape);
+                          widget.layersNotifier.value =
+                              List.from(widget.layersNotifier.value);
+                          _undoRedoManager.addAction(widget.layersNotifier.value);
+                        }
+                      },
+                      child: const Text("Save"),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -552,24 +735,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                 },
                 onPanEnd: (details) {
                   onPanEndHandler(details.localPosition);
-                  if (getToolTypeForTool(selectedTool) == "Delete") {
-                    _undoRedoManager.addAction(widget.layersNotifier.value);
-                  }
-                  if (_previewPointsNotifier.value.isNotEmpty) {
-                    _addShape(DrawingShape(
-                      points: List.from(_previewPointsNotifier.value),
-                      toolType: getToolTypeForTool(selectedTool),
-                      fillColor: _fillColor,
-                      strokeColor: _strokeColor,
-                      strokeWidth: _strokeWidth,
-                      tool: selectedTool,
-                    ));
-                  }
-                  _pointsNotifier.value = [
-                    ..._pointsNotifier.value,
-                    ..._previewPointsNotifier.value,
-                  ];
-                  _previewPointsNotifier.value = [];
                 },
                 child: ValueListenableBuilder<List<Offset?>>(
                   valueListenable: _pointsNotifier,

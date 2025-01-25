@@ -2,7 +2,7 @@ import 'package:flutter/material.dart' show BorderRadius, BoxDecoration, BuildCo
 
 import '../models/layer.dart';
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF697565);
+const Color lgreencolor = Color(0xFF406040);
 const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
@@ -41,10 +41,20 @@ class LayersTab extends StatelessWidget {
                 tooltip: 'Add Layer',
                 onPressed: onAddLayer,
               ),
-              IconButton(
-                icon: const Icon(Icons.remove),
-                tooltip: 'Remove Layer',
-                onPressed: onRemoveLayer,
+              ValueListenableBuilder<List<Layer>>(
+                valueListenable: layersNotifier,
+                builder: (context, layers, _) {
+                  final isOnlyOneLayer = layers.length == 1;
+                  return IconButton(
+                    icon: Icon(
+                      Icons.remove,
+                      color: isOnlyOneLayer ? Colors.grey : Colors.black,
+                    ),
+                    tooltip: 'Remove Layer',
+                    // Disable onRemoveLayer when there's only 1 layer
+                    onPressed: isOnlyOneLayer ? null : onRemoveLayer,
+                  );
+                },
               ),
             ],
           ),

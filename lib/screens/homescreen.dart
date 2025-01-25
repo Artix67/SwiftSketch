@@ -6,7 +6,7 @@ import '/FirebaseAuthService.dart';
 import 'package:intl/intl.dart';
 
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF697565);
+const Color lgreencolor = Color(0xFF406040);
 const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
@@ -265,17 +265,33 @@ class _HomeScreenState extends State<HomeScreen> {
                                           title: const Text('Delete Project'),
                                           content: const Text('Are you sure you want to delete this project? This action cannot be undone.'),
                                           actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(false); // User chose not to delete
-                                              },
-                                              child: const Text('Cancel'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(true); // User confirmed deletion
-                                              },
-                                              child: const Text('Delete'),
+                                            Row (
+                                              mainAxisAlignment: MainAxisAlignment.end,
+                                              children: [
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: redcolor,
+                                                    foregroundColor: Colors.white,
+                                                    shape: const StadiumBorder(),
+                                                    padding: const EdgeInsets.symmetric(
+                                                        horizontal: 20, vertical: 12),
+                                                  ),
+                                                  onPressed: () => Navigator.of(context).pop(true), // Cancel
+                                                  child: const Text("Cancel"),
+                                                ),
+                                                const Spacer(),
+                                                ElevatedButton(
+                                                  style: ElevatedButton.styleFrom(
+                                                    backgroundColor: Colors.grey[300],
+                                                    foregroundColor: Colors.black,
+                                                    shape: const StadiumBorder(),
+                                                    padding: const EdgeInsets.symmetric(
+                                                        horizontal: 20, vertical: 12),
+                                                  ),
+                                                  onPressed: () => Navigator.of(context).pop(false), // Cancel
+                                                  child: const Text("Cancel"),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         );

@@ -6,7 +6,7 @@ import '../models/layer.dart';
 import 'package:swift_sketch/ProjectManager.dart';
 
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF697565);
+const Color lgreencolor = Color(0xFF406040);
 const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
@@ -18,27 +18,32 @@ class Drawscreen extends StatefulWidget {
   final bool exportImmediately;
   final bool isGuest;
 
-  const Drawscreen({super.key, required this.projectName, required this.exportImmediately, required this.isGuest});
+  const Drawscreen(
+      {super.key,
+      required this.projectName,
+      required this.exportImmediately,
+      required this.isGuest});
 
   @override
   State<Drawscreen> createState() => _Drawscreen();
 }
 
 class _Drawscreen extends State<Drawscreen> {
-  final GlobalKey<DrawingCanvasState> _drawingCanvasKey = GlobalKey<DrawingCanvasState>();
+  final GlobalKey<DrawingCanvasState> _drawingCanvasKey =
+      GlobalKey<DrawingCanvasState>();
   final ProjectManager _projectManager = ProjectManager();
 
-  Color _fillColor = Colors.transparent;
+  Color _fillColor = Colors.white;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
   double _gridSize = 10.0;
   double _snapSensitivity = 2.0;
   double _iconSize = 1.25;
-  double _spacerSize = 15;
+  double _iconLabelSize = 8;
+  double _spacerSize = 1;
 
-  final ValueNotifier<List<Layer>> _layersNotifier = ValueNotifier([
-    Layer(id: "1", name: "Layer 1", shapes: [])
-  ]);
+  final ValueNotifier<List<Layer>> _layersNotifier =
+      ValueNotifier([Layer(id: "1", name: "Layer 1", shapes: [])]);
 
   final ValueNotifier<int> _selectedLayerIndex = ValueNotifier(0);
 
@@ -48,7 +53,8 @@ class _Drawscreen extends State<Drawscreen> {
     _loadProject();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_layersNotifier.value.isNotEmpty) {
-        _drawingCanvasKey.currentState?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
+        _drawingCanvasKey.currentState
+            ?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
       }
     });
     if (widget.exportImmediately) {
@@ -68,7 +74,8 @@ class _Drawscreen extends State<Drawscreen> {
       if (layers.isNotEmpty) {
         print('Loaded Layers: $layers');
         _layersNotifier.value = layers;
-        _drawingCanvasKey.currentState?.setActiveLayer(layers[_selectedLayerIndex.value]);
+        _drawingCanvasKey.currentState
+            ?.setActiveLayer(layers[_selectedLayerIndex.value]);
       }
     });
   }
@@ -95,13 +102,6 @@ class _Drawscreen extends State<Drawscreen> {
     _drawingCanvasKey.currentState?.updateSnapSensitivity(value);
   }
 
-  void _updateGridSize(double value) {
-    setState(() {
-      _gridSize = value;
-    });
-    _drawingCanvasKey.currentState?.updateGridSize(value);
-  }
-
   void _updateColors(Color fillColor, Color strokeColor) {
     setState(() {
       _fillColor = fillColor;
@@ -126,28 +126,60 @@ class _Drawscreen extends State<Drawscreen> {
     if (_layersNotifier.value.length > 1) {
       final List<Layer> updatedLayers = List<Layer>.from(_layersNotifier.value);
       updatedLayers.removeAt(_selectedLayerIndex.value);
-      _selectedLayerIndex.value = (_selectedLayerIndex.value > 0) ? _selectedLayerIndex.value - 1 : 0;
+      _selectedLayerIndex.value =
+          (_selectedLayerIndex.value > 0) ? _selectedLayerIndex.value - 1 : 0;
 
       _layersNotifier.value = updatedLayers;
-      _drawingCanvasKey.currentState?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
+      _drawingCanvasKey.currentState
+          ?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
     }
   }
 
   Future<void> _confirmRemoveLayer() async {
-    if (_layersNotifier.value.length <= 1) return; // Prevent removing the last layer
+    if (_layersNotifier.value.length <= 1)
+      return; // Prevent removing the last layer
     final shouldRemove = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Remove Layer'),
         content: const Text('Are you sure you want to delete this layer?'),
         actions: [
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-          TextButton(
-            child: const Text('Delete'),
-            onPressed: () => Navigator.of(context).pop(true),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: redcolor, // Red background
+                  foregroundColor: Colors.white, // White text
+                  shape: const StadiumBorder(), // Pill shape
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop(true); // Close the dialog
+                },
+                child: const Text("Delete"),
+              ),
+              const Spacer(),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[300],
+                  foregroundColor: Colors.black,
+                  shape: const StadiumBorder(),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                ),
+                onPressed: () {
+                  // Cancel logic
+                  Navigator.of(context).pop(false);
+                },
+                child: const Text("Cancel"),
+              ),
+            ],
           ),
         ],
       ),
@@ -160,60 +192,59 @@ class _Drawscreen extends State<Drawscreen> {
   void _selectLayer(int index) {
     setState(() {
       _selectedLayerIndex.value = index;
-
     });
-    _drawingCanvasKey.currentState?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
+    _drawingCanvasKey.currentState
+        ?.setActiveLayer(_layersNotifier.value[_selectedLayerIndex.value]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Toolbar(
-            fillColor: _fillColor,
-            strokeColor: _strokeColor,
-            strokeWidth: _strokeWidth,
-            gridSize: _gridSize,
-            snapSensitivity: _snapSensitivity,
-            onUpdateStrokeWidth: _updateStrokeWidth,
-            onUpdateGridSize: _updateGridSize,
-            onUpdateColors: _updateColors,
-            drawingCanvasKey: _drawingCanvasKey,
-            onDeleteToolUpdate: () {
-              setState(() {});
-            },
-            onSaved: _saveProject,
-            activeLayerShapes: _layersNotifier.value[_selectedLayerIndex.value].shapes,
-            refreshUI: () {
-              setState(() {});
-            },
-            onUpdateSnapSensitivity: _updateSnapSensitivity,
-            iconSize: _iconSize,
-            spacerSize: _spacerSize,
-            name: widget.projectName,
-            isGuest: widget.isGuest,
-          ),
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: Toolbar(
+          fillColor: _fillColor,
+          strokeColor: _strokeColor,
+          strokeWidth: _strokeWidth,
+          gridSize: _gridSize,
+          snapSensitivity: _snapSensitivity,
+          onUpdateStrokeWidth: _updateStrokeWidth,
+          onUpdateColors: _updateColors,
+          drawingCanvasKey: _drawingCanvasKey,
+          onDeleteToolUpdate: () {
+            setState(() {});
+          },
+          onSaved: _saveProject,
+          activeLayerShapes:
+              _layersNotifier.value[_selectedLayerIndex.value].shapes,
+          refreshUI: () {
+            setState(() {});
+          },
+          onUpdateSnapSensitivity: _updateSnapSensitivity,
+          iconSize: _iconSize,
+          iconLabelSize: _iconLabelSize,
+          spacerSize: _spacerSize,
+          name: widget.projectName,
+          isGuest: widget.isGuest,
         ),
-        body: Row(
-          children: [
-            Expanded(
-              child: DrawingCanvas(
-                key: _drawingCanvasKey,
-                layersNotifier: _layersNotifier,
-                initialSnapSensitivity: _snapSensitivity,
-              ),
-            ),
-            LayersTab(
+      ),
+      body: Row(
+        children: [
+          Expanded(
+            child: DrawingCanvas(
+              key: _drawingCanvasKey,
               layersNotifier: _layersNotifier,
-              selectedLayerIndexNotifier: _selectedLayerIndex,
-              onAddLayer: _addLayer,
-              onRemoveLayer: _confirmRemoveLayer,
-              onSelectLayer: _selectLayer,
+              initialSnapSensitivity: _snapSensitivity,
             ),
-          ],
-        ),
+          ),
+          LayersTab(
+            layersNotifier: _layersNotifier,
+            selectedLayerIndexNotifier: _selectedLayerIndex,
+            onAddLayer: _addLayer,
+            onRemoveLayer: _confirmRemoveLayer,
+            onSelectLayer: _selectLayer,
+          ),
+        ],
       ),
     );
   }

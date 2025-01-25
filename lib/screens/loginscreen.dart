@@ -185,19 +185,33 @@ class _LoginScreenState extends State<LoginScreen> {
                               'You cannot save drawings without an account. Are you sure you want to sign in as a guest?',
                             ),
                             actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(false); // User chose not to proceed
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(true); // User chose to proceed
-                                },
-                                child: const Text('Proceed'),
+                              Row (
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[300],
+                                      foregroundColor: Colors.black,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 12),
+                                    ),
+                                    onPressed: () => Navigator.of(context).pop(true), // Cancel
+                                    child: const Text("Proceed"),
+                                  ),
+                                  const Spacer(),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[300],
+                                      foregroundColor: Colors.black,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 12),
+                                    ),
+                                    onPressed: () => Navigator.of(context).pop(false), // Cancel
+                                    child: const Text("Cancel"),
+                                  ),
+                                ],
                               ),
                             ],
                           );
