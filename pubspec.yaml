@@ -61,6 +61,7 @@ flutter:
     - icons/label.png
     - icons/line.png
     - icons/load.png
+    - icons/magnet.png
     - icons/menu.png
     - icons/navigation.png
     - icons/pan.png
@@ -69,6 +70,7 @@ flutter:
     - icons/ruler.png
     - icons/save.png
     - icons/settings.png
+    - icons/signal.png
     - icons/slidermenu.png
     - icons/square.png
     - icons/tools.png
