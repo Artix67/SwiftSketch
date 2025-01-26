@@ -21,8 +21,8 @@ const Color bluecolor = Color(0xFF11487A);
 const Color blackcolor = Color(0xFF181818);
 const Color midgreencolor = Color(0xFF3C3D37);
 const Color whitecolor = Color(0xFFEEEEEE);
-const double iconBoxSize = 22;
-const double textBoxSizeWidth = 45;
+const double iconBoxSize = 24;
+const double textBoxSizeWidth = 39;
 const double textBoxSizeHeight = 12;
 
 class Toolbar extends StatelessWidget {
@@ -136,6 +136,7 @@ class Toolbar extends StatelessWidget {
     });
   }
 
+  // TODO: Show Stroke Thickness Dialog
   void _showStrokeWidthDialog(BuildContext context) {
     double tempStrokeWidth = drawingCanvasKey.currentState!.strokeWidth;
 
@@ -145,11 +146,11 @@ class Toolbar extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return AlertDialog(
-              title: const Text("Adjust Stroke Width"),
+              title: const Text("Adjust Stroke Thickness"),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   StrokeWidth(
                     strokeWidth: tempStrokeWidth,
                     onUpdateStrokeWidth: (value) {
@@ -201,6 +202,72 @@ class Toolbar extends StatelessWidget {
     );
   }
 
+  //TODO: Show Snap Range Dialog
+  void _showSnapRangeDialog(BuildContext context) {
+    double tempSnapSensitivity = drawingCanvasKey.currentState!.snapSensitivity;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: const Text("Adjust Snap Range"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 20),
+                  StrokeWidth(
+                    strokeWidth: tempSnapSensitivity,
+                    onUpdateStrokeWidth: (value) {
+                      setStateDialog(() {
+                        tempSnapSensitivity = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        foregroundColor: Colors.black,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(), // Cancel
+                      child: const Text("Cancel"),
+                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                      onPressed: () {
+                        drawingCanvasKey.currentState!
+                            .updateSnapSensitivity(tempSnapSensitivity);
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Widget buildToolButton({
     required DrawingTool tool,
     required String tooltip,
@@ -222,7 +289,7 @@ class Toolbar extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                 ),
               IconButton(
@@ -762,15 +829,12 @@ class Toolbar extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // Show the icon in black when true, or gray when false
                               SizedBox(
                                 width: iconBoxSize,
                                 height: iconBoxSize,
-                                child: Icon(
-                                  Icons.square_foot,
-                                  color: isSnapEnabled
-                                      ? Colors.black
-                                      : Colors.grey,
+                                child: ImageIcon(
+                                  const AssetImage("icons/magnet.png"),
+                                  color: isSnapEnabled ? Colors.black : Colors.grey,
                                 ),
                               ),
                               SizedBox(
@@ -788,6 +852,42 @@ class Toolbar extends StatelessWidget {
                         ),
                       );
                     },
+                  ),
+
+                  //TODO: Snap Range
+//TODO: STROKE THICKNESS BUTTON
+                  Transform.scale(
+                    scale: iconSize,
+                    child: IconButton(
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: ImageIcon(
+                              AssetImage("icons/signal.png"),
+                            ),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Snap Range",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      tooltip: 'Adjust Snap Sensitivity',
+                      onPressed: () {
+                        _showSnapRangeDialog(context);
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -1093,17 +1193,6 @@ class Toolbar extends StatelessWidget {
                 ],
               ),
 
-              //TODO: CREATE POLYGON TOOL
-              // Transform.scale(
-              //                 scale: 2,
-              //                 child:  IconButton(onPressed: (){
-              //                    drawingCanvasKey.currentState?.switchTool(PolygonTool());
-              //                 },
-              //                     icon:  const ImageIcon(AssetImage("icons/freeformshapes.png"))
-              //                 ),
-              //               ),
-              //               const SizedBox(width: 15,),
-
               //TODO: CONFORM THIS TO TOOL STYLING
               // You may want to add this styling to other buttons as well. Via a bool the button
               // changes looks to indicate that it is selected.
@@ -1151,17 +1240,6 @@ class Toolbar extends StatelessWidget {
               //   ),
               // ),
               // SizedBox(width: iconSize,),
-
-              //MARK: - CURSOR TOOL SELECTOR
-              //This may be unnecessary, currently we don't have a tool that would use this.
-              //Keeping just in case.
-              // Transform.scale(
-              //   scale: iconSize,
-              //   child: IconButton(onPressed: (){},
-              //       icon:  const ImageIcon(AssetImage("icons/cursor.png"))
-              //   ),
-              // ),
-              // SizedBox(width: iconSize,),
             ],
           ))
         ]);
@@ -1173,10 +1251,10 @@ class StrokeWidth extends StatefulWidget {
   final Function(double) onUpdateStrokeWidth;
 
   const StrokeWidth({
-    Key? key,
+    super.key,
     required this.strokeWidth,
     required this.onUpdateStrokeWidth,
-  }) : super(key: key);
+  });
 
   @override
   State<StrokeWidth> createState() => _StrokeWidthState();
@@ -1221,7 +1299,6 @@ class _StrokeWidthState extends State<StrokeWidth> {
           setState(() {
             _sliderValue = value;
           });
-          // Update DrawingCanvasState stroke width
           widget.onUpdateStrokeWidth(value);
         },
       ),

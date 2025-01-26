@@ -28,7 +28,7 @@ class LayersTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 200,
+      width: 140,
       padding: const EdgeInsets.all(4.0),
       color: Colors.grey[200],
       child: Column(

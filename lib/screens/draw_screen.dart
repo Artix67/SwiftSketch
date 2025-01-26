@@ -36,11 +36,11 @@ class _Drawscreen extends State<Drawscreen> {
   Color _fillColor = Colors.white;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
-  double _gridSize = 10.0;
-  double _snapSensitivity = 2.0;
-  double _iconSize = 1.25;
-  double _iconLabelSize = 8;
-  double _spacerSize = 1;
+  double _snapSensitivity = 1;
+  final double _gridSize = 10.0;
+  final double _iconSize = 1.25;
+  final double _iconLabelSize = 8;
+  final double _spacerSize = 1;
 
   final ValueNotifier<List<Layer>> _layersNotifier =
       ValueNotifier([Layer(id: "1", name: "Layer 1", shapes: [])]);
@@ -63,7 +63,7 @@ class _Drawscreen extends State<Drawscreen> {
   }
 
   void _triggerExport() {
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       _drawingCanvasKey.currentState?.export(widget.projectName);
     });
   }
@@ -72,7 +72,6 @@ class _Drawscreen extends State<Drawscreen> {
     List<Layer> layers = await _projectManager.loadProject(widget.projectName);
     setState(() {
       if (layers.isNotEmpty) {
-        print('Loaded Layers: $layers');
         _layersNotifier.value = layers;
         _drawingCanvasKey.currentState
             ?.setActiveLayer(layers[_selectedLayerIndex.value]);
@@ -136,8 +135,9 @@ class _Drawscreen extends State<Drawscreen> {
   }
 
   Future<void> _confirmRemoveLayer() async {
-    if (_layersNotifier.value.length <= 1)
-      return; // Prevent removing the last layer
+    if (_layersNotifier.value.length <= 1) {
+      return;
+    }
     final shouldRemove = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -149,16 +149,16 @@ class _Drawscreen extends State<Drawscreen> {
             children: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: redcolor, // Red background
-                  foregroundColor: Colors.white, // White text
-                  shape: const StadiumBorder(), // Pill shape
+                  backgroundColor: redcolor,
+                  foregroundColor: Colors.white,
+                  shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
                     vertical: 12,
                   ),
                 ),
                 onPressed: () {
-                  Navigator.of(context).pop(true); // Close the dialog
+                  Navigator.of(context).pop(true);
                 },
                 child: const Text("Delete"),
               ),
@@ -174,7 +174,6 @@ class _Drawscreen extends State<Drawscreen> {
                   ),
                 ),
                 onPressed: () {
-                  // Cancel logic
                   Navigator.of(context).pop(false);
                 },
                 child: const Text("Cancel"),
