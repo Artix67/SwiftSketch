@@ -5,11 +5,11 @@ import '/SettingsManager.dart';
 
 
 
-const List<String> toolbarposlist = <String>['Top', 'Bottom', 'Left', 'Right'];
+const List<String> toolbarposlist = <String>['Top', 'Bottom'];
 const List<String> gridsizelist = <String>['5', '10', '15', '20'];
 
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF697565);
+const Color lgreencolor = Color(0xFF406040);
 const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
@@ -33,6 +33,7 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
   String _gridSize = '10';
   bool _gridVisibility = true;
   double _lineThickness = 0;
+  bool _isToolbarOnTop = true;
 
   @override
   void initState() {
@@ -113,6 +114,11 @@ class _AppSettingsScreenState extends State<AppSettingsScreen> {
                         debugPrint('Tool Bar Position: $value');
                         setState(() {
                           _toolbarPosition = value!;
+
+                          if (_toolbarPosition != 'Top'){
+                            _isToolbarOnTop == false;
+                          }
+													
                           _updateSettings('toolbarPosition', value);
                         });
                       },

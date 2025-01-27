@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:swift_sketch/screens/SettingsDrawer.dart';
 import '/screens/draw_screen.dart';
+import 'package:swift_sketch/screens/SettingsDrawer.dart';
 import 'package:swift_sketch/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import 'package:intl/intl.dart';
 
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF697565);
+const Color lgreencolor = Color(0xFF406040);
 const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
@@ -22,8 +22,10 @@ class HomeScreen extends StatefulWidget {
 }
 final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 class _HomeScreenState extends State<HomeScreen> {
+  int _projectCount = 0;
   String _searchQuery = '';
-  final FirebaseAuthService _authService = FirebaseAuthService(); // Initialize the auth service
+  final FirebaseAuthService _authService =
+      FirebaseAuthService(); // Initialize the auth service
 
   void _updateSearchQuery(String query) {
     setState(() {
@@ -37,7 +39,11 @@ class _HomeScreenState extends State<HomeScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) {
-          return Drawscreen(projectName: projectName, exportImmediately: false, isGuest: false,);
+          return Drawscreen(
+            projectName: projectName,
+            exportImmediately: false,
+            isGuest: false,
+          );
         }),
       );
     }
@@ -47,37 +53,63 @@ class _HomeScreenState extends State<HomeScreen> {
     TextEditingController _nameController = TextEditingController();
 
     return await showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Enter Project Name'),
-          content: TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(hintText: 'Project Name'),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, '');
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, _nameController.text);
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    ) ?? '';
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Enter Project Name'),
+              content: TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(hintText: 'Project Name'),
+              ),
+              actions: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        foregroundColor: Colors.black,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context, '');
+                      },
+                      child: const Text('Cancel'),
+                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context, _nameController.text);
+                      },
+                      child: const Text('Save'),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        ) ??
+        '';
   }
 
   String formatDateTime(String dateTime) {
     try {
       final DateTime parsedDateTime = DateTime.parse(dateTime);
-      final DateFormat formatter = DateFormat('MMMM d, y \'at\' h:mm a'); // AM/PM format
+      final DateFormat formatter =
+          DateFormat('MMMM d, y \'at\' h:mm a'); // AM/PM format
       return formatter.format(parsedDateTime);
     } catch (e) {
       return dateTime; // Fallback in case of an error
@@ -86,90 +118,104 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        key: _scaffoldKey,
+
+    final bool pinnedMode = _projectCount >= 11;
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: biegecolor,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: biegecolor,
-        appBar: AppBar(
-          backgroundColor: biegecolor,
-          title: Row(
-            children: [
-              Row(
-                children: [
-                  const SizedBox(width: 20),
-                  FittedBox(
-                    fit: BoxFit.contain,
-                    child: Image.asset(
-                      'images/SSLogo.png',
-                      height: 40,
-                      width: 40,
-                    ),
+        title: Row(
+          children: [
+            Row(
+              children: [
+                const SizedBox(width: 20),
+                FittedBox(
+                  fit: BoxFit.contain,
+                  child: Image.asset(
+                    'images/SSLogo.png',
+                    height: 40,
+                    width: 40,
                   ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    "Swift Sketch",
-                    style: TextStyle(fontSize: 24),
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  "Swift Sketch",
+                  style: TextStyle(fontSize: 24),
+                ),
+              ],
+            ),
+            const Spacer(),
+            Flexible(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  //TODO: SEARCH BAR
+                  SizedBox(
+                    height: 40,
+                    width: 300,
+                    child: SearchBar(onSearchChanged: _updateSearchQuery),
+                  ),
+                  const SizedBox(width: 20),
+                  //TODO: SETTINGS BUTTON
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) {
+                          return const SettingsScreen();
+                        }),
+                      );
+                    },
+                    tooltip: 'Settings',
+                    icon: const ImageIcon(AssetImage("icons/settings.png")),
                   ),
                 ],
               ),
-              const Spacer(),
-              Flexible(
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(onPressed: (){
+            _scaffoldKey.currentState!.openEndDrawer();
+          }, icon: const ImageIcon(AssetImage("icons/settings.png")))
+        ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            //TODO: HEADER ROW
+            Container(
+              margin: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+              height: 50,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black, width: 2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    SizedBox(
-                      height: 40,
-                      width: 300,
-                      child: SearchBar(onSearchChanged: _updateSearchQuery),
-                    ),
-                    const SizedBox(width: 20),
+                    Text("Project Name"),
+                    Spacer(),
+                    Text("Date"),
+                    Spacer(),
+                    Text("Actions"),
                   ],
                 ),
               ),
-            ],
-
-          ),
-          actions: [
-              IconButton(onPressed: (){
-                _scaffoldKey.currentState!.openEndDrawer();
-              }, icon: const ImageIcon(AssetImage("icons/settings.png")))
-          ],
-        ),
-        endDrawer: SettingsDrawer(),
-        body: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * .055,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.black,
-                    width: 2,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Row(
-                    children: [
-                      const Text("Project Name"),
-                      const Spacer(),
-                      const Text("Date"),
-                      const Spacer(),
-                      const Text("Actions")
-                    ],
-                  ),
-                ),
-              ),
             ),
+
+            //TODO: PROJECT LIST
             Expanded(
-              child: StreamBuilder(
+              child:
+              StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('projects')
                     .where('userUID',
-                    isEqualTo: _authService.auth.currentUser?.uid) // Filter by the current user's UID
+                        isEqualTo: _authService.auth.currentUser
+                            ?.uid) // Filter by the current user's UID
                     .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -177,7 +223,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                   if (snapshot.hasError) {
                     debugPrint('Error: ${snapshot.error}');
-                    return const Center(child: Text('Error connecting to Firestore.'));
+                    return const Center(
+                        child: Text('Error connecting to Firestore.'));
                   }
                   if (snapshot.hasData) {
                     var projects = snapshot.data!.docs;
@@ -192,9 +239,39 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (projects.isEmpty) {
                       return const Center(child: Text('No projects found.'));
                     }
+                    projects.sort((a, b) {
+                      final dateA = DateTime.parse(a['date']);
+                      final dateB = DateTime.parse(b['date']);
+                      return dateB.compareTo(dateA);
+                    });
+                    int newCount = projects.length;
+                    if (_projectCount != newCount) {
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          _projectCount = newCount;
+                        });
+                      });
+                    }
+                    final bool pinnedMode = _projectCount >= 11;
+                    final itemCount = pinnedMode ? projects.length : (projects.length + 1);
                     return ListView.builder(
-                      itemCount: projects.length,
+                      itemCount: itemCount,
                       itemBuilder: (context, index) {
+                        final lastIndex = projects.length;
+                        if (!pinnedMode && index == lastIndex) {
+                          return Container(
+                            margin: const EdgeInsets.fromLTRB(30, 10, 30, 20),
+                            alignment: Alignment.centerRight,
+                            child: OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                backgroundColor: lgreencolor,
+                                foregroundColor: Colors.white,
+                              ),
+                              onPressed: _createNewProject,
+                              child: const Text('New Project'),
+                            ),
+                          );
+                        }
                         var project = projects[index];
                         return Padding(
                           padding: const EdgeInsets.fromLTRB(30, 10, 30, 0),
@@ -207,15 +284,16 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Row(
                               children: [
                                 const SizedBox(width: 10),
-                                Container(
+                                SizedBox(
                                   width: 250,
                                   child: Text(project['name']),
                                 ),
                                 const Spacer(),
-                                Container(
+                                SizedBox(
                                   width: 250,
                                   child: Text(
-                                    formatDateTime(project['date']), // Call the formatting function here
+                                    formatDateTime(project[
+                                        'date']),
                                   ),
                                 ),
                                 const Spacer(),
@@ -226,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       MaterialPageRoute(
                                         builder: (context) {
                                           return Drawscreen(
-                                              projectName: project['name'],
+                                            projectName: project['name'],
                                             exportImmediately: false,
                                             isGuest: false,
                                           );
@@ -234,7 +312,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     );
                                   },
-                                  icon: const ImageIcon(AssetImage("icons/draw.png")),
+                                  icon: const ImageIcon(
+                                      AssetImage("icons/draw.png")),
                                 ),
                                 IconButton(
                                   onPressed: () {
@@ -251,7 +330,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ),
                                     );
                                   },
-                                  icon: const ImageIcon(AssetImage("icons/export2.png")),
+                                  icon: const ImageIcon(
+                                      AssetImage("icons/export2.png")),
                                 ),
                                 IconButton(
                                   onPressed: () async {
@@ -260,19 +340,54 @@ class _HomeScreenState extends State<HomeScreen> {
                                       builder: (BuildContext context) {
                                         return AlertDialog(
                                           title: const Text('Delete Project'),
-                                          content: const Text('Are you sure you want to delete this project? This action cannot be undone.'),
+                                          content: const Text(
+                                              'Are you sure you want to delete this project? This action cannot be undone.'),
                                           actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(false); // User chose not to delete
-                                              },
-                                              child: const Text('Cancel'),
-                                            ),
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop(true); // User confirmed deletion
-                                              },
-                                              child: const Text('Delete'),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor: redcolor,
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    shape:
+                                                        const StadiumBorder(),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 12),
+                                                  ),
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(true),
+                                                  // Cancel
+                                                  child: const Text("Delete"),
+                                                ),
+                                                const Spacer(),
+                                                ElevatedButton(
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                        Colors.grey[300],
+                                                    foregroundColor:
+                                                        Colors.black,
+                                                    shape:
+                                                        const StadiumBorder(),
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20,
+                                                        vertical: 12),
+                                                  ),
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(false),
+                                                  // Cancel
+                                                  child: const Text("Cancel"),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         );
@@ -295,28 +410,32 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     );
                   } else {
-                    return const Center(child: Text('No projects yet created.'));
+                    return const Center(
+                      child: Text('No projects yet created.'),
+                    );
                   }
                 },
-              ),
-            ),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: lgreencolor,
-                    foregroundColor: biegecolor
-                  ),
-                  onPressed: _createNewProject,
-                  child: const Text('New Project'),
-                ),
               ),
             ),
           ],
         ),
       ),
+      bottomNavigationBar: pinnedMode
+          ? Container(
+              height: 70,
+              color: biegecolor,
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: 30),
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: lgreencolor,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: _createNewProject,
+                child: const Text('New Project'),
+              ),
+            )
+          : null,
     );
   }
 }

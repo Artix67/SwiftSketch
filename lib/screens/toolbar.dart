@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
 import '../drawing_canvas.dart';
 import '../drawing_shapes/drawing_shape.dart';
+import '../drawing_tools/drawing_tool.dart';
 import '../drawing_tools/freeform_tool.dart';
 import '../drawing_tools/circle_tool.dart';
 import '../drawing_tools/delete_tool.dart';
@@ -13,14 +14,16 @@ import 'homescreen.dart';
 import 'loginscreen.dart';
 
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF697565);
+const Color lgreencolor = Color(0xFF406040);
 const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
 const Color blackcolor = Color(0xFF181818);
 const Color midgreencolor = Color(0xFF3C3D37);
 const Color whitecolor = Color(0xFFEEEEEE);
-
+const double iconBoxSize = 24;
+const double textBoxSizeWidth = 39;
+const double textBoxSizeHeight = 12;
 
 class Toolbar extends StatelessWidget {
   final Color fillColor;
@@ -29,7 +32,6 @@ class Toolbar extends StatelessWidget {
   final double gridSize;
   final double snapSensitivity;
   final Function(double) onUpdateStrokeWidth;
-  final Function(double) onUpdateGridSize;
   final Function(Color, Color) onUpdateColors;
   final Function(double) onUpdateSnapSensitivity;
   final GlobalKey<DrawingCanvasState> drawingCanvasKey;
@@ -39,9 +41,9 @@ class Toolbar extends StatelessWidget {
   final VoidCallback refreshUI;
   final double spacerSize;
   final double iconSize;
+  final double iconLabelSize;
   final String name;
   final bool isGuest;
-
 
   const Toolbar({
     super.key,
@@ -51,7 +53,6 @@ class Toolbar extends StatelessWidget {
     required this.gridSize,
     required this.snapSensitivity,
     required this.onUpdateStrokeWidth,
-    required this.onUpdateGridSize,
     required this.onUpdateColors,
     required this.onUpdateSnapSensitivity,
     required this.drawingCanvasKey,
@@ -61,46 +62,243 @@ class Toolbar extends StatelessWidget {
     required this.refreshUI,
     required this.spacerSize,
     required this.iconSize,
+    required this.iconLabelSize,
     required this.name,
     required this.isGuest,
   });
 
   void _pickColor(BuildContext context, bool isFill) {
-    Color tempColor = isFill ? fillColor : strokeColor;
+    Color localTempColor = isFill ? fillColor : strokeColor;
+    showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (BuildContext context,
+              void Function(void Function()) setStateDialog) {
+            return AlertDialog(
+              title: Text(isFill ? 'Pick Fill Color' : 'Pick Stroke Color'),
+              content: SingleChildScrollView(
+                child: ColorPicker(
+                  color: localTempColor,
+                  onColorChanged: (Color newColor) {
+                    setStateDialog(() => localTempColor = newColor);
+                  },
+                  showColorName: true,
+                  enableShadesSelection: true,
+                ),
+              ),
+              actions: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(false),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        foregroundColor: Colors.black,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: const Text("Cancel"),
+                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(dialogContext).pop(true),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((didConfirm) {
+      if (didConfirm == true) {
+        if (isFill) {
+          onUpdateColors(localTempColor, strokeColor);
+        } else {
+          onUpdateColors(fillColor, localTempColor);
+        }
+      }
+    });
+  }
+
+  // TODO: Show Stroke Thickness Dialog
+  void _showStrokeWidthDialog(BuildContext context) {
+    double tempStrokeWidth = drawingCanvasKey.currentState!.strokeWidth;
 
     showDialog(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(isFill ? 'Pick Fill Color' : 'Pick Stroke Color'),
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              color: tempColor,
-              onColorChanged: (Color color) {
-                if (isFill) {
-                  onUpdateColors(color, strokeColor);
-                } else {
-                  onUpdateColors(fillColor, color);
-                }
-              },
-              showColorName: true,
-              enableShadesSelection: true,
-            ),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: const Text("Adjust Stroke Thickness"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 20),
+                  StrokeWidth(
+                    strokeWidth: tempStrokeWidth,
+                    onUpdateStrokeWidth: (value) {
+                      setStateDialog(() {
+                        tempStrokeWidth = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        foregroundColor: Colors.black,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(), // Cancel
+                      child: const Text("Cancel"),
+                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                      onPressed: () {
+                        drawingCanvasKey.currentState!
+                            .updateStrokeWidth(tempStrokeWidth);
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  //TODO: Show Snap Range Dialog
+  void _showSnapRangeDialog(BuildContext context) {
+    double tempSnapSensitivity = drawingCanvasKey.currentState!.snapSensitivity;
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              title: const Text("Adjust Snap Range"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 20),
+                  StrokeWidth(
+                    strokeWidth: tempSnapSensitivity,
+                    onUpdateStrokeWidth: (value) {
+                      setStateDialog(() {
+                        tempSnapSensitivity = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        foregroundColor: Colors.black,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(), // Cancel
+                      child: const Text("Cancel"),
+                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 12),
+                      ),
+                      onPressed: () {
+                        drawingCanvasKey.currentState!
+                            .updateSnapSensitivity(tempSnapSensitivity);
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("OK"),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget buildToolButton({
+    required DrawingTool tool,
+    required String tooltip,
+    required Widget icon,
+    required VoidCallback onPressed,
+  }) {
+    return ValueListenableBuilder<DrawingTool>(
+      valueListenable: drawingCanvasKey.currentState!.selectedToolNotifier,
+      builder: (context, selectedTool, child) {
+        final isSelected = selectedTool.runtimeType == tool.runtimeType;
+        return Transform.scale(
+          scale: iconSize,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              if (isSelected)
+                Container(
+                  width: 38,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                ),
+              IconButton(
+                icon: icon,
+                tooltip: tooltip,
+                onPressed: onPressed,
+              ),
+            ],
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );
@@ -109,11 +307,140 @@ class Toolbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: biegecolor,
         actions: <Widget>[
           Expanded(
-              child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              //TODO: UTILITY ROW
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+                  SizedBox(width: spacerSize),
+
+                  //TODO: RETURN BUTTON
+                  Transform.scale(
+                    scale: iconSize,
+                    child: IconButton(
+                      onPressed: () async {
+                        if (!isGuest) {
+                          final shouldSave = await showDialog<bool>(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text("Save Drawing"),
+                                content: const Text(
+                                  "Do you want to save your current drawing before returning to the home screen?",
+                                ),
+                                actions: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: redcolor,
+                                          // Red background
+                                          foregroundColor: Colors.white,
+                                          // White text
+                                          shape: const StadiumBorder(),
+                                          // Pill shape
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 12,
+                                          ),
+                                        ),
+                                        child: const Text("Don't Save"),
+                                      ),
+                                      const Spacer(),
+                                      ElevatedButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(null),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.grey[300],
+                                          foregroundColor: Colors.black,
+                                          shape: const StadiumBorder(),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 12,
+                                          ),
+                                        ),
+                                        child: const Text("Cancel"),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      const Spacer(),
+                                      ElevatedButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: lgreencolor,
+                                          foregroundColor: Colors.white,
+                                          shape: const StadiumBorder(),
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 20,
+                                            vertical: 12,
+                                          ),
+                                        ),
+                                        child: const Text("Save"),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          // Handle user's choice
+                          if (shouldSave == true) {
+                            onSaved(); // Call the save function
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return const HomeScreen();
+                            }));
+                          } else if (shouldSave == false) {
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return const HomeScreen();
+                            }));
+                          }
+                          // If shouldSave is null (Cancel), do nothing
+                        } else {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return const LoginScreen();
+                          }));
+                        }
+                      },
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: Icon(Icons.keyboard_return),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Return",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      tooltip: 'Return',
+                    ),
+                  ),
+
+                  //TODO: SAVE BUTTON
                   if (!isGuest)
                     Transform.scale(
                       scale: iconSize,
@@ -121,25 +448,67 @@ class Toolbar extends StatelessWidget {
                         onPressed: () {
                           onSaved();
                         },
-                        icon: const ImageIcon(AssetImage("icons/save.png")),
+                        icon: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: iconBoxSize,
+                              height: iconBoxSize,
+                              child: ImageIcon(AssetImage("icons/save.png")),
+                            ),
+                            SizedBox(
+                              width: textBoxSizeWidth,
+                              height: textBoxSizeHeight,
+                              child: Center(
+                                child: Text(
+                                  "Save",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: iconLabelSize),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         tooltip: "Save",
                       ),
                     ),
+
+                  //TODO: - EXPORT BUTTON
                   if (!isGuest)
-
-                  //MARK: - EXPORT BUTTON
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/export2.png")),
-                      tooltip: 'Export',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.export(name);
-                      },
+                    Transform.scale(
+                      scale: iconSize,
+                      child: IconButton(
+                        icon: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const SizedBox(
+                              width: iconBoxSize,
+                              height: iconBoxSize,
+                              child: ImageIcon(AssetImage("icons/export2.png")),
+                            ),
+                            SizedBox(
+                              width: textBoxSizeWidth,
+                              height: textBoxSizeHeight,
+                              child: Center(
+                                child: Text(
+                                  "Export",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(fontSize: iconLabelSize),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        tooltip: 'Export',
+                        onPressed: () {
+                          drawingCanvasKey.currentState?.export(name);
+                        },
+                      ),
                     ),
-                  ),
 
-                  //MARK: - UNDO BUTTON
+                  //TODO: - UNDO BUTTON
                   Transform.scale(
                     scale: iconSize,
                     child: IconButton(
@@ -147,12 +516,33 @@ class Toolbar extends StatelessWidget {
                         drawingCanvasKey.currentState?.undo();
                         refreshUI();
                       },
-                      icon: const ImageIcon(AssetImage("icons/undo.png")),
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: ImageIcon(AssetImage("icons/undo.png")),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Undo",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       tooltip: "Undo",
                     ),
                   ),
 
-                  //MARK: - REDO BUTTON
+                  //TODO: - REDO BUTTON
                   Transform.scale(
                     scale: iconSize,
                     child: IconButton(
@@ -160,43 +550,76 @@ class Toolbar extends StatelessWidget {
                         drawingCanvasKey.currentState?.redo();
                         refreshUI();
                       },
-                      icon: const ImageIcon(AssetImage("icons/redo.png")),
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: ImageIcon(AssetImage("icons/redo.png")),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Redo",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       tooltip: "Redo",
                     ),
                   ),
+                ],
+              ),
 
-                  //MARK: - STROKE WIDTH SLIDER
-                  //StrokeWidth(),
-                  // Slider(
-                  //   value: strokeWidth,
-                  //   min: 1.0,
-                  //   max: 10.0,
-                  //   divisions: 9,
-                  //   label: '${strokeWidth.toStringAsFixed(1)} px',
-                  //   onChanged: onUpdateStrokeWidth,
-                  // ),
-
-                  //TODO: Redesign to match desired style
+              // TODO: SETTINGS ROW
+              Row(
+                children: [
+                  //TODO: Fill Color
                   Transform.scale(
                     scale: iconSize,
                     child: IconButton(
-                      icon: Stack(
-                        alignment: Alignment.center,
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.square_rounded,
-                            color:
-                            fillColor == Colors.transparent
-                                ? Colors.grey
-                                : fillColor,
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                width: iconBoxSize,
+                                height: iconBoxSize,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.square_rounded,
+                                      color: fillColor == Colors.transparent
+                                          ? Colors.grey
+                                          : fillColor,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          if (fillColor == Colors.transparent)
-                            const Icon(
-                              //indicates no fill color, otherwise icon would be invisible
-                              Icons.blur_off_outlined,
-                              color: Colors.redAccent,
-                              size: 16,
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Fill Color",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
+                              ),
                             ),
+                          ),
                         ],
                       ),
                       tooltip: 'Set Fill Color',
@@ -206,26 +629,40 @@ class Toolbar extends StatelessWidget {
                     ),
                   ),
 
-                  //TODO: Redesign to match desired style
+                  //TODO: STROKE BUTTON
                   Transform.scale(
                     scale: iconSize,
                     child: IconButton(
-                      icon: Stack(
-                        alignment: Alignment.center,
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Icon(
-                            Icons.crop_square_rounded,
-                            color: strokeColor == Colors.transparent
-                                ? Colors.grey
-                                : strokeColor,
-                          ),
-                          if (strokeColor == Colors.transparent)
-                            const Icon(
-                              //indicates no stroke color, otherwise icon would be invisible
-                              Icons.blur_off_outlined,
-                              color: Colors.redAccent,
-                              size: 16,
+                          SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Icon(
+                                  Icons.crop_square_rounded,
+                                  color: strokeColor == Colors.transparent
+                                      ? Colors.grey
+                                      : strokeColor,
+                                ),
+                              ],
                             ),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Stroke Color",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                       tooltip: 'Set Stroke Color',
@@ -235,219 +672,514 @@ class Toolbar extends StatelessWidget {
                     ),
                   ),
 
-                  // MARK: - FREEFORM TOOL SELECTOR
+                  //TODO: STROKE THICKNESS BUTTON
                   Transform.scale(
                     scale: iconSize,
                     child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/draw.png")),
-                      tooltip: 'Freeform',
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: Icon(Icons.line_weight),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Thickness",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      tooltip: 'Adjust Stroke Width',
                       onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(
-                            FreeformTool());
+                        _showStrokeWidthDialog(context);
                       },
                     ),
                   ),
 
-                  //MARK: - LINE TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/line.png")),
-                      tooltip: 'Line',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(LineTool());
-                      },
-                    ),
-                  ),
-
-                  //MARK: - TRIANGLE TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/triangle.png")),
-                      tooltip: 'Triangle',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(
-                            TriangleTool());
-                      },
-                    ),
-                  ),
-
-                  //MARK: - SQUARE TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/square.png")),
-                      tooltip: 'Rectangle',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(
-                            RectangleTool());
-                      },
-                    ),
-                  ),
-
-                  //MARK: - CIRCLE TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/circle.png")),
-                      tooltip: 'Circle',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(CircleTool());
-                      },
-                    ),
-                  ),
-
-                  //TODO: CREATE POLYGON TOOL
-                  // Transform.scale(
-                  //                 scale: 2,
-                  //                 child:  IconButton(onPressed: (){
-                  //                    drawingCanvasKey.currentState?.switchTool(PolygonTool());
-                  //                 },
-                  //                     icon:  const ImageIcon(AssetImage("icons/freeformshapes.png"))
-                  //                 ),
-                  //               ),
-                  //               const SizedBox(width: 15,),
-
-                  //MARK: - ANNOTATION TOOL
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(onPressed: () {
-                      drawingCanvasKey.currentState?.switchTool(
-                          AnnotationTool());
-                    },
-                      icon: const ImageIcon(AssetImage("icons/label.png")),
-                      tooltip: 'Annotation Tool',
-                    ),
-                  ),
-
-                  //MARK: - ERASER TOOL SELECTOR
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/eraser.png")),
-                      tooltip: 'Eraser',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.switchTool(DeleteTool(
-                          activeLayerShapes,
-                              () {
-                            refreshUI();
+                  //TODO: - TOGGLE GRID VISIBILITY
+                  ValueListenableBuilder<bool>(
+                    valueListenable:
+                        drawingCanvasKey.currentState!.showGridNotifier,
+                    builder: (context, isGridOn, _) {
+                      return Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          tooltip: 'Toggle Grid',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.toggleGrid();
                           },
-                        ));
-                      },
-                    ),
+                          icon: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: iconBoxSize,
+                                height: iconBoxSize,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    const ImageIcon(
+                                        AssetImage("icons/grid.png")),
+                                    Positioned(
+                                      bottom: 0,
+                                      right: 0,
+                                      child: Container(
+                                        width: 12,
+                                        height: 12,
+                                        decoration: const BoxDecoration(
+                                          color: biegecolor,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          isGridOn
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          size: 11,
+                                          color: isGridOn
+                                              ? Colors.black
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(
+                                width: textBoxSizeWidth,
+                                height: textBoxSizeHeight,
+                                child: Center(
+                                  child: Text(
+                                    isGridOn ? "Hide Grid" : "Show Grid",
+                                    style: TextStyle(fontSize: iconLabelSize),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
 
-                  //MARK: - TOGGLE GRID VISIBILITY
+                  //TODO: - TOGGLE GRID SIZE
+                  ValueListenableBuilder<bool>(
+                    valueListenable:
+                        drawingCanvasKey.currentState!.gridSizeNotifier,
+                    builder: (context, isGridSmall, _) {
+                      return Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          tooltip: 'Grid Size',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.toggleGridSize();
+                          },
+                          icon: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: iconBoxSize,
+                                height: iconBoxSize,
+                                child: isGridSmall
+                                    ? const ImageIcon(
+                                        AssetImage("icons/grid.png"))
+                                    : const ImageIcon(
+                                        AssetImage("icons/grid2.png")),
+                              ),
+                              SizedBox(
+                                width: textBoxSizeWidth,
+                                height: textBoxSizeHeight,
+                                child: Center(
+                                  child: Text(
+                                    "Grid Size",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: iconLabelSize),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  //TODO: - TOGGLE SNAP TO GRID
+                  ValueListenableBuilder<bool>(
+                    valueListenable:
+                        drawingCanvasKey.currentState!.snapToGridNotifier,
+                    builder: (context, isSnapEnabled, _) {
+                      return Transform.scale(
+                        scale: iconSize,
+                        child: IconButton(
+                          tooltip: 'Snap to Grid',
+                          onPressed: () {
+                            drawingCanvasKey.currentState?.toggleSnapToGrid();
+                          },
+                          icon: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: iconBoxSize,
+                                height: iconBoxSize,
+                                child: ImageIcon(
+                                  const AssetImage("icons/magnet.png"),
+                                  color: isSnapEnabled ? Colors.black : Colors.grey,
+                                ),
+                              ),
+                              SizedBox(
+                                width: textBoxSizeWidth,
+                                height: textBoxSizeHeight,
+                                child: Center(
+                                  child: Text(
+                                    "Snap",
+                                    style: TextStyle(fontSize: iconLabelSize),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  //TODO: Snap Range
+//TODO: STROKE THICKNESS BUTTON
                   Transform.scale(
                     scale: iconSize,
                     child: IconButton(
-                      icon: const ImageIcon(AssetImage("icons/grid.png")),
-                      tooltip: 'Toggle Grid',
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: ImageIcon(
+                              AssetImage("icons/signal.png"),
+                            ),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Snap Range",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      tooltip: 'Adjust Snap Sensitivity',
                       onPressed: () {
-                        drawingCanvasKey.currentState?.toggleGrid();
+                        _showSnapRangeDialog(context);
                       },
                     ),
                   ),
+                ],
+              ),
 
-                  //MARK: - TOGGLE SNAP TO GRID
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      icon: const Icon(Icons.square_foot),
-                      tooltip: 'Snap to Grid',
-                      onPressed: () {
-                        drawingCanvasKey.currentState?.toggleSnapToGrid();
-                      },
+              //TODO: TOOL ROW
+              Row(
+                children: [
+                  // TODO: Freeform Tool
+                  buildToolButton(
+                    tool: FreeformTool(),
+                    tooltip: 'Freeform',
+                    icon: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: iconBoxSize,
+                          height: iconBoxSize,
+                          child: ImageIcon(AssetImage("icons/draw.png")),
+                        ),
+                        SizedBox(
+                          width: textBoxSizeWidth,
+                          height: textBoxSizeHeight,
+                          child: Center(
+                            child: Text(
+                              "Draw",
+                              style: TextStyle(fontSize: iconLabelSize),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
+                    onPressed: () {
+                      drawingCanvasKey.currentState?.switchTool(FreeformTool());
+                    },
                   ),
 
-                  //TODO: CONFORM THIS TO TOOL STYLING
-                  // You may want to add this styling to other buttons as well. Via a bool the button
-                  // changes looks to indicate that it is selected.
+                  //TODO:  Eraser Tool
+                  buildToolButton(
+                    tool: DeleteTool(activeLayerShapes, refreshUI),
+                    tooltip: 'Eraser',
+                    icon: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: iconBoxSize,
+                          height: iconBoxSize,
+                          child: ImageIcon(AssetImage("icons/eraser.png")),
+                        ),
+                        SizedBox(
+                          width: textBoxSizeWidth,
+                          height: textBoxSizeHeight,
+                          child: Center(
+                            child: Text(
+                              "Eraser",
+                              style: TextStyle(fontSize: iconLabelSize),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      drawingCanvasKey.currentState?.switchTool(
+                        DeleteTool(activeLayerShapes, refreshUI),
+                      );
+                    },
+                  ),
 
-                  //Removed for Video
+                  //TODO:  Line Tool
+                  buildToolButton(
+                    tool: LineTool(),
+                    tooltip: 'Line',
+                    icon: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: iconBoxSize,
+                          height: iconBoxSize,
+                          child: ImageIcon(AssetImage("icons/line.png")),
+                        ),
+                        SizedBox(
+                          width: textBoxSizeWidth,
+                          height: textBoxSizeHeight,
+                          child: Center(
+                            child: Text(
+                              "Line",
+                              style: TextStyle(fontSize: iconLabelSize),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      drawingCanvasKey.currentState?.switchTool(LineTool());
+                    },
+                  ),
 
-                  //MARK: - ZOOM IN/OUT TOGGLE
-                  // ValueListenableBuilder<bool>(
-                  //   valueListenable: drawingCanvasKey.currentState?.isZoomEnabledNotifier ?? ValueNotifier(false),
-                  //   builder: (context, isZoomEnabled, child) {
-                  //     return Container(
-                  //       decoration: isZoomEnabled
-                  //           ? BoxDecoration(
-                  //         color: Colors.grey[50], // Background color when zoom is enabled
-                  //         borderRadius: BorderRadius.circular(8),
-                  //       )
-                  //           : null,
-                  //       child: Row(
-                  //         children: [
-                  //           Transform.scale(
-                  //           scale: iconSize,
-                  //           child: IconButton(
-                  //             icon: ImageIcon(isZoomEnabled ? AssetImage("icons/zoomout.png") : AssetImage("icons/zoomin.png")),
-                  //             tooltip: 'Toggle Zoom',
-                  //             onPressed: () {
-                  //               drawingCanvasKey.currentState?.toggleZoom();
-                  //             },
-                  //           ),
-                  //           ),
-                  //           SizedBox(width: spacerSize),
-                  //         ],
-                  //       ),
-                  //
-                  //     );
-                  //   },
-                  // ),
+                  //TODO:  Triangle Tool
+                  buildToolButton(
+                    tool: TriangleTool(),
+                    tooltip: 'Triangle',
+                    icon: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: iconBoxSize,
+                          height: iconBoxSize,
+                          child: ImageIcon(AssetImage("icons/triangle.png")),
+                        ),
+                        SizedBox(
+                          width: textBoxSizeWidth,
+                          height: textBoxSizeHeight,
+                          child: Center(
+                            child: Text(
+                              "Triangle",
+                              style: TextStyle(fontSize: iconLabelSize),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      drawingCanvasKey.currentState?.switchTool(TriangleTool());
+                    },
+                  ),
 
-                  //TODO: DEVELOP A TOOL FOR PANNING THAT IS SEPARATE FROM ZOOM
-                  // currently zoom also handles pan, but we may change that
-                  //MARK: - PAN TOOL SELECTOR
-                  // Transform.scale(
-                  //   scale: iconSize,
-                  //   child: IconButton(onPressed: (){},
-                  //       icon:  const ImageIcon(AssetImage("icons/pan.png"))
-                  //   ),
-                  // ),
-                  // SizedBox(width: iconSize,),
+                  //TODO:  Rectangle Tool
+                  buildToolButton(
+                    tool: RectangleTool(),
+                    tooltip: 'Rectangle',
+                    icon: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: iconBoxSize,
+                          height: iconBoxSize,
+                          child: ImageIcon(AssetImage("icons/square.png")),
+                        ),
+                        SizedBox(
+                          width: textBoxSizeWidth,
+                          height: textBoxSizeHeight,
+                          child: Center(
+                            child: Text(
+                              "Rectangle",
+                              style: TextStyle(fontSize: iconLabelSize),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      drawingCanvasKey.currentState
+                          ?.switchTool(RectangleTool());
+                    },
+                  ),
 
-                  //MARK: - CURSOR TOOL SELECTOR
-                  //This may be unnecessary, currently we don't have a tool that would use this.
-                  //Keeping just in case.
-                  // Transform.scale(
-                  //   scale: iconSize,
-                  //   child: IconButton(onPressed: (){},
-                  //       icon:  const ImageIcon(AssetImage("icons/cursor.png"))
-                  //   ),
-                  // ),
-                  // SizedBox(width: iconSize,),
+                  //TODO:  Circle Tool
+                  buildToolButton(
+                    tool: CircleTool(),
+                    tooltip: 'Circle',
+                    icon: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: iconBoxSize,
+                          height: iconBoxSize,
+                          child: ImageIcon(AssetImage("icons/circle.png")),
+                        ),
+                        SizedBox(
+                          width: textBoxSizeWidth,
+                          height: textBoxSizeHeight,
+                          child: Center(
+                            child: Text(
+                              "Circle",
+                              style: TextStyle(fontSize: iconLabelSize),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      drawingCanvasKey.currentState?.switchTool(CircleTool());
+                    },
+                  ),
 
+                  //TODO:  Annotation Tool
+                  buildToolButton(
+                    tool: AnnotationTool(),
+                    tooltip: 'Annotation',
+                    icon: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        const SizedBox(
+                          width: iconBoxSize,
+                          height: iconBoxSize,
+                          child: Icon(Icons.text_fields),
+                        ),
+                        SizedBox(
+                          width: textBoxSizeWidth,
+                          height: textBoxSizeHeight,
+                          child: Center(
+                            child: Text(
+                              "Text Box",
+                              style: TextStyle(fontSize: iconLabelSize),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    onPressed: () {
+                      drawingCanvasKey.currentState
+                          ?.switchTool(AnnotationTool());
+                    },
+                  ),
+
+                  //TODO: RESET BUTTON
                   Transform.scale(
                     scale: iconSize,
                     child: IconButton(
-                      icon: const Icon(Icons.delete),
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: Icon(Icons.delete),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Reset",
+                                style: TextStyle(fontSize: iconLabelSize),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       tooltip: 'Clear Canvas',
                       onPressed: () async {
                         final shouldClear = await showDialog<bool>(
                           context: context,
-                          builder: (context) =>
-                              AlertDialog(
-                                title: const Text('Reset Drawing and Layers'),
-                                content: const Text(
-                                  'Are you sure you want to reset the drawing and all layers? This action cannot be undone.',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(false),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
+                          builder: (context) => AlertDialog(
+                            title: const Text('Reset Drawing and Layers'),
+                            content: const Text(
+                              'Are you sure you want to reset the drawing and all layers? This action cannot be undone.',
+                            ),
+                            actions: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: redcolor,
+                                      foregroundColor: Colors.white,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 12,
+                                      ),
+                                    ),
                                     onPressed: () =>
                                         Navigator.of(context).pop(true),
                                     child: const Text('Reset'),
                                   ),
+                                  const Spacer(),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[300],
+                                      foregroundColor: Colors.black,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 20,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text('Cancel'),
+                                  ),
                                 ],
                               ),
+                            ],
+                          ),
                         );
 
                         if (shouldClear == true) {
@@ -456,82 +1188,120 @@ class Toolbar extends StatelessWidget {
                       },
                     ),
                   ),
-                  Transform.scale(
-                    scale: iconSize,
-                    child: IconButton(
-                      onPressed: () {
-                        if (!isGuest)
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (context) {
-                            return const HomeScreen();
-                          }));
-                        if (isGuest)
-                          Navigator.push(
-                              context, MaterialPageRoute(builder: (context) {
-                            return const LoginScreen();
-                          }));
-                      },
-                      icon: const Icon(Icons.keyboard_return),
-                      tooltip: 'Home',
-                    ),
-                  ),
+
+                  SizedBox(width: spacerSize),
                 ],
-              )
-          )
-        ]
-    );
+              ),
+
+              //TODO: CONFORM THIS TO TOOL STYLING
+              // You may want to add this styling to other buttons as well. Via a bool the button
+              // changes looks to indicate that it is selected.
+
+              //Removed for Video
+
+              //MARK: - ZOOM IN/OUT TOGGLE
+              // ValueListenableBuilder<bool>(
+              //   valueListenable: drawingCanvasKey.currentState?.isZoomEnabledNotifier ?? ValueNotifier(false),
+              //   builder: (context, isZoomEnabled, child) {
+              //     return Container(
+              //       decoration: isZoomEnabled
+              //           ? BoxDecoration(
+              //         color: Colors.grey[50], // Background color when zoom is enabled
+              //         borderRadius: BorderRadius.circular(8),
+              //       )
+              //           : null,
+              //       child: Row(
+              //         children: [
+              //           Transform.scale(
+              //           scale: iconSize,
+              //           child: IconButton(
+              //             icon: ImageIcon(isZoomEnabled ? AssetImage("icons/zoomout.png") : AssetImage("icons/zoomin.png")),
+              //             tooltip: 'Toggle Zoom',
+              //             onPressed: () {
+              //               drawingCanvasKey.currentState?.toggleZoom();
+              //             },
+              //           ),
+              //           ),
+              //           SizedBox(width: spacerSize),
+              //         ],
+              //       ),
+              //
+              //     );
+              //   },
+              // ),
+
+              //TODO: DEVELOP A TOOL FOR PANNING THAT IS SEPARATE FROM ZOOM
+              // currently zoom also handles pan, but we may change that
+              //MARK: - PAN TOOL SELECTOR
+              // Transform.scale(
+              //   scale: iconSize,
+              //   child: IconButton(onPressed: (){},
+              //       icon:  const ImageIcon(AssetImage("icons/pan.png"))
+              //   ),
+              // ),
+              // SizedBox(width: iconSize,),
+            ],
+          ))
+        ]);
   }
 }
 
-
 class StrokeWidth extends StatefulWidget {
-  const StrokeWidth({super.key});
+  final double strokeWidth;
+  final Function(double) onUpdateStrokeWidth;
 
+  const StrokeWidth({
+    super.key,
+    required this.strokeWidth,
+    required this.onUpdateStrokeWidth,
+  });
 
   @override
-  State<StrokeWidth> createState() => _StrokeWidth();
+  State<StrokeWidth> createState() => _StrokeWidthState();
 }
-double _currentSliderValue = 0;
-class _StrokeWidth extends State<StrokeWidth> {
 
+class _StrokeWidthState extends State<StrokeWidth> {
+  late double _sliderValue;
 
   @override
   void initState() {
     super.initState();
-
+    _sliderValue = widget.strokeWidth;
   }
 
   @override
   Widget build(BuildContext context) {
-
     return SliderTheme(
-        data: SliderThemeData(
-          inactiveTrackColor: Colors.grey[500],
-          activeTrackColor: Colors.green[900],
-          thumbColor: Colors.black,
-          thumbShape:const  RoundSliderThumbShape(enabledThumbRadius: 6.0),
-          overlayShape:const  RoundSliderOverlayShape(overlayRadius: 5.0),
-          activeTickMarkColor: Colors.black,
-          inactiveTickMarkColor: Colors.black,
-          trackHeight: 5,
-          valueIndicatorColor: Colors.black,
-          valueIndicatorStrokeColor: Colors.green[900],
-          valueIndicatorTextStyle:  TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-            color: Colors.green[900],
-          ),
+      data: SliderThemeData(
+        inactiveTrackColor: Colors.grey[300],
+        activeTrackColor: Colors.grey[300],
+        thumbColor: Colors.grey[600],
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
+        overlayShape: const RoundSliderOverlayShape(overlayRadius: 2.0),
+        activeTickMarkColor: Colors.grey[600],
+        inactiveTickMarkColor: Colors.grey[600],
+        trackHeight: 5,
+        valueIndicatorColor: lgreencolor,
+        valueIndicatorStrokeColor: lgreencolor,
+        valueIndicatorTextStyle: const TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
-        child: Slider.adaptive(
-          value: _currentSliderValue,
-          max: 10,
-          divisions: 10,
-          label: _currentSliderValue.toString(),
-          onChanged: (double value) {
-            setState(() {
-              _currentSliderValue = value;
-            });
-          },
-        ));
+      ),
+      child: Slider.adaptive(
+        value: _sliderValue,
+        min: 1,
+        max: 16,
+        divisions: 15,
+        label: _sliderValue.toString(),
+        onChanged: (double value) {
+          setState(() {
+            _sliderValue = value;
+          });
+          widget.onUpdateStrokeWidth(value);
+        },
+      ),
+    );
   }
 }

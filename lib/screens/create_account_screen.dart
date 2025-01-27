@@ -5,12 +5,13 @@ import '/FirebaseAuthService.dart';
 import 'homescreen.dart';
 
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF697565);
+const Color lgreencolor = Color(0xFF406040);
 const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
 const Color blackcolor = Color(0xFF181818);
 const Color midgreencolor = Color(0xFF3C3D37);
+
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
 
@@ -24,6 +25,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   final FirebaseAuthService _authService = FirebaseAuthService();
 
   void _createAccount() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter both email and password.')),
+      );
+      return;
+    }
+
     try {
       User? user = await _authService.createUserWithEmailAndPassword(
         _emailController.text,

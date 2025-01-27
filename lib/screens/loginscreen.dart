@@ -6,7 +6,7 @@ import 'create_account_screen.dart';
 import 'homescreen.dart';
 
 const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF697565);
+const Color lgreencolor = Color(0xFF406040);
 const Color biegecolor = Color(0xFFCBC2B4);
 const Color redcolor = Color(0xFFAB3E2B);
 const Color bluecolor = Color(0xFF11487A);
@@ -27,6 +27,13 @@ class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuthService _authService = FirebaseAuthService();
 
   void _signIn() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter both email and password.')),
+      );
+      return;
+    }
+
     try {
       User? user = await _authService.signInWithEmailAndPassword(
         _emailController.text,
@@ -41,15 +48,36 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       // Handle login error
       print('Login failed: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login failed. Please check your email and password or create a new account.')),
+      );
     }
   }
+
 
   void _resetPassword() async {
     if (_emailController.text.isNotEmpty) {
       try {
         await _authService.resetPassword(_emailController.text);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password reset email sent')),
+          const SnackBar(content: Text('Password reset email sent. Please check your email.')),
+        );
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Password Reset'),
+              content: const Text('A password reset email has been sent. Please check your email to reset your password.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
         );
       } catch (e) {
         print('Password reset failed: $e');
@@ -78,7 +106,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 80,
                 width: 80,
               ),
-              Text(
+              const Text(
                 "SwiftSketch",
                 style: TextStyle(fontSize: 32),
               )
@@ -93,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: Column(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Container(
@@ -105,12 +133,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: TextField(
                       controller: _emailController,
+                      textAlign: TextAlign.center,
                       decoration: const InputDecoration.collapsed(
                         hintText: 'Email',
                       ),
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 10,
                   ),
                   Container(
@@ -122,6 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: TextField(
                       controller: _passwordController,
+                      textAlign: TextAlign.center,
                       textAlignVertical: TextAlignVertical.center,
                       decoration: const InputDecoration.collapsed(
                         hintText: 'Password',
@@ -129,22 +159,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: true,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     height: 5,
                   ),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(200, 40),
-                        backgroundColor: dgreencolor,
-                        foregroundColor: biegecolor),
+                        minimumSize: const Size(300, 40),
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,),
                     onPressed: _signIn,
                     child: const Text("Sign In"),
                   ),
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(200, 40),
-                        backgroundColor: dgreencolor,
-                        foregroundColor: biegecolor),
+                        minimumSize: const Size(300, 40),
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,),
                     onPressed: () async {
                       bool proceedAsGuest = await showDialog(
                         context: context,
@@ -155,19 +185,33 @@ class _LoginScreenState extends State<LoginScreen> {
                               'You cannot save drawings without an account. Are you sure you want to sign in as a guest?',
                             ),
                             actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(false); // User chose not to proceed
-                                },
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(true); // User chose to proceed
-                                },
-                                child: const Text('Proceed'),
+                              Row (
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[300],
+                                      foregroundColor: Colors.black,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 12),
+                                    ),
+                                    onPressed: () => Navigator.of(context).pop(true), // Cancel
+                                    child: const Text("Proceed"),
+                                  ),
+                                  const Spacer(),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.grey[300],
+                                      foregroundColor: Colors.black,
+                                      shape: const StadiumBorder(),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 12),
+                                    ),
+                                    onPressed: () => Navigator.of(context).pop(false), // Cancel
+                                    child: const Text("Cancel"),
+                                  ),
+                                ],
                               ),
                             ],
                           );

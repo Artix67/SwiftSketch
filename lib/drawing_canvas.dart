@@ -12,6 +12,14 @@ import '/drawing_shapes/drawing_shape.dart';
 import 'models/layer.dart';
 import '/drawing_tools/undo_redo_manager.dart';
 
+const Color dgreencolor = Color(0xFF181C14);
+const Color lgreencolor = Color(0xFF406040);
+const Color biegecolor = Color(0xFFCBC2B4);
+const Color redcolor = Color(0xFFAB3E2B);
+const Color bluecolor = Color(0xFF11487A);
+const Color blackcolor = Color(0xFF181818);
+const Color midgreencolor = Color(0xFF3C3D37);
+
 class DrawingPainter extends CustomPainter {
   final List<Layer> layers;
   final List<Offset?> points;
@@ -40,7 +48,7 @@ class DrawingPainter extends CustomPainter {
 
     if (showGrid) {
       final gridPaint = Paint()
-        ..color = Colors.grey.withOpacity(0.3)
+        ..color = Colors.black.withOpacity(0.2)
         ..strokeWidth = 0.5;
 
       for (double x = 0; x < size.width; x += gridSize) {
@@ -90,7 +98,7 @@ class DrawingPainter extends CustomPainter {
           );
 
           double fontSize = 100.0;
-          const double minFontSize = 12.0;
+          const double minFontSize = 8.0;
           const double paddingReduction = padding * 2;
 
           while (fontSize > minFontSize) {
@@ -169,14 +177,22 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   final ValueNotifier<List<Offset?>> _previewPointsNotifier = ValueNotifier<List<Offset?>>([]);
   // final TransformationController _transformationController = TransformationController(); // Daniel - Transformation Controller added
   final ValueNotifier<bool> isZoomEnabledNotifier = ValueNotifier(false);
+  final ValueNotifier<DrawingTool> selectedToolNotifier = ValueNotifier<DrawingTool>(FreeformTool());
+  final ValueNotifier<bool> showGridNotifier = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> snapToGridNotifier = ValueNotifier<bool>(true);
+  final ValueNotifier<bool> gridSizeNotifier = ValueNotifier<bool>(true);
 
   Layer? _activeLayer;
-
+  Offset? _startPosition;
   bool _showGrid = true;
   bool _snapToGrid = true;
   bool _isZoomEnabled = false; // Daniel - New variable to manage zoom state
+  bool get isGridVisible => showGridNotifier.value;
+  bool get isSnapEnabled => snapToGridNotifier.value;
+  bool get isGridSmall => gridSizeNotifier.value;
   double _gridSize = 10.0;
-  late double _snapSensitivity;
+  double _snapSensitivity = 1.0;
+  double get snapSensitivity => _snapSensitivity;
 
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
@@ -184,6 +200,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   Color _fillColor = Colors.transparent;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
+  double get strokeWidth => _strokeWidth;
 
   bool get isZoomEnabled => _isZoomEnabled;
 
@@ -236,6 +253,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     widget.layersNotifier.addListener(_updateActiveLayer);
   }
 
+  //TODO: UPDATE ACTIVE LAYER
   void _updateActiveLayer() {
     if (_activeLayer == null ||
         !widget.layersNotifier.value.contains(_activeLayer)) {
@@ -246,24 +264,33 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     setState(() {});
   }
 
+  //TODO: SET ACTIVE LAYER
   void setActiveLayer(Layer? layer) {
     setState(() {
       _activeLayer = layer;
     });
   }
 
+  //TODO: UPDATE SNAP SENSITIVITY
   void updateSnapSensitivity(double value) {
     setState(() {
       _snapSensitivity = value;
     });
   }
 
-  void updateGridSize(double gridSize) {
-    setState(() {
-      _gridSize = gridSize;
-    });
+  //TODO: TOGGLE GRID SIZE
+  void toggleGridSize() {
+    if (_gridSize == 10.0) {
+      _gridSize = 20.0;
+      gridSizeNotifier.value = false;
+    } else {
+      _gridSize = 10.0;
+      gridSizeNotifier.value = true;
+    }
+    setState(() {});
   }
 
+  //TODO: UPDATE COLORS
   void updateColors(Color fillColor, Color strokeColor) {
     setState(() {
       _fillColor = fillColor;
@@ -271,27 +298,38 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
-  void updateStrokeWidth(double strokeWidth) {
+  //TODO: UPDATE STROKE WIDTH
+  void updateStrokeWidth(double newWidth) {
     setState(() {
-      _strokeWidth = strokeWidth;
+      _strokeWidth = newWidth;
     });
   }
 
+  //TODO: SWITCH TOOLS
   void switchTool(DrawingTool tool) {
     setState(() {
+      // Clear the current points and preview points
+      _pointsNotifier.value = [];
+      _previewPointsNotifier.value = [];
+
+      // Set the new tool
       selectedTool = tool;
+      selectedToolNotifier.value = tool;
       selectedTool.setSnapToGrid(_snapToGrid);
     });
   }
 
+  //TODO: UNDO
   void undo() {
     widget.layersNotifier.value = _undoRedoManager.undo(widget.layersNotifier.value);
   }
 
+  //TODO: REDO
   void redo() {
     widget.layersNotifier.value = _undoRedoManager.redo();
   }
 
+  //TODO: CLEAR CANVAS
   void clearCanvas() {
     setState(() {
       if (widget.layersNotifier.value.isNotEmpty) {
@@ -308,13 +346,17 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
+  //TODO: TOGGLE GRID
   void toggleGrid() {
+    showGridNotifier.value = !showGridNotifier.value;
     setState(() {
       _showGrid = !_showGrid;
     });
   }
 
+  //TODO: TOGGLE SNAP TO GRID
   void toggleSnapToGrid() {
+    snapToGridNotifier.value = !snapToGridNotifier.value;
     setState(() {
       _snapToGrid = !_snapToGrid;
       selectedTool.setSnapToGrid(_snapToGrid);
@@ -322,6 +364,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   }
 
   void onPanStartHandler(Offset position) {
+    _startPosition = position;
     final snapPoints = getSnapPoints(widget.layersNotifier.value);
     if (selectedTool is FreeformTool) {
       selectedTool.onPanStart(position, _previewPointsNotifier.value);
@@ -349,27 +392,92 @@ class DrawingCanvasState extends State<DrawingCanvas> {
 
   void onPanEndHandler(Offset position) {
     final snapPoints = getSnapPoints(widget.layersNotifier.value);
+
+    if (selectedTool is AnnotationTool &&
+        _startPosition != null &&
+        (position - _startPosition!).distance < 5.0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            "For annotations, drag to create the box size where your text will go.",
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     if (selectedTool is FreeformTool) {
       selectedTool.onPanEnd(position, _previewPointsNotifier.value);
     } else {
       selectedTool.onPanEnd(
         snapToGridOrExistingPoint(
-            position, snapPoints, _gridSize, _snapSensitivity),
+          position,
+          snapPoints,
+          _gridSize,
+          _snapSensitivity,
+        ),
         _previewPointsNotifier.value,
       );
     }
 
-    if (_previewPointsNotifier.value.isNotEmpty) {
-      _addShape(DrawingShape(
-        points: List.from(_previewPointsNotifier.value),
-        toolType: getToolTypeForTool(selectedTool),
-        fillColor: _fillColor,
-        strokeColor: _strokeColor,
-        strokeWidth: _strokeWidth,
-        tool: selectedTool,
-      ));
+    if (selectedTool is AnnotationTool && _previewPointsNotifier.value.isNotEmpty) {
+      List<Offset?> adjustedPoints = List.from(_previewPointsNotifier.value);
+
+      Offset? start = adjustedPoints.first;
+      Offset? end =
+      adjustedPoints.length > 1 ? adjustedPoints[2] : null;
+
+      if (start != null && end != null) {
+        double width = (end.dx - start.dx).abs();
+        double height = (end.dy - start.dy).abs();
+
+        const double minWidth = 50.0;
+        const double minHeight = 30.0;
+
+        if (width < minWidth || height < minHeight) {
+          double adjustedWidth = width < minWidth ? minWidth : width;
+          double adjustedHeight = height < minHeight ? minHeight : height;
+
+          Offset adjustedEnd = Offset(
+            start.dx + adjustedWidth * (end.dx > start.dx ? 1 : -1),
+            start.dy + adjustedHeight * (end.dy > start.dy ? 1 : -1),
+          );
+
+          adjustedPoints = [
+            start,
+            Offset(adjustedEnd.dx, start.dy),
+            adjustedEnd,
+            Offset(start.dx, adjustedEnd.dy),
+            start,
+          ];
+        }
+      }
+
+      _previewPointsNotifier.value = adjustedPoints;
     }
 
+    if (_previewPointsNotifier.value.isNotEmpty) {
+      _addShape(
+        DrawingShape(
+          points: List.from(_previewPointsNotifier.value),
+          toolType: getToolTypeForTool(selectedTool),
+          fillColor: _fillColor,
+          strokeColor: _strokeColor,
+          strokeWidth: _strokeWidth,
+          tool: selectedTool,
+        ),
+      );
+    }
+
+    if (getToolTypeForTool(selectedTool) == "Delete") {
+      _undoRedoManager.addAction(widget.layersNotifier.value);
+    }
+
+    _pointsNotifier.value = [
+      ..._pointsNotifier.value,
+      ..._previewPointsNotifier.value,
+    ];
     _previewPointsNotifier.value = [];
   }
 
@@ -384,35 +492,75 @@ class DrawingCanvasState extends State<DrawingCanvas> {
             TextEditingController annotationController = TextEditingController();
             return AlertDialog(
               title: const Text("Add Annotation"),
-              content: TextField(
-                controller: annotationController,
-                decoration: const InputDecoration(hintText: "Enter your note"),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: annotationController,
+                      decoration: const InputDecoration(
+                        hintText: "Enter your note",
+                      ),
+                      keyboardType: TextInputType.multiline,
+                      maxLines: null,
+                    ),
+                    const SizedBox(height: 8.0),
+                    const Text(
+                      "If your text box ends up too small, try dragging the annotation tool to create a larger box.",
+                      style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    if (annotationController.text.isNotEmpty) {
-                      shape = DrawingShape(
-                        points: shape.points,
-                        toolType: 'Annotation',
-                        fillColor: Colors.transparent,
-                        strokeColor: _strokeColor,
-                        strokeWidth: _strokeWidth,
-                        annotation: annotationController.text,
-                        tool: selectedTool,
-                      );
-                      _activeLayer!.shapes.add(shape);
-                      widget.layersNotifier.value =
-                          List.from(widget.layersNotifier.value);
-                      _undoRedoManager.addAction(widget.layersNotifier.value);
-                    }
-                  },
-                  child: const Text("Save"),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("Cancel"),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.grey[300],
+                        foregroundColor: Colors.black,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text("Cancel"),
+                    ),
+                    const Spacer(),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: lgreencolor,
+                        foregroundColor: Colors.white,
+                        shape: const StadiumBorder(),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        if (annotationController.text.isNotEmpty) {
+                          shape = DrawingShape(
+                            points: shape.points,
+                            toolType: 'Annotation',
+                            fillColor: Colors.transparent,
+                            strokeColor: _strokeColor,
+                            strokeWidth: _strokeWidth,
+                            annotation: annotationController.text,
+                            tool: selectedTool,
+                          );
+                          _activeLayer!.shapes.add(shape);
+                          widget.layersNotifier.value =
+                              List.from(widget.layersNotifier.value);
+                          _undoRedoManager.addAction(widget.layersNotifier.value);
+                        }
+                      },
+                      child: const Text("Save"),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -452,11 +600,11 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   @override
   void dispose() {
     isZoomEnabledNotifier.dispose();
+    selectedToolNotifier.dispose();
     super.dispose();
   }
 
   void export(String name) {
-    print("export ran");
     exportToPdf(context, exportGlobalKey, name);
   }
 
@@ -482,24 +630,6 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                 },
                 onPanEnd: (details) {
                   onPanEndHandler(details.localPosition);
-                  if (getToolTypeForTool(selectedTool) == "Delete") {
-                    _undoRedoManager.addAction(widget.layersNotifier.value);
-                  }
-                  if (_previewPointsNotifier.value.isNotEmpty) {
-                    _addShape(DrawingShape(
-                      points: List.from(_previewPointsNotifier.value),
-                      toolType: getToolTypeForTool(selectedTool),
-                      fillColor: _fillColor,
-                      strokeColor: _strokeColor,
-                      strokeWidth: _strokeWidth,
-                      tool: selectedTool,
-                    ));
-                  }
-                  _pointsNotifier.value = [
-                    ..._pointsNotifier.value,
-                    ..._previewPointsNotifier.value,
-                  ];
-                  _previewPointsNotifier.value = [];
                 },
                 child: ValueListenableBuilder<List<Offset?>>(
                   valueListenable: _pointsNotifier,
@@ -507,7 +637,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                     return ValueListenableBuilder<List<Offset?>>(
                       valueListenable: _previewPointsNotifier,
                       builder: (context, previewPoints, _) {
-                        return Container(
+                        return SizedBox(
                           width: double.infinity,
                           height: double.infinity,
                           child: CustomPaint(
