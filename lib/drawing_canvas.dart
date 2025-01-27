@@ -489,15 +489,43 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextField(
-                      controller: annotationController,
-                      decoration: const InputDecoration(
-                        hintText: "Enter your note",
+                    // TextField(
+                    //   controller: annotationController,
+                    //   decoration: const InputDecoration(
+                    //     hintText: "Enter your note",
+                    //   ),
+                    //   keyboardType: TextInputType.multiline,
+                    //   maxLines: null,
+                    // ),
+                    Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: whitecolor,
+                        border: Border.all(
+                          color: blackcolor,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
+                      child: TextField(
+                        controller: annotationController,
+                        style:
+                        const TextStyle(fontSize: 14, color: blackcolor),
+                        textAlignVertical: TextAlignVertical.center,
+                        obscureText: false,
+                        decoration: const InputDecoration(
+                          hintText: "Enter your note",
+                          hintStyle: TextStyle(color: placeholdercolor),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 8),
+                        ),
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
+                      ),
                     ),
-                    const SizedBox(height: 8.0),
+                    const SizedBox(height: 10.0),
                     const Text(
                       "If your text box ends up too small, try dragging the annotation tool to create a larger box.",
                       style: TextStyle(fontSize: 14.0, color: disablecolor),
@@ -505,6 +533,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                   ],
                 ),
               ),
+              backgroundColor: beigecolor,
               actions: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,

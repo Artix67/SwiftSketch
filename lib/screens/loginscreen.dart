@@ -229,6 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     content: const Text(
                                       'You cannot save drawings without an account. Are you sure you want to sign in as a guest?',
                                     ),
+                                    backgroundColor: beigecolor,
                                     actions: [
                                       Row(
                                         mainAxisAlignment:

@@ -50,10 +50,33 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context) {
             return AlertDialog(
               title: const Text('Enter Project Name'),
-              content: TextField(
-                controller: _nameController,
-                decoration: const InputDecoration(hintText: 'Project Name'),
+              content: Container(
+                height: 40,
+                decoration: BoxDecoration(
+                  color: whitecolor,
+                  border: Border.all(
+                    color: blackcolor,
+                    width: 2,
+                  ),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: TextField(
+                  controller: _nameController,
+                  style:
+                  const TextStyle(fontSize: 14, color: blackcolor),
+                  textAlignVertical: TextAlignVertical.center,
+                  obscureText: false,
+                  decoration: const InputDecoration(
+                    hintText: "Enter project name",
+                    hintStyle: TextStyle(color: placeholdercolor),
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 8),
+                  ),
+                ),
               ),
+              backgroundColor: beigecolor,
               actions: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -170,10 +193,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
-          IconButton(onPressed: (){
-            _scaffoldKey.currentState!.openEndDrawer();
-          }, icon: const ImageIcon(AssetImage("icons/settings.png"))),
-          const SizedBox(width: 20)
+          Builder(
+            builder: (context) => IconButton(
+              onPressed: () {
+                Scaffold.of(context).openEndDrawer();
+              },
+              icon: const ImageIcon(AssetImage("icons/settings.png")),
+            ),
+          ),
+          const SizedBox(width: 20),
         ],
       ),
       endDrawer: const AccountSettingsScreen(),
@@ -344,6 +372,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           title: const Text('Delete Project'),
                                           content: const Text(
                                               'Are you sure you want to delete this project? This action cannot be undone.'),
+                                          backgroundColor: beigecolor,
                                           actions: [
                                             Row(
                                               mainAxisAlignment:

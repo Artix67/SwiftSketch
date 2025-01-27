@@ -136,6 +136,7 @@ class _Drawscreen extends State<Drawscreen> {
       builder: (context) => AlertDialog(
         title: const Text('Remove Layer'),
         content: const Text('Are you sure you want to delete this layer?'),
+        backgroundColor: beigecolor,
         actions: [
           Row(
             mainAxisAlignment: MainAxisAlignment.end,

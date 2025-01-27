@@ -80,6 +80,7 @@ class Toolbar extends StatelessWidget {
                   enableShadesSelection: true,
                 ),
               ),
+              backgroundColor: beigecolor,
               actions: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -154,6 +155,7 @@ class Toolbar extends StatelessWidget {
                   ),
                 ],
               ),
+              backgroundColor: beigecolor,
               actions: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -220,6 +222,7 @@ class Toolbar extends StatelessWidget {
                   ),
                 ],
               ),
+              backgroundColor: beigecolor,
               actions: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -327,6 +330,7 @@ class Toolbar extends StatelessWidget {
                                 content: const Text(
                                   "Do you want to save your current drawing before returning to the home screen?",
                                 ),
+                                backgroundColor: beigecolor,
                                 actions: [
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
@@ -1130,6 +1134,7 @@ class Toolbar extends StatelessWidget {
                             content: const Text(
                               'Are you sure you want to reset the drawing and all layers? This action cannot be undone.',
                             ),
+                            backgroundColor: beigecolor,
                             actions: [
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
