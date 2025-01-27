@@ -1,16 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../app_colors.dart';
 import 'loginscreen.dart';
 import '/FirebaseAuthService.dart';
 import 'homescreen.dart';
-
-const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF406040);
-const Color biegecolor = Color(0xFFCBC2B4);
-const Color redcolor = Color(0xFFAB3E2B);
-const Color bluecolor = Color(0xFF11487A);
-const Color blackcolor = Color(0xFF181818);
-const Color midgreencolor = Color(0xFF3C3D37);
 
 class CreateAccountScreen extends StatefulWidget {
   const CreateAccountScreen({super.key});
@@ -69,7 +62,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: biegecolor,
+      backgroundColor: beigecolor,
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Row(
@@ -131,7 +124,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     style: OutlinedButton.styleFrom(
                         minimumSize: const Size(200, 40),
                         backgroundColor: dgreencolor,
-                        foregroundColor: biegecolor),
+                        foregroundColor: beigecolor),
                     onPressed: _createAccount,
                     child: const Text('Create Account'),
                   ),

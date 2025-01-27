@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/screens/toolbar.dart';
 import 'package:swift_sketch/screens/layers_tab.dart';
+import '../app_colors.dart';
 import '../drawing_canvas.dart';
 import '../models/layer.dart';
 import 'package:swift_sketch/ProjectManager.dart';
-
-const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF406040);
-const Color biegecolor = Color(0xFFCBC2B4);
-const Color redcolor = Color(0xFFAB3E2B);
-const Color bluecolor = Color(0xFF11487A);
-const Color blackcolor = Color(0xFF181818);
-const Color midgreencolor = Color(0xFF3C3D37);
 
 class Drawscreen extends StatefulWidget {
   final String projectName;
@@ -150,7 +143,7 @@ class _Drawscreen extends State<Drawscreen> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: redcolor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: whitecolor,
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,
@@ -165,8 +158,8 @@ class _Drawscreen extends State<Drawscreen> {
               const Spacer(),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[300],
-                  foregroundColor: Colors.black,
+                  backgroundColor: lgreycolor,
+                  foregroundColor: blackcolor,
                   shape: const StadiumBorder(),
                   padding: const EdgeInsets.symmetric(
                     horizontal: 20,

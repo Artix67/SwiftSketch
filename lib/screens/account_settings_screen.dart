@@ -1,20 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../app_colors.dart';
 import 'package:swift_sketch/screens/homescreen.dart';
 import '/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import '/FirestoreService.dart';
 import '/SettingsManager.dart';
-
-const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF406040); // Default color for the button
-const Color biegecolor = Color(0xFFCBC2B4);
-const Color redcolor = Color(0xFFAB3E2B);
-const Color bluecolor = Color(0xFF11487A);
-const Color blackcolor = Color(0xFF181818);
-const Color midgreencolor = Color(0xFF3C3D37);
-const Color whitecolor = Color(0xFFEEEEEE);
-const Color disablecolor = Color(0xFF595959); // Dark gray color for disabled state
 
 class AccountSettingsScreen extends StatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -165,10 +156,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         builder: (context) => Scaffold(
           resizeToAvoidBottomInset: false,
           extendBodyBehindAppBar: true,
-          backgroundColor: biegecolor,
+          backgroundColor: beigecolor,
           appBar: AppBar(
             centerTitle: true,
-            backgroundColor: biegecolor,
+            backgroundColor: beigecolor,
             title: const Text('Account Settings'),
             leading: IconButton(
               onPressed: () {
@@ -191,7 +182,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                   children: [
                     const ImageIcon(
                       AssetImage("icons/userprofile.png"),
-                      color: Colors.black,
+                      color: blackcolor,
                       size: 50.0,
                     ),
                     const SizedBox(height: 10),
@@ -214,7 +205,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                       decoration: const InputDecoration(
                         hintText: 'Last Name',
                       ),
-                      onChanged: (value) => _settingsManager.updateUserSetting('lastName', value), // Save on change
+                      onChanged: (value) => _settingsManager.updateUserSetting('lastName', value),
                     ),
                     const SizedBox(height: 10),
                     const SelectionContainer.disabled(
@@ -225,14 +216,14 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                       decoration: const InputDecoration(
                         hintText: 'Email Address',
                       ),
-                      onChanged: (value) => _settingsManager.updateUserSetting('email', value), // Save on change
+                      onChanged: (value) => _settingsManager.updateUserSetting('email', value),
                     ),
                     const SizedBox(height: 10),
                     OutlinedButton(
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(200, 50),
-                        backgroundColor: _isButtonDisabled ? disablecolor : lgreencolor, // Dark gray when disabled, lgreencolor otherwise
-                        foregroundColor: _isButtonDisabled ? Colors.white : biegecolor, // White font when disabled
+                        backgroundColor: _isButtonDisabled ? disablecolor : lgreencolor,
+                        foregroundColor: _isButtonDisabled ? whitecolor : beigecolor,
                       ),
                       onPressed: _isButtonDisabled ? null : () => _changePassword(context),
                       child: Row(
@@ -244,7 +235,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                               padding: const EdgeInsets.only(left: 10),
                               child: Text(
                                 _formatTime(_secondsRemaining), // Format MM:SS
-                                style: const TextStyle(color: Colors.white),
+                                style: const TextStyle(color: whitecolor),
                               ),
                             ),
                         ],
@@ -255,7 +246,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(200, 50),
                         backgroundColor: lgreencolor,
-                        foregroundColor: biegecolor,
+                        foregroundColor: beigecolor,
                       ),
                       onPressed: () => _updateProfile(context),
                       child: const Text("Update Profile"),

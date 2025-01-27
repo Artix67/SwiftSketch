@@ -1,18 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../app_colors.dart';
 import '/screens/draw_screen.dart';
 import 'package:swift_sketch/screens/SettingsDrawer.dart';
 import 'package:swift_sketch/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import 'package:intl/intl.dart';
-
-const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF406040);
-const Color biegecolor = Color(0xFFCBC2B4);
-const Color redcolor = Color(0xFFAB3E2B);
-const Color bluecolor = Color(0xFF11487A);
-const Color blackcolor = Color(0xFF181818);
-const Color midgreencolor = Color(0xFF3C3D37);
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -67,8 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        foregroundColor: Colors.black,
+                        backgroundColor: lgreycolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -84,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: whitecolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -122,10 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final bool pinnedMode = _projectCount >= 11;
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: biegecolor,
+      backgroundColor: beigecolor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: biegecolor,
+        backgroundColor: beigecolor,
         title: Row(
           children: [
             Row(
@@ -190,7 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
               margin: const EdgeInsets.fromLTRB(30, 10, 30, 10),
               height: 50,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black, width: 2),
+                border: Border.all(color: blackcolor, width: 2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: const Padding(
@@ -265,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: OutlinedButton(
                               style: OutlinedButton.styleFrom(
                                 backgroundColor: lgreencolor,
-                                foregroundColor: Colors.white,
+                                foregroundColor: whitecolor,
                               ),
                               onPressed: _createNewProject,
                               child: const Text('New Project'),
@@ -278,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Container(
                             height: 40,
                             decoration: BoxDecoration(
-                              color: Colors.white60,
+                              color: whitecolor,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -351,8 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   style:
                                                       ElevatedButton.styleFrom(
                                                     backgroundColor: redcolor,
-                                                    foregroundColor:
-                                                        Colors.white,
+                                                    foregroundColor: whitecolor,
                                                     shape:
                                                         const StadiumBorder(),
                                                     padding: const EdgeInsets
@@ -371,9 +363,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   style:
                                                       ElevatedButton.styleFrom(
                                                     backgroundColor:
-                                                        Colors.grey[300],
+                                                        lgreycolor,
                                                     foregroundColor:
-                                                        Colors.black,
+                                                        blackcolor,
                                                     shape:
                                                         const StadiumBorder(),
                                                     padding: const EdgeInsets
@@ -423,13 +415,13 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: pinnedMode
           ? Container(
               height: 70,
-              color: biegecolor,
+              color: beigecolor,
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.only(right: 30),
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   backgroundColor: lgreencolor,
-                  foregroundColor: Colors.white,
+                  foregroundColor: whitecolor,
                 ),
                 onPressed: _createNewProject,
                 child: const Text('New Project'),
@@ -450,22 +442,23 @@ class SearchBar extends StatelessWidget {
     return Container(
       height: 40,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: whitecolor,
         border: Border.all(
-          color: Colors.black,
+          color: blackcolor,
           width: 2,
         ),
         borderRadius: BorderRadius.circular(8),
       ),
       child: TextField(
-        style: const TextStyle(fontSize: 14, color: Colors.black),
+        style: const TextStyle(fontSize: 14, color: blackcolor),
         textAlignVertical: TextAlignVertical.center,
         decoration: const InputDecoration(
           hintText: 'Search Projects',
-          hintStyle: TextStyle(color: Colors.grey),
+          hintStyle: TextStyle(color: placeholdercolor),
           border: InputBorder.none,
           isDense: true,
-          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: 8),
+          prefixIcon: Icon(Icons.search, color: placeholdercolor),
         ),
         onChanged: onSearchChanged,
       ),

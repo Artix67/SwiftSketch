@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
+import '../app_colors.dart';
 import '../drawing_canvas.dart';
 import '../drawing_shapes/drawing_shape.dart';
 import '../drawing_tools/drawing_tool.dart';
@@ -13,16 +14,8 @@ import '../drawing_tools/annotation_tool.dart';
 import 'homescreen.dart';
 import 'loginscreen.dart';
 
-const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF406040);
-const Color biegecolor = Color(0xFFCBC2B4);
-const Color redcolor = Color(0xFFAB3E2B);
-const Color bluecolor = Color(0xFF11487A);
-const Color blackcolor = Color(0xFF181818);
-const Color midgreencolor = Color(0xFF3C3D37);
-const Color whitecolor = Color(0xFFEEEEEE);
 const double iconBoxSize = 24;
-const double textBoxSizeWidth = 39;
+const double textBoxSizeWidth = 45;
 const double textBoxSizeHeight = 12;
 
 class Toolbar extends StatelessWidget {
@@ -94,8 +87,8 @@ class Toolbar extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () => Navigator.of(dialogContext).pop(false),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        foregroundColor: Colors.black,
+                        backgroundColor: lgreycolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -109,7 +102,7 @@ class Toolbar extends StatelessWidget {
                       onPressed: () => Navigator.of(dialogContext).pop(true),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: whitecolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -167,8 +160,8 @@ class Toolbar extends StatelessWidget {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        foregroundColor: Colors.black,
+                        backgroundColor: lgreycolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 12),
@@ -180,7 +173,7 @@ class Toolbar extends StatelessWidget {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: whitecolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 12),
@@ -233,8 +226,8 @@ class Toolbar extends StatelessWidget {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        foregroundColor: Colors.black,
+                        backgroundColor: lgreycolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 12),
@@ -246,7 +239,7 @@ class Toolbar extends StatelessWidget {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: whitecolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 12),
@@ -288,7 +281,7 @@ class Toolbar extends StatelessWidget {
                   width: 38,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: whitecolor,
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ),
@@ -308,7 +301,7 @@ class Toolbar extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: biegecolor,
+        backgroundColor: beigecolor,
         actions: <Widget>[
           Expanded(
               child: Row(
@@ -344,7 +337,7 @@ class Toolbar extends StatelessWidget {
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: redcolor,
                                           // Red background
-                                          foregroundColor: Colors.white,
+                                          foregroundColor: whitecolor,
                                           // White text
                                           shape: const StadiumBorder(),
                                           // Pill shape
@@ -360,8 +353,8 @@ class Toolbar extends StatelessWidget {
                                         onPressed: () =>
                                             Navigator.of(context).pop(null),
                                         style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.grey[300],
-                                          foregroundColor: Colors.black,
+                                          backgroundColor: lgreycolor,
+                                          foregroundColor: blackcolor,
                                           shape: const StadiumBorder(),
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 20,
@@ -377,7 +370,7 @@ class Toolbar extends StatelessWidget {
                                             Navigator.of(context).pop(true),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: lgreencolor,
-                                          foregroundColor: Colors.white,
+                                          foregroundColor: whitecolor,
                                           shape: const StadiumBorder(),
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 20,
@@ -600,9 +593,7 @@ class Toolbar extends StatelessWidget {
                                   children: [
                                     Icon(
                                       Icons.square_rounded,
-                                      color: fillColor == Colors.transparent
-                                          ? Colors.grey
-                                          : fillColor,
+                                      color: fillColor,
                                     ),
                                   ],
                                 ),
@@ -645,9 +636,7 @@ class Toolbar extends StatelessWidget {
                               children: [
                                 Icon(
                                   Icons.crop_square_rounded,
-                                  color: strokeColor == Colors.transparent
-                                      ? Colors.grey
-                                      : strokeColor,
+                                  color: strokeColor,
                                 ),
                               ],
                             ),
@@ -736,7 +725,7 @@ class Toolbar extends StatelessWidget {
                                         width: 12,
                                         height: 12,
                                         decoration: const BoxDecoration(
-                                          color: biegecolor,
+                                          color: beigecolor,
                                           shape: BoxShape.circle,
                                         ),
                                         child: Icon(
@@ -744,9 +733,7 @@ class Toolbar extends StatelessWidget {
                                               ? Icons.visibility
                                               : Icons.visibility_off,
                                           size: 11,
-                                          color: isGridOn
-                                              ? Colors.black
-                                              : Colors.grey,
+                                          color: isGridOn ? blackcolor : disablecolor,
                                         ),
                                       ),
                                     ),
@@ -834,7 +821,7 @@ class Toolbar extends StatelessWidget {
                                 height: iconBoxSize,
                                 child: ImageIcon(
                                   const AssetImage("icons/magnet.png"),
-                                  color: isSnapEnabled ? Colors.black : Colors.grey,
+                                  color: isSnapEnabled ? blackcolor : disablecolor,
                                 ),
                               ),
                               SizedBox(
@@ -1150,7 +1137,7 @@ class Toolbar extends StatelessWidget {
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: redcolor,
-                                      foregroundColor: Colors.white,
+                                      foregroundColor: whitecolor,
                                       shape: const StadiumBorder(),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 20,
@@ -1164,8 +1151,8 @@ class Toolbar extends StatelessWidget {
                                   const Spacer(),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey[300],
-                                      foregroundColor: Colors.black,
+                                      backgroundColor: lgreycolor,
+                                      foregroundColor: blackcolor,
                                       shape: const StadiumBorder(),
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 20,
@@ -1272,21 +1259,21 @@ class _StrokeWidthState extends State<StrokeWidth> {
   @override
   Widget build(BuildContext context) {
     return SliderTheme(
-      data: SliderThemeData(
-        inactiveTrackColor: Colors.grey[300],
-        activeTrackColor: Colors.grey[300],
-        thumbColor: Colors.grey[600],
-        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8.0),
-        overlayShape: const RoundSliderOverlayShape(overlayRadius: 2.0),
-        activeTickMarkColor: Colors.grey[600],
-        inactiveTickMarkColor: Colors.grey[600],
+      data: const SliderThemeData(
+        inactiveTrackColor: lgreycolor,
+        activeTrackColor: lgreycolor,
+        thumbColor: placeholdercolor,
+        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 8.0),
+        overlayShape: RoundSliderOverlayShape(overlayRadius: 2.0),
+        activeTickMarkColor: placeholdercolor,
+        inactiveTickMarkColor: placeholdercolor,
         trackHeight: 5,
         valueIndicatorColor: lgreencolor,
         valueIndicatorStrokeColor: lgreencolor,
-        valueIndicatorTextStyle: const TextStyle(
+        valueIndicatorTextStyle: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: Colors.white,
+          color: whitecolor,
         ),
       ),
       child: Slider.adaptive(
