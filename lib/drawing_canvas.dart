@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_sketch/app_colors.dart';
 import '/export_drawing.dart';
 import '/drawing_tools/drawing_tool.dart';
 import '/drawing_tools/freeform_tool.dart';
@@ -11,14 +12,6 @@ import '/drawing_tools/annotation_tool.dart';
 import '/drawing_shapes/drawing_shape.dart';
 import 'models/layer.dart';
 import '/drawing_tools/undo_redo_manager.dart';
-
-const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF406040);
-const Color biegecolor = Color(0xFFCBC2B4);
-const Color redcolor = Color(0xFFAB3E2B);
-const Color bluecolor = Color(0xFF11487A);
-const Color blackcolor = Color(0xFF181818);
-const Color midgreencolor = Color(0xFF3C3D37);
 
 class DrawingPainter extends CustomPainter {
   final List<Layer> layers;
@@ -89,7 +82,7 @@ class DrawingPainter extends CustomPainter {
 
           final textSpan = TextSpan(
             text: shape.annotation,
-            style: const TextStyle(color: Colors.black),
+            style: const TextStyle(color: blackcolor),
           );
 
           final textPainter = TextPainter(
@@ -104,7 +97,7 @@ class DrawingPainter extends CustomPainter {
           while (fontSize > minFontSize) {
             textPainter.text = TextSpan(
               text: shape.annotation,
-              style: TextStyle(color: Colors.black, fontSize: fontSize),
+              style: TextStyle(color: blackcolor, fontSize: fontSize),
             );
 
             textPainter.layout(maxWidth: bounds.width - paddingReduction);
@@ -507,7 +500,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                     const SizedBox(height: 8.0),
                     const Text(
                       "If your text box ends up too small, try dragging the annotation tool to create a larger box.",
-                      style: TextStyle(fontSize: 12.0, color: Colors.grey),
+                      style: TextStyle(fontSize: 14.0, color: disablecolor),
                     ),
                   ],
                 ),
@@ -518,8 +511,8 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                   children: [
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.grey[300],
-                        foregroundColor: Colors.black,
+                        backgroundColor: lgreycolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -533,7 +526,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: Colors.white,
+                        foregroundColor: whitecolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,

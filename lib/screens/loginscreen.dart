@@ -1,18 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:swift_sketch/screens/draw_screen.dart';
+import '../app_colors.dart';
 import '/FirebaseAuthService.dart';
 import 'create_account_screen.dart';
 import 'homescreen.dart';
-
-const Color dgreencolor = Color(0xFF181C14);
-const Color lgreencolor = Color(0xFF406040);
-const Color biegecolor = Color(0xFFCBC2B4);
-const Color redcolor = Color(0xFFAB3E2B);
-const Color bluecolor = Color(0xFF11487A);
-const Color blackcolor = Color(0xFF181818);
-const Color midgreencolor = Color(0xFF3C3D37);
-const Color whitecolor = Color(0xFFEEEEEE);
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -95,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: biegecolor,
+      backgroundColor: beigecolor,
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           Row(
@@ -166,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: OutlinedButton.styleFrom(
                         minimumSize: const Size(300, 40),
                         backgroundColor: lgreencolor,
-                        foregroundColor: Colors.white,),
+                        foregroundColor: whitecolor,),
                     onPressed: _signIn,
                     child: const Text("Sign In"),
                   ),
@@ -174,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: OutlinedButton.styleFrom(
                         minimumSize: const Size(300, 40),
                         backgroundColor: lgreencolor,
-                        foregroundColor: Colors.white,),
+                        foregroundColor: whitecolor,),
                     onPressed: () async {
                       bool proceedAsGuest = await showDialog(
                         context: context,
@@ -190,8 +182,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 children: [
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey[300],
-                                      foregroundColor: Colors.black,
+                                      backgroundColor: lgreycolor,
+                                      foregroundColor: blackcolor,
                                       shape: const StadiumBorder(),
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 20, vertical: 12),
@@ -202,8 +194,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   const Spacer(),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.grey[300],
-                                      foregroundColor: Colors.black,
+                                      backgroundColor: lgreycolor,
+                                      foregroundColor: blackcolor,
                                       shape: const StadiumBorder(),
                                       padding: const EdgeInsets.symmetric(
                                           horizontal: 20, vertical: 12),
