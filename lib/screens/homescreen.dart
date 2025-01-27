@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:swift_sketch/screens/account_settings_screen.dart';
 import '../app_colors.dart';
 import '/screens/draw_screen.dart';
 import 'package:swift_sketch/screens/SettingsDrawer.dart';
-import 'package:swift_sketch/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import 'package:intl/intl.dart';
 
@@ -150,20 +150,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 300,
                     child: SearchBar(onSearchChanged: _updateSearchQuery),
                   ),
-                  const SizedBox(width: 20),
+                  // const SizedBox(width: 20),
                   //TODO: SETTINGS BUTTON
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) {
-                          return const SettingsScreen();
-                        }),
-                      );
-                    },
-                    tooltip: 'Settings',
-                    icon: const ImageIcon(AssetImage("icons/settings.png")),
-                  ),
+                  // IconButton(
+                  //   onPressed: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(builder: (context) {
+                  //         return const SettingsDrawer();
+                  //       }),
+                  //     );
+                  //   },
+                  //   tooltip: 'Settings',
+                  //   icon: const ImageIcon(AssetImage("icons/settings.png")),
+                  // ),
                 ],
               ),
             ),
@@ -172,9 +172,11 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(onPressed: (){
             _scaffoldKey.currentState!.openEndDrawer();
-          }, icon: const ImageIcon(AssetImage("icons/settings.png")))
+          }, icon: const ImageIcon(AssetImage("icons/settings.png"))),
+          const SizedBox(width: 20)
         ],
       ),
+      endDrawer: const AccountSettingsScreen(),
       body: SafeArea(
         child: Column(
           children: [
@@ -184,15 +186,22 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 50,
               decoration: BoxDecoration(
                 border: Border.all(color: blackcolor, width: 2),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
               ),
               child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
                   children: [
-                    Text("Project Name"),
-                    Spacer(),
-                    Text("Date"),
+                    SizedBox(
+                        width: 500,
+                        child: Text("Project Name")
+                    ),
+                    SizedBox(
+                      width: 300,
+                      child: Text("Date",
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
                     Spacer(),
                     Text("Actions"),
                   ],
@@ -272,21 +281,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 40,
                             decoration: BoxDecoration(
                               color: whitecolor,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                             ),
                             child: Row(
                               children: [
                                 const SizedBox(width: 10),
                                 SizedBox(
-                                  width: 250,
-                                  child: Text(project['name']),
+                                  width: 500,
+                                  child: Text(project['name'])
                                 ),
-                                const Spacer(),
                                 SizedBox(
-                                  width: 250,
+                                  width: 300,
                                   child: Text(
                                     formatDateTime(project[
                                         'date']),
+                                    textAlign: TextAlign.left,
                                   ),
                                 ),
                                 const Spacer(),
