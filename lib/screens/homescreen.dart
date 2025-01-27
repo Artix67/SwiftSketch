@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../app_colors.dart';
 import '/screens/draw_screen.dart';
+import 'package:swift_sketch/screens/SettingsDrawer.dart';
 import 'package:swift_sketch/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import 'package:intl/intl.dart';
@@ -12,7 +13,7 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 class _HomeScreenState extends State<HomeScreen> {
   int _projectCount = 0;
   String _searchQuery = '';
@@ -113,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final bool pinnedMode = _projectCount >= 11;
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: beigecolor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -167,6 +169,11 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(onPressed: (){
+            _scaffoldKey.currentState!.openEndDrawer();
+          }, icon: const ImageIcon(AssetImage("icons/settings.png")))
+        ],
       ),
       body: SafeArea(
         child: Column(
