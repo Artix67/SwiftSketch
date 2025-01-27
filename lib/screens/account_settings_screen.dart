@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:swift_sketch/screens/homescreen.dart';
 import '/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
 import '/FirestoreService.dart';
@@ -123,7 +124,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
-                  return const SettingsScreen();
+                  return const HomeScreen();
                 }),
               );
             },
@@ -132,57 +133,131 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         ),
         body: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints.expand(height: 500, width: 500),
-            child: SizedBox(
-              child: Column(
+            constraints: const BoxConstraints.expand(height: 475, width: 450),
+            child: Container(
+              decoration: BoxDecoration(
+              color: whitecolor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
+                  const SizedBox(height: 30,),
                   const ImageIcon(
                     AssetImage("icons/userprofile.png"),
                     color: Colors.black,
                     size: 50.0,
                   ),
                   const SizedBox(height: 10),
-                  const SelectionContainer.disabled(
-                    child: Text('First Name:'),
-                  ),
-                  TextField(
-                    controller: _firstNameController,
-                    decoration: const InputDecoration(
-                      hintText: 'First Name',
+
+                   Container(
+                    width: 300,
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                             SizedBox(width: 8,),
+                             SelectionContainer.disabled(
+                              child: Text('First Name:'),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: 300,
+                          child: TextField(
+                            maxLines: 1,
+                            controller: _firstNameController,
+                            decoration:  InputDecoration(
+                              hintText: 'First Name',
+                              contentPadding: EdgeInsets.all(8),
+                              border: OutlineInputBorder(),
+                            ),
+                            onChanged: (value) => _settingsManager.updateUserSetting('firstName', value), // Save on change
+                          ),
+                        ),
+                      ],
                     ),
-                    onChanged: (value) => _settingsManager.updateUserSetting('firstName', value), // Save on change
                   ),
+
                   const SizedBox(height: 10),
-                  const SelectionContainer.disabled(
-                    child: Text('Last Name:'),
-                  ),
-                  TextField(
-                    controller: _lastNameController,
-                    decoration: const InputDecoration(
-                      hintText: 'Last Name',
+
+                  Container(
+                    width: 300,
+                    child: Column(
+                      children: [
+                        const Row(
+                          children: [
+                            SizedBox(width: 8,),
+                            SelectionContainer.disabled(
+                              child: Text('Last Name:'),
+                            ),
+                        ],),
+                        SizedBox(
+                          width: 300,
+                          child: TextField(
+                            maxLines: 1,
+                            controller: _lastNameController,
+                            decoration: const InputDecoration(
+                              hintText: 'Last Name',
+                              contentPadding: EdgeInsets.all(8),
+                              border: OutlineInputBorder(),
+                            ),
+                            onChanged: (value) => _settingsManager.updateUserSetting('lastName', value), // Save on change
+                          ),
+                        ),
+                      ],
                     ),
-                    onChanged: (value) => _settingsManager.updateUserSetting('lastName', value), // Save on change
                   ),
+
+
+
+
                   const SizedBox(height: 10),
-                  const SelectionContainer.disabled(
-                    child: Text('Email Address:'),
-                  ),
-                  TextField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      hintText: 'Email Address',
+
+                  Container(
+                    width: 300,
+                    child:  Column(
+                      children: [
+                        const Row(
+                          children: [
+                            SizedBox(width: 8,),
+                            SelectionContainer.disabled(
+                              child: Text('Email Address:'),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          width: 300,
+                          child: TextField(
+                            maxLines: 1,
+                            controller: _emailController,
+                            decoration: const InputDecoration(
+                              hintText: 'Email Address',
+                              contentPadding: EdgeInsets.all(8),
+                              border: OutlineInputBorder(),
+                            ),
+                            onChanged: (value) => _settingsManager.updateUserSetting('email', value), // Save on change
+                          ),
+                        ),
+                      ],
                     ),
-                    onChanged: (value) => _settingsManager.updateUserSetting('email', value), // Save on change
                   ),
+
                   const SizedBox(height: 10),
                   OutlinedButton(
-                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
+                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50),
+                        backgroundColor: lgreencolor,
+                      foregroundColor: biegecolor
+                    ),
+
                     onPressed: _changePassword,
                     child: const Text("Change Password"),
                   ),
                   const SizedBox(height: 10),
                   OutlinedButton(
-                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50)),
+                    style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50),
+                        backgroundColor: lgreencolor,
+                        foregroundColor: biegecolor
+                    ),
                     onPressed: _updateProfile,
                     child: const Text("Update Profile"),
                   ),

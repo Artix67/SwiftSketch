@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:swift_sketch/screens/SettingsDrawer.dart';
 import '/screens/draw_screen.dart';
 import 'package:swift_sketch/screens/settingsscreen.dart';
 import '/FirebaseAuthService.dart';
@@ -19,7 +20,7 @@ class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   final FirebaseAuthService _authService = FirebaseAuthService(); // Initialize the auth service
@@ -87,6 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        key: _scaffoldKey,
         backgroundColor: biegecolor,
         appBar: AppBar(
           backgroundColor: biegecolor,
@@ -121,24 +123,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: SearchBar(onSearchChanged: _updateSearchQuery),
                     ),
                     const SizedBox(width: 20),
-                    IconButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            return const SettingsScreen();
-                          }),
-                        );
-                      },
-                      tooltip: 'Settings',
-                      icon: const ImageIcon(AssetImage("icons/settings.png")),
-                    ),
                   ],
                 ),
               ),
             ],
+
           ),
+          actions: [
+              IconButton(onPressed: (){
+                _scaffoldKey.currentState!.openEndDrawer();
+              }, icon: const ImageIcon(AssetImage("icons/settings.png")))
+          ],
         ),
+        endDrawer: SettingsDrawer(),
         body: Column(
           children: <Widget>[
             Padding(
