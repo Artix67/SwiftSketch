@@ -440,7 +440,7 @@ class SearchBar extends StatelessWidget {
           color: blackcolor,
           width: 2,
         ),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: TextField(
         style: const TextStyle(fontSize: 14, color: blackcolor),
