@@ -34,6 +34,7 @@ class _Drawscreen extends State<Drawscreen> {
   final double _iconSize = 1.25;
   final double _iconLabelSize = 8;
   final double _spacerSize = 1;
+  late bool isGuest;
 
   final ValueNotifier<List<Layer>> _layersNotifier =
       ValueNotifier([Layer(id: "1", name: "Layer 1", shapes: [])]);
@@ -43,6 +44,7 @@ class _Drawscreen extends State<Drawscreen> {
   @override
   void initState() {
     super.initState();
+    isGuest = widget.isGuest;
     _loadProject();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_layersNotifier.value.isNotEmpty) {
@@ -53,6 +55,12 @@ class _Drawscreen extends State<Drawscreen> {
     if (widget.exportImmediately) {
       _triggerExport();
     }
+  }
+
+  void updateGuestStatus() {
+    setState(() {
+      isGuest = false;
+    });
   }
 
   void _triggerExport() {
@@ -218,7 +226,8 @@ class _Drawscreen extends State<Drawscreen> {
           iconLabelSize: _iconLabelSize,
           spacerSize: _spacerSize,
           name: widget.projectName,
-          isGuest: widget.isGuest,
+          isGuest: isGuest,
+          updateGuestStatus: updateGuestStatus,
         ),
       ),
       body: Row(

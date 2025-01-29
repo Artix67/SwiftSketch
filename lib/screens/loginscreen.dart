@@ -127,8 +127,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text("Welcome",
-                              style: TextStyle(fontSize: 24)),
+                          Text("Welcome", style: TextStyle(fontSize: 24)),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -233,7 +232,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     actions: [
                                       Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.end,
+                                            MainAxisAlignment.end,
                                         children: [
                                           ElevatedButton(
                                             style: ElevatedButton.styleFrom(
@@ -241,13 +240,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                               foregroundColor: blackcolor,
                                               shape: const StadiumBorder(),
                                               padding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 20,
-                                                  vertical: 12),
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 12),
                                             ),
                                             onPressed: () =>
                                                 Navigator.of(context).pop(true),
-                                            // Cancel
                                             child: const Text("Proceed"),
                                           ),
                                           const Spacer(),
@@ -257,16 +255,37 @@ class _LoginScreenState extends State<LoginScreen> {
                                               foregroundColor: blackcolor,
                                               shape: const StadiumBorder(),
                                               padding:
-                                              const EdgeInsets.symmetric(
-                                                  horizontal: 20,
-                                                  vertical: 12),
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 12),
                                             ),
                                             onPressed: () =>
                                                 Navigator.of(context)
                                                     .pop(false),
-                                            // Cancel
                                             child: const Text("Cancel"),
                                           ),
+                                          const SizedBox(width: 10,),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: lgreencolor,
+                                              foregroundColor: blackcolor,
+                                              shape: const StadiumBorder(),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 12),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                                  return const CreateAccountScreen();
+                                                }),
+                                              );
+                                            },
+                                            child: const Text("Create Account"),
+                                          )
                                         ],
                                       ),
                                     ],
@@ -307,7 +326,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                           ),
-
                         ],
                       ),
                     ],

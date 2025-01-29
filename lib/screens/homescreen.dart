@@ -297,8 +297,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             return Container(
                               margin: const EdgeInsets.fromLTRB(10, 10, 10, 20),
                               alignment: Alignment.centerRight,
-                              child: OutlinedButton(
-                                style: OutlinedButton.styleFrom(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
                                   backgroundColor: lgreencolor,
                                   foregroundColor: blackcolor,
                                 ),
@@ -461,8 +461,8 @@ class _HomeScreenState extends State<HomeScreen> {
               color: beigecolor,
               alignment: Alignment.centerRight,
               padding: const EdgeInsets.only(right: 30),
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
                   backgroundColor: lgreencolor,
                   foregroundColor: blackcolor,
                 ),

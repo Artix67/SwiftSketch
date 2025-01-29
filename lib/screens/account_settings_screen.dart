@@ -27,12 +27,16 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
   int _secondsRemaining = 300;
   Timer? _timer;
 
+  bool isEditingFirstName = false;
+  bool isEditingLastName = false;
+
   @override
   void initState() {
     super.initState();
     _loadUserData();
   }
 
+  //TODO: Load User Data
   void _loadUserData() async {
     final user = _authService.auth.currentUser;
     if (user != null) {
@@ -52,6 +56,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     }
   }
 
+  //TODO: Update Profile
   void _updateProfile(BuildContext context) async {
     final user = _authService.auth.currentUser;
     if (user != null) {
@@ -99,6 +104,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     }
   }
 
+  //TODO: Change Password
   void _changePassword(BuildContext context) async {
     final user = _authService.auth.currentUser;
     if (user != null) {
@@ -109,7 +115,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text(
-                  'An email has been sent to your email. Wait 5 minutes before clicking again.'),
+                  'An reset link has been sent to your email. Wait 1 minute before clicking again.'),
               duration: Duration(seconds: 5), // Toast duration
             ),
           );
@@ -118,7 +124,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
         // Disable the button and start the timer
         setState(() {
           _isButtonDisabled = true;
-          _secondsRemaining = 300;
+          _secondsRemaining = 60;
         });
 
         _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -147,12 +153,148 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
     }
   }
 
+  //TODO: Format Time
   String _formatTime(int seconds) {
     final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
     final secs = (seconds % 60).toString().padLeft(2, '0');
     return '$minutes:$secs';
   }
 
+  //TODO: First Name Text Field
+  Widget _buildFirstNameField() {
+    return isEditingFirstName
+        ? Container(
+      height: 40,
+      width: 350,
+      decoration: BoxDecoration(
+        color: whitecolor,
+        border: Border.all(
+          color: blackcolor,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: TextField(
+        controller: _firstNameController,
+        style: const TextStyle(fontSize: 14, color: blackcolor),
+        textAlignVertical: TextAlignVertical.center,
+        obscureText: false,
+        decoration: const InputDecoration(
+          hintText: "First Name",
+          hintStyle: TextStyle(color: placeholdercolor),
+          border: InputBorder.none,
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        ),
+        onChanged: (value) =>
+            _settingsManager.updateUserSetting('firstName', value),
+        onSubmitted: (_) {
+          setState(() {
+            isEditingFirstName = false;
+          });
+        },
+      ),
+    )
+        : Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          _firstNameController.text.isNotEmpty ? _firstNameController.text : "First Name",
+          style: const TextStyle(fontSize: 16, color: blackcolor),
+        ),
+        const Spacer(),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              isEditingFirstName = true;
+            });
+          },
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: const Text(
+            "Edit",
+            style: TextStyle(
+              color: bluecolor,
+              decoration: TextDecoration.underline,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  //TODO: Last Name Text Field
+  Widget _buildLastNameField() {
+    return isEditingLastName
+        ? Container(
+      height: 40,
+      width: 350,
+      decoration: BoxDecoration(
+        color: whitecolor,
+        border: Border.all(
+          color: blackcolor,
+          width: 2,
+        ),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: TextField(
+        controller: _lastNameController,
+        style: const TextStyle(fontSize: 14, color: blackcolor),
+        textAlignVertical: TextAlignVertical.center,
+        obscureText: false,
+        decoration: const InputDecoration(
+          hintText: "Last Name",
+          hintStyle: TextStyle(color: placeholdercolor),
+          border: InputBorder.none,
+          isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        ),
+        onChanged: (value) =>
+            _settingsManager.updateUserSetting('lastName', value),
+        onSubmitted: (_) {
+          setState(() {
+            isEditingLastName = false;
+          });
+        },
+      ),
+    )
+        : Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          _lastNameController.text.isNotEmpty ? _lastNameController.text : "First Name",
+          style: const TextStyle(fontSize: 16, color: blackcolor),
+        ),
+        const Spacer(),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              isEditingLastName = true;
+            });
+          },
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          ),
+          child: const Text(
+            "Edit",
+            style: TextStyle(
+              color: bluecolor,
+              decoration: TextDecoration.underline,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  //TODO: Widget
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -164,6 +306,10 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             'Account Settings',
             style: TextStyle(color: blackcolor, fontSize: 24),
           ),
+          Text(
+            "Account: ${_emailController.text.isNotEmpty ? _emailController.text : "Email"}",
+            style: const TextStyle(fontSize: 14, color: blackcolor),
+          ),
 
           // Taylor - This should only be here if you can upload a profile picture. Otherwise it implies that you could.
           // const ImageIcon(
@@ -173,98 +319,12 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           // ),
 
           const SizedBox(height: 20),
-          Container(
-            height: 40,
-            width: 350,
-            decoration: BoxDecoration(
-              color: whitecolor,
-              border: Border.all(
-                color: blackcolor,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: TextField(
-              controller: _firstNameController,
-              style:
-              const TextStyle(fontSize: 14, color: blackcolor),
-              textAlignVertical: TextAlignVertical.center,
-              obscureText: false,
-              decoration: const InputDecoration(
-                hintText: "First Name",
-                hintStyle: TextStyle(color: placeholdercolor),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 8),
-              ),
-              onChanged: (value) =>
-                  _settingsManager.updateUserSetting('firstName', value),
-            ),
-          ),
+          _buildFirstNameField(),
           const SizedBox(height: 10),
-          Container(
-            height: 40,
-            width: 350,
-            decoration: BoxDecoration(
-              color: whitecolor,
-              border: Border.all(
-                color: blackcolor,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: TextField(
-              controller: _lastNameController,
-              style:
-              const TextStyle(fontSize: 14, color: blackcolor),
-              textAlignVertical: TextAlignVertical.center,
-              obscureText: false,
-              decoration: const InputDecoration(
-                hintText: "Last Name",
-                hintStyle: TextStyle(color: placeholdercolor),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 8),
-              ),
-              onChanged: (value) =>
-                  _settingsManager.updateUserSetting('lastName', value),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Container(
-            height: 40,
-            width: 350,
-            decoration: BoxDecoration(
-              color: whitecolor,
-              border: Border.all(
-                color: blackcolor,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: TextField(
-              controller: _emailController,
-              style:
-              const TextStyle(fontSize: 14, color: blackcolor),
-              textAlignVertical: TextAlignVertical.center,
-              obscureText: false,
-              decoration: const InputDecoration(
-                hintText: "Email Address",
-                hintStyle: TextStyle(color: placeholdercolor),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 8),
-              ),
-              onChanged: (value) =>
-                  _settingsManager.updateUserSetting('email', value),
-            ),
-          ),
+          _buildLastNameField(),
           const SizedBox(height: 20),
-          OutlinedButton(
-            style: OutlinedButton.styleFrom(
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
               backgroundColor: lgreencolor,
               foregroundColor: blackcolor,
             ),
@@ -274,15 +334,14 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           Row(
             children: [
               TextButton(
-                onPressed: () {
-                  Navigator.push(
-                      //This will need to be changed to Navigator.pushNamedAndRemoveUntil(context, ## your routename here ##, (_) => false);
-                      context,
-                      //This will make it so that since were logging out the user can never return to this screen completely emptying the
-                      MaterialPageRoute(builder: (context) {
-                    //navigator stack
-                    return const LoginScreen();
-                  }));
+                onPressed: () async {
+                  await _authService.signOut();
+
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                        (route) => false,
+                  );
                 },
                 child: const Text(
                   'Log Out',
@@ -307,12 +366,17 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
             ],
           ),
           if (_isButtonDisabled)
+            Row(
+              children: [
+                const Spacer(),
             Padding(
-              padding: const EdgeInsets.only(left: 10),
+              padding: const EdgeInsets.only(right: 10),
               child: Text(
                 _formatTime(_secondsRemaining), // Format MM:SS
-                style: const TextStyle(color: whitecolor),
+                style: const TextStyle(color: blackcolor),
               ),
+            ),
+    ],
             ),
         ],
       ),

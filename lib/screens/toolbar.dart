@@ -1,5 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flex_color_picker/flex_color_picker.dart';
+import '../FirebaseAuthService.dart';
 import '../app_colors.dart';
 import '../drawing_canvas.dart';
 import '../drawing_shapes/drawing_shape.dart';
@@ -37,6 +39,7 @@ class Toolbar extends StatelessWidget {
   final double iconLabelSize;
   final String name;
   final bool isGuest;
+  final VoidCallback updateGuestStatus;
 
   const Toolbar({
     super.key,
@@ -58,8 +61,10 @@ class Toolbar extends StatelessWidget {
     required this.iconLabelSize,
     required this.name,
     required this.isGuest,
+    required this.updateGuestStatus,
   });
 
+  //TODO: Pick Color Dialog
   void _pickColor(BuildContext context, bool isFill) {
     Color localTempColor = isFill ? fillColor : strokeColor;
     showDialog<bool>(
@@ -264,6 +269,171 @@ class Toolbar extends StatelessWidget {
     );
   }
 
+  //TODO: Show create account dialog
+  void showCreateAccountDialog(BuildContext context, VoidCallback onSuccess) {
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+    final FirebaseAuthService authService = FirebaseAuthService();
+
+    void createAccount() async {
+      if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter both email and password.')),
+        );
+        return;
+      }
+
+      try {
+        User? user = await authService.createUserWithEmailAndPassword(
+          emailController.text,
+          passwordController.text,
+        );
+        if (user != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Account created successfully!')),
+          );
+
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+
+          updateGuestStatus();
+          onSuccess();
+        }
+      } on FirebaseAuthException catch (e) {
+        String errorMessage = 'Failed to create account';
+        if (e.code == 'too-many-requests') {
+          errorMessage = 'Too many requests. Please try again later.';
+        } else {
+          errorMessage = e.message ?? errorMessage;
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(errorMessage)),
+        );
+      }
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          backgroundColor: beigecolor,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: IntrinsicWidth(
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          'images/SSLogo.png',
+                          height: 60,
+                          width: 60,
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          "SwiftSketch",
+                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    const Row (
+                      children: [
+                        Text(
+                          "Create an Account",
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        Spacer(),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      height: 40,
+                      width: 350,
+                      decoration: BoxDecoration(
+                        color: whitecolor,
+                        border: Border.all(color: blackcolor, width: 2),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: TextField(
+                        controller: emailController,
+                        style: const TextStyle(fontSize: 14, color: blackcolor),
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: const InputDecoration(
+                          hintText: "Email",
+                          hintStyle: TextStyle(color: placeholdercolor),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      height: 40,
+                      width: 350,
+                      decoration: BoxDecoration(
+                        color: whitecolor,
+                        border: Border.all(color: blackcolor, width: 2),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: TextField(
+                        controller: passwordController,
+                        style: const TextStyle(fontSize: 14, color: blackcolor),
+                        textAlignVertical: TextAlignVertical.center,
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          hintText: "Password",
+                          hintStyle: TextStyle(color: placeholdercolor),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: lgreycolor,
+                            foregroundColor: blackcolor,
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          ),
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Cancel'),
+                        ),
+                        const Spacer(),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: lgreencolor,
+                            foregroundColor: blackcolor,
+                            shape: const StadiumBorder(),
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          ),
+                          onPressed: createAccount,
+                          child: const Text('Create'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget buildToolButton({
     required DrawingTool tool,
     required String tooltip,
@@ -322,13 +492,94 @@ class Toolbar extends StatelessWidget {
                     child: IconButton(
                       onPressed: () async {
                         if (!isGuest) {
-                          final shouldSave = await showDialog<bool>(
+                          // Check if there are unsaved changes
+                          if (drawingCanvasKey.currentState?.hasUnsavedChanges == true) {
+                            final shouldSave = await showDialog<bool>(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: const Text("Save Drawing"),
+                                  content: const Text(
+                                    "Do you want to save your current drawing before returning to the home screen?",
+                                  ),
+                                  backgroundColor: beigecolor,
+                                  actions: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () => Navigator.of(context).pop(false),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: redcolor,
+                                            foregroundColor: whitecolor,
+                                            shape: const StadiumBorder(),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                              vertical: 12,
+                                            ),
+                                          ),
+                                          child: const Text("Don't Save"),
+                                        ),
+                                        const Spacer(),
+                                        ElevatedButton(
+                                          onPressed: () => Navigator.of(context).pop(null),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: lgreycolor,
+                                            foregroundColor: blackcolor,
+                                            shape: const StadiumBorder(),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                              vertical: 12,
+                                            ),
+                                          ),
+                                          child: const Text("Cancel"),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        ElevatedButton(
+                                          onPressed: () => Navigator.of(context).pop(true),
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: lgreencolor,
+                                            foregroundColor: blackcolor,
+                                            shape: const StadiumBorder(),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                              vertical: 12,
+                                            ),
+                                          ),
+                                          child: const Text("Save"),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+
+                            if (shouldSave == true) {
+                              onSaved(); // Call the save function
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                                return const HomeScreen();
+                              }));
+                            } else if (shouldSave == false) {
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                                return const HomeScreen();
+                              }));
+                            }
+                          } else {
+                            // No unsaved changes, go back immediately
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                              return const HomeScreen();
+                            }));
+                          }
+                        } else {
+                          // If guest, prompt them to create an account before saving
+                          final shouldCreateAccount = await showDialog<bool>(
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                title: const Text("Save Drawing"),
+                                title: const Text("Save Your Drawing?"),
                                 content: const Text(
-                                  "Do you want to save your current drawing before returning to the home screen?",
+                                  "You need an account to save your drawing. Would you like to create an account now?",
                                 ),
                                 backgroundColor: beigecolor,
                                 actions: [
@@ -336,15 +587,11 @@ class Toolbar extends StatelessWidget {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       ElevatedButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
+                                        onPressed: () => Navigator.of(context).pop(false),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: redcolor,
-                                          // Red background
                                           foregroundColor: whitecolor,
-                                          // White text
                                           shape: const StadiumBorder(),
-                                          // Pill shape
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 20,
                                             vertical: 12,
@@ -354,8 +601,7 @@ class Toolbar extends StatelessWidget {
                                       ),
                                       const Spacer(),
                                       ElevatedButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(null),
+                                        onPressed: () => Navigator.of(context).pop(null),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: lgreycolor,
                                           foregroundColor: blackcolor,
@@ -367,11 +613,8 @@ class Toolbar extends StatelessWidget {
                                         ),
                                         child: const Text("Cancel"),
                                       ),
-                                      const SizedBox(width: 8),
-                                      const Spacer(),
                                       ElevatedButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(true),
+                                        onPressed: () => Navigator.of(context).pop(true),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: lgreencolor,
                                           foregroundColor: blackcolor,
@@ -381,7 +624,7 @@ class Toolbar extends StatelessWidget {
                                             vertical: 12,
                                           ),
                                         ),
-                                        child: const Text("Save"),
+                                        child: const Text("Create Account"),
                                       ),
                                     ],
                                   ),
@@ -390,25 +633,19 @@ class Toolbar extends StatelessWidget {
                             },
                           );
 
-                          // Handle user's choice
-                          if (shouldSave == true) {
-                            onSaved(); // Call the save function
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return const HomeScreen();
-                            }));
-                          } else if (shouldSave == false) {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return const HomeScreen();
+                          // If the guest chooses to create an account, show the create account dialog
+                          if (shouldCreateAccount == true) {
+                            showCreateAccountDialog(context, () {
+                              updateGuestStatus();
+                              onSaved();
+                              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+                            });
+                          } else {
+                            // If they choose not to save, return to login screen
+                            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                              return const LoginScreen();
                             }));
                           }
-                          // If shouldSave is null (Cancel), do nothing
-                        } else {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return const LoginScreen();
-                          }));
                         }
                       },
                       icon: Column(
@@ -438,72 +675,86 @@ class Toolbar extends StatelessWidget {
                   ),
 
                   //TODO: SAVE BUTTON
-                  if (!isGuest)
-                    Transform.scale(
-                      scale: iconSize,
-                      child: IconButton(
-                        onPressed: () {
+                  Transform.scale(
+                    scale: iconSize,
+                    child: IconButton(
+                      onPressed: () {
+                        if (isGuest) {
+                          showCreateAccountDialog(context, () { //error: Too many positional arguments: 1 expected, but 2 found. (extra_positional_arguments at [swift_sketch] lib/screens/toolbar.dart:674)
+                            drawingCanvasKey.currentState?.onSaved();
+                            updateGuestStatus();
+                            onSaved();
+                          });
+                        } else {
+                          drawingCanvasKey.currentState?.onSaved();
+                          updateGuestStatus();
                           onSaved();
-                        },
-                        icon: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(
-                              width: iconBoxSize,
-                              height: iconBoxSize,
-                              child: ImageIcon(AssetImage("icons/save.png")),
-                            ),
-                            SizedBox(
-                              width: textBoxSizeWidth,
-                              height: textBoxSizeHeight,
-                              child: Center(
-                                child: Text(
-                                  "Save",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: iconLabelSize),
-                                ),
+                        }
+                      },
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: ImageIcon(AssetImage("icons/save.png")),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Save",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
                               ),
                             ),
-                          ],
-                        ),
-                        tooltip: "Save",
+                          ),
+                        ],
                       ),
+                      tooltip: "Save",
                     ),
+                  ),
 
                   //TODO: - EXPORT BUTTON
-                  if (!isGuest)
-                    Transform.scale(
-                      scale: iconSize,
-                      child: IconButton(
-                        icon: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(
-                              width: iconBoxSize,
-                              height: iconBoxSize,
-                              child: ImageIcon(AssetImage("icons/export2.png")),
-                            ),
-                            SizedBox(
-                              width: textBoxSizeWidth,
-                              height: textBoxSizeHeight,
-                              child: Center(
-                                child: Text(
-                                  "Export",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: iconLabelSize),
-                                ),
+                  Transform.scale(
+                    scale: iconSize,
+                    child: IconButton(
+                      icon: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(
+                            width: iconBoxSize,
+                            height: iconBoxSize,
+                            child: ImageIcon(AssetImage("icons/export2.png")),
+                          ),
+                          SizedBox(
+                            width: textBoxSizeWidth,
+                            height: textBoxSizeHeight,
+                            child: Center(
+                              child: Text(
+                                "Export",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: iconLabelSize),
                               ),
                             ),
-                          ],
-                        ),
-                        tooltip: 'Export',
-                        onPressed: () {
-                          drawingCanvasKey.currentState?.export(name);
-                        },
+                          ),
+                        ],
                       ),
+                      tooltip: 'Export',
+                      onPressed: () {
+                        if (isGuest) {
+                          showCreateAccountDialog(context, () { //error: Too many positional arguments: 1 expected, but 2 found. (extra_positional_arguments at [swift_sketch] lib/screens/toolbar.dart:738)
+                            drawingCanvasKey.currentState?.export(name);
+                          });
+                        } else {
+                          drawingCanvasKey.currentState?.export(name);
+                        }
+                      },
                     ),
+                  ),
 
                   //TODO: - UNDO BUTTON
                   Transform.scale(
@@ -737,7 +988,9 @@ class Toolbar extends StatelessWidget {
                                               ? Icons.visibility
                                               : Icons.visibility_off,
                                           size: 11,
-                                          color: isGridOn ? blackcolor : disablecolor,
+                                          color: isGridOn
+                                              ? blackcolor
+                                              : disablecolor,
                                         ),
                                       ),
                                     ),
@@ -825,7 +1078,8 @@ class Toolbar extends StatelessWidget {
                                 height: iconBoxSize,
                                 child: ImageIcon(
                                   const AssetImage("icons/magnet.png"),
-                                  color: isSnapEnabled ? blackcolor : disablecolor,
+                                  color:
+                                      isSnapEnabled ? blackcolor : disablecolor,
                                 ),
                               ),
                               SizedBox(
@@ -1111,7 +1365,10 @@ class Toolbar extends StatelessWidget {
                           const SizedBox(
                             width: iconBoxSize,
                             height: iconBoxSize,
-                            child: Icon(Icons.delete),
+                            child: Icon(
+                              Icons.delete,
+                              color: redcolor,
+                            ),
                           ),
                           SizedBox(
                             width: textBoxSizeWidth,
@@ -1119,7 +1376,8 @@ class Toolbar extends StatelessWidget {
                             child: Center(
                               child: Text(
                                 "Reset",
-                                style: TextStyle(fontSize: iconLabelSize),
+                                style: TextStyle(
+                                    fontSize: iconLabelSize, color: redcolor),
                               ),
                             ),
                           ),

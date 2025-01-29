@@ -33,4 +33,14 @@ class UndoRedoManager {
     _undoStack.add(layersToRestore.map((layer) => layer.copy()).toList());
     return layersToRestore;
   }
+
+  bool isAtInitialState() {
+    return _undoStack.length <= 1;
+  }
+
+  void setInitialState(List<Layer> currentLayers) {
+    _undoStack.clear();
+    _redoStack.clear();
+    _undoStack.add(currentLayers.map((layer) => layer.copy()).toList());
+  }
 }

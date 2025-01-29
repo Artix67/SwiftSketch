@@ -190,12 +190,15 @@ class DrawingCanvasState extends State<DrawingCanvas> {
   DrawingTool selectedTool = FreeformTool();
   List<DrawingShape> shapes = [];
   final UndoRedoManager _undoRedoManager = UndoRedoManager(); // Undo/Redo manager initialization
-  Color _fillColor = Colors.transparent;
+  Color _fillColor = Colors.white;
   Color _strokeColor = Colors.black;
   double _strokeWidth = 4.0;
   double get strokeWidth => _strokeWidth;
 
   bool get isZoomEnabled => _isZoomEnabled;
+  bool get hasUnsavedChanges {
+    return !_undoRedoManager.isAtInitialState();
+  }
 
   String getToolTypeForTool(selectedTool) {
     if (selectedTool is FreeformTool) return 'Freeform';
@@ -322,6 +325,11 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     widget.layersNotifier.value = _undoRedoManager.redo();
   }
 
+  //TODO: ON SAVED
+  void onSaved() {
+    _undoRedoManager.setInitialState(widget.layersNotifier.value);
+  }
+
   //TODO: CLEAR CANVAS
   void clearCanvas() {
     setState(() {
@@ -356,6 +364,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     });
   }
 
+  //TODO: onPan START
   void onPanStartHandler(Offset position) {
     _startPosition = position;
     final snapPoints = getSnapPoints(widget.layersNotifier.value);
@@ -370,6 +379,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     }
   }
 
+  //TODO: onPan UPDATE
   void onPanUpdateHandler(Offset position) {
     final snapPoints = getSnapPoints(widget.layersNotifier.value);
     if (selectedTool is FreeformTool) {
@@ -383,6 +393,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     }
   }
 
+  //TODO: onPan END
   void onPanEndHandler(Offset position) {
     final snapPoints = getSnapPoints(widget.layersNotifier.value);
 
@@ -474,6 +485,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
     _previewPointsNotifier.value = [];
   }
 
+  //TODO: Add Shape
   void _addShape(DrawingShape shape) {
     if (_activeLayer == null) return;
 
