@@ -101,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: whitecolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -300,7 +300,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   backgroundColor: lgreencolor,
-                                  foregroundColor: whitecolor,
+                                  foregroundColor: blackcolor,
                                 ),
                                 onPressed: _createNewProject,
                                 child: const Text('New Project'),
@@ -464,7 +464,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
                   backgroundColor: lgreencolor,
-                  foregroundColor: whitecolor,
+                  foregroundColor: blackcolor,
                 ),
                 onPressed: _createNewProject,
                 child: const Text('New Project'),

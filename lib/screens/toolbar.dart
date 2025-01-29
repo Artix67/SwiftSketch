@@ -103,7 +103,7 @@ class Toolbar extends StatelessWidget {
                       onPressed: () => Navigator.of(dialogContext).pop(true),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: whitecolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,
@@ -175,7 +175,7 @@ class Toolbar extends StatelessWidget {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: whitecolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 12),
@@ -242,7 +242,7 @@ class Toolbar extends StatelessWidget {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: whitecolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 20, vertical: 12),
@@ -374,7 +374,7 @@ class Toolbar extends StatelessWidget {
                                             Navigator.of(context).pop(true),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: lgreencolor,
-                                          foregroundColor: whitecolor,
+                                          foregroundColor: blackcolor,
                                           shape: const StadiumBorder(),
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 20,
@@ -1278,7 +1278,7 @@ class _StrokeWidthState extends State<StrokeWidth> {
         valueIndicatorTextStyle: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: whitecolor,
+          color: blackcolor,
         ),
       ),
       child: Slider.adaptive(

@@ -555,7 +555,7 @@ class DrawingCanvasState extends State<DrawingCanvas> {
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: lgreencolor,
-                        foregroundColor: whitecolor,
+                        foregroundColor: blackcolor,
                         shape: const StadiumBorder(),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 20,

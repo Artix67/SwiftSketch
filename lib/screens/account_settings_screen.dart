@@ -266,7 +266,7 @@ class _AccountSettingsScreenState extends State<AccountSettingsScreen> {
           OutlinedButton(
             style: OutlinedButton.styleFrom(
               backgroundColor: lgreencolor,
-              foregroundColor: whitecolor,
+              foregroundColor: blackcolor,
             ),
             onPressed: () => _updateProfile(context),
             child: const Text("Update Profile"),

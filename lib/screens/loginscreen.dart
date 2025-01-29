@@ -193,8 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           ElevatedButton(
                             style: OutlinedButton.styleFrom(
-                              backgroundColor: dgreencolor,
-                              foregroundColor: whitecolor,
+                              backgroundColor: lgreycolor,
+                              foregroundColor: blackcolor,
                             ),
                             onPressed: () {
                               Navigator.push(
@@ -210,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ElevatedButton(
                             style: OutlinedButton.styleFrom(
                               backgroundColor: lgreencolor,
-                              foregroundColor: whitecolor,
+                              foregroundColor: blackcolor,
                             ),
                             onPressed: _signIn,
                             child: const Text("Sign In"),

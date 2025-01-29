@@ -19,7 +19,7 @@ class SettingsDrawer extends StatelessWidget{
               OutlinedButton(
                 style: OutlinedButton.styleFrom(minimumSize: const Size(200, 50),
                     backgroundColor: lgreencolor,
-                    foregroundColor: whitecolor),
+                    foregroundColor: blackcolor),
                 onPressed: (){
                   Navigator.push(
                       context,
@@ -62,7 +62,7 @@ class SettingsDrawer extends StatelessWidget{
 Widget buildHeader() => InkWell(
   child: Container(
     padding: const EdgeInsets.fromLTRB(70, 20, 70, 20),
-    color: lgreencolor,
+    color: blackcolor,
     child: Column(crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Image.asset("icons/userprofile.png",

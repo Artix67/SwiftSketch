@@ -184,7 +184,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                           ElevatedButton(
                             style: OutlinedButton.styleFrom(
                                 backgroundColor: lgreencolor,
-                                foregroundColor: whitecolor),
+                                foregroundColor: blackcolor),
                             onPressed: _createAccount,
                             child: const Text('Create'),
                           ),

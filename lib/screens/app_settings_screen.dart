@@ -293,7 +293,7 @@ class _LineThicknessState extends State<LineThickness> {
         valueIndicatorTextStyle: TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
-          color: whitecolor,
+          color: blackcolor,
         ),
       ),
       child: Slider.adaptive(
